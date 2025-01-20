@@ -17,22 +17,9 @@
 		0FBBB8A12D3E5B7F007AD449 /* zzimtory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = zzimtory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0FBBB8B32D3E5B80007AD449 /* Exceptions for "zzimtory" folder in "zzimtory" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				App/Info.plist,
-			);
-			target = 0FBBB8A02D3E5B7F007AD449 /* zzimtory */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0FBBB8A32D3E5B7F007AD449 /* zzimtory */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				0FBBB8B32D3E5B80007AD449 /* Exceptions for "zzimtory" folder in "zzimtory" target */,
-			);
 			path = zzimtory;
 			sourceTree = "<group>";
 		};
