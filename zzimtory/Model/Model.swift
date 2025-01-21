@@ -5,6 +5,40 @@
 //  Created by t2023-m0072 on 1/21/25.
 //
 
+struct ShoppingAPIResponse {
+    let start: Int
+    let display: Int
+    let items: [Item]
+}
+
+struct Item {
+    let title: String
+    let link: String
+    let image: String
+    let price: String
+    let mallName: String
+    let productID: String
+    let productType: String
+    let brand: String
+    let maker: String
+    let category1: String
+    let category2: String
+    let category3: String
+    let category4: String
+    
+    enum CodingKeys: String, CodingKey {
+        case price = "lprice"
+        case productID = "productId"
+    }
+}
+
+struct Pocket {
+    let title: String
+    let items: [Item]
+}
+
+
+// MARK: - API Response 참고용 JSON (추후 삭제 요망)
 //{
 //    "lastBuildDate": "Tue, 21 Jan 2025 10:20:29 +0900",
 //    "total": 4832140,
