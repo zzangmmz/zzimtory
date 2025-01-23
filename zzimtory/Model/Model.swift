@@ -5,13 +5,13 @@
 //  Created by t2023-m0072 on 1/21/25.
 //
 
-struct ShoppingAPIResponse {
+struct ShoppingAPIResponse: Decodable {
     let start: Int
     let display: Int
     let items: [Item]
 }
 
-struct Item {
+struct Item: Decodable {
     let title: String
     let link: String
     let image: String
@@ -27,8 +27,19 @@ struct Item {
     let category4: String
     
     enum CodingKeys: String, CodingKey {
+        case title
+        case link
+        case image
         case price = "lprice"
+        case mallName
         case productID = "productId"
+        case productType
+        case brand
+        case maker
+        case category1
+        case category2
+        case category3
+        case category4
     }
 }
 
