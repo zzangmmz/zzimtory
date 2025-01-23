@@ -88,7 +88,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				0F53BE062D3F6C520015B260 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				0FBBB8A32D3E5B7F007AD449 /* zzimtory */,
@@ -134,7 +133,6 @@
 				0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				0FBBB8BD2D3E5E0F007AD449 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				0FD052BF2D3E6F8B00D6A3F1 /* XCRemoteSwiftPackageReference "RxSwift" */,
-				0F53BE042D3F6C410015B260 /* XCRemoteSwiftPackageReference "SwiftLint" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0FBBB8A22D3E5B7F007AD449 /* Products */;
@@ -187,13 +185,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		0F53BE062D3F6C520015B260 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 0F53BE052D3F6C520015B260 /* SwiftLintBuildToolPlugin */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		0FBBB8B52D3E5B80007AD449 /* Debug */ = {
@@ -409,14 +400,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		0F53BE042D3F6C410015B260 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/SwiftLint.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.58.2;
-			};
-		};
 		0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -444,11 +427,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0F53BE052D3F6C520015B260 /* SwiftLintBuildToolPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0F53BE042D3F6C410015B260 /* XCRemoteSwiftPackageReference "SwiftLint" */;
-			productName = "plugin:SwiftLintBuildToolPlugin";
-		};
 		0FBBB8BB2D3E5CE6007AD449 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */;

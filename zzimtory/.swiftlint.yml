@@ -1,0 +1,32 @@
+#
+#  .swiftlint.yml
+#  zzimtory
+#
+#  Created by 김하민 on 1/21/25.
+#
+
+disabled_rules: # Disable specific rules
+  - trailing_whitespace
+
+opt_in_rules: # Enable additional rules that are opt-in
+  - empty_count
+  - explicit_self
+
+# Customize specific rules
+line_length:
+  warning: 120
+
+type_name:
+  min_length: # Set minimum length for type names
+    warning: 3
+  max_length: # Set maximum length for type names
+    warning: 40
+
+excluded: # Exclude specific files or directories from linting
+  - Carthage
+  - Pods
+  - Scripts
+
+included: # Explicitly include specific files or directories
+  - Model
+  - App
