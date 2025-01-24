@@ -8,10 +8,29 @@
 import UIKit
 
 class ZTView: UIView {
-
+    
+    private let topColor = UIColor.backgroundGradientTop
+    private let bottomColor = UIColor.backgroundGradientBottom
+    
+    private lazy var gradientLayer: CAGradientLayer = {
+        let layer = CAGradientLayer()
+        
+        layer.frame = self.bounds
+        layer.startPoint = CGPoint(x: 1.0, y: 0.0)
+        layer.endPoint = CGPoint(x: 1.0, y: 1.0)
+        
+        return layer
+    }()
+    
+    private func changeGradient() {
+        // Assets의 컬러는 UIColor이므로, .cgColor 프로퍼티로 CGColor를 반환.
+        let colors = [topColor.cgColor, bottomColor.cgColor]
+        gradientLayer.colors = colors
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setBackgroundGradient()
+        layer.addSublayer(gradientLayer)
     }
     
     required init?(coder: NSCoder) {
@@ -25,38 +44,7 @@ class ZTView: UIView {
             guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else {
                 return
             }
-            setBackgroundGradient()
+            changeGradient()
         }
-    }
-}
-
-extension ZTView {
-    // MARK: - 배경 그라데이션 설정
-    private func setBackgroundGradient() {
-        
-        let topColor = UIColor.backgroundGradientTop
-        let bottomColor = UIColor.backgroundGradientBottom
-        
-        // Assets의 컬러는 UIColor이므로, .cgColor 프로퍼티로 CGColor를 반환.
-        let colors = [
-            topColor.cgColor,
-            bottomColor.cgColor
-        ]
-        
-        layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
-        
-        let gradientLayer: CAGradientLayer = {
-            let layer = CAGradientLayer()
-            
-            layer.frame = self.bounds
-            layer.colors = colors
-            layer.startPoint = CGPoint(x: 1.0, y: 0.0)
-            layer.endPoint = CGPoint(x: 1.0, y: 1.0)
-            
-            return layer
-        }()
-
-        print(self.frame)
-        layer.addSublayer(gradientLayer)
     }
 }
