@@ -16,7 +16,10 @@ extension ShoppingAPI: TargetType {
     var baseURL: URL {
         switch self {
         case .search:
-            URL(string: "https://openapi.naver.com")!
+            guard let url = URL(string: "https://openapi.naver.com") else {
+                fatalError("baseURL이 올바르지 않습니다.")
+            }
+            return url
         }
     }
     
@@ -31,15 +34,12 @@ extension ShoppingAPI: TargetType {
     var task: Moya.Task {
         switch self {
         case .search(query: let query):
-            guard let utf8Query = query.data(using: .utf8) else {
-                return .requestParameters(parameters: [:], encoding: URLEncoding.default)
-            }
-            let parameters: [String: Any] = ["query": utf8Query]
+            let parameters: [String: Any] = ["query": query]
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
         }
     }
     
-    var headers: [String : String]? {
+    var headers: [String: String]? {
         switch self {
         default:
             ["X-Naver-Client-Id": APIKey.clientID,
@@ -47,4 +47,3 @@ extension ShoppingAPI: TargetType {
         }
     }
 }
-
