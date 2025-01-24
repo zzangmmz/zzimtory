@@ -1,0 +1,12 @@
+//
+//  Config.xcconfig
+//  zzimtory
+//
+//  Created by 이명지 on 1/24/25.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+ClientID = DPftpJ7EAv4KOluVEnzx
+ClientSecret = wqguQRowMS
