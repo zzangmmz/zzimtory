@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Client ID</key>
+	<key>ClientID</key>
 	<string>DPftpJ7EAv4KOluVEnzx</string>
-	<key>Client Secret</key>
+	<key>ClientSecret</key>
 	<string>G7XwJd1Oyh</string>
 	<key>CFBundleExecutable</key>
 	<string>zzimtory</string>
