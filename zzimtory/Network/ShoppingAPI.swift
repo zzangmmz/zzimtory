@@ -31,7 +31,10 @@ extension ShoppingAPI: TargetType {
     var task: Moya.Task {
         switch self {
         case .search(query: let query):
-            let parameters: [String: Any] = ["query": query.utf8]
+            guard let utf8Query = query.data(using: .utf8) else {
+                return .requestParameters(parameters: [:], encoding: URLEncoding.default)
+            }
+            let parameters: [String: Any] = ["query": utf8Query]
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
         }
     }
