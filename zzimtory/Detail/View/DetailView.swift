@@ -13,16 +13,13 @@ final class DetailView: UIView {
     // 뒤로가기 버튼
     private let backButton: UIButton = {
         let button = UIButton()
-        // 원형 배경 뷰 생성
         button.backgroundColor = .systemBackground.withAlphaComponent(0.8)
-        button.layer.cornerRadius = 20 // 원하는 크기의 절반
+        button.layer.cornerRadius = 20
         
-        // 화살표 이미지 설정
         let arrowConfig = UIImage.SymbolConfiguration(pointSize: 15, weight: .medium)
         button.setImage(UIImage(systemName: "chevron.left", withConfiguration: arrowConfig), for: .normal)
         button.tintColor = .black
         
-        // 그림자 효과
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOffset = CGSize(width: 0, height: 2)
         button.layer.shadowRadius = 4
