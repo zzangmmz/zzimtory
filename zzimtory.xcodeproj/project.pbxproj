@@ -257,6 +257,8 @@
 		};
 		0FBBB8B72D3E5B80007AD449 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 0FBBB8A32D3E5B7F007AD449 /* zzimtory */;
+			baseConfigurationReferenceRelativePath = Network/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
