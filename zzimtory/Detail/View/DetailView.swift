@@ -16,8 +16,8 @@ final class DetailView: UIView {
         button.backgroundColor = .systemBackground.withAlphaComponent(0.8)
         button.layer.cornerRadius = 20
         
-        let arrowConfig = UIImage.SymbolConfiguration(pointSize: 15, weight: .medium)
-        button.setImage(UIImage(systemName: "chevron.left", withConfiguration: arrowConfig), for: .normal)
+        let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .medium)
+        button.setImage(UIImage(systemName: "chevron.left", withConfiguration: config), for: .normal)
         button.tintColor = .black
         
         button.layer.shadowColor = UIColor.black.cgColor
@@ -36,13 +36,12 @@ final class DetailView: UIView {
     }()
     
     // 브랜드
-    private let brandLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 13, weight: .medium)
-        label.textColor = .label
-        label.textAlignment = .left
-        label.text = "브랜드명"
-        return label
+    private let brandButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("브랜드명 >", for: .normal)
+        button.setTitleColor(.black900Zt, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 13, weight: .medium)
+        return button
     }()
     
     // 상품명
@@ -68,21 +67,40 @@ final class DetailView: UIView {
     // 공유 버튼
     private let shareButton: UIButton = {
         let button = UIButton()
-        button.setTitle("공유", for: .normal)
+        button.backgroundColor = .systemBackground.withAlphaComponent(0.8)
+        button.layer.cornerRadius = 20
+        
+        let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .medium)
+        button.setImage(UIImage(systemName: "square.and.arrow.up", withConfiguration: config), for: .normal)
+        button.tintColor = .black
+        
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowRadius = 4
+        button.layer.shadowOpacity = 0.2
+        
         return button
     }()
     
     // 웹사이트 이동 버튼
     private let websiteButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Visit Website", for: .normal)
+        button.setTitle("웹사이트 이동", for: .normal)
+        button.backgroundColor = .white100Zt
+        button.layer.cornerRadius = 10
+        button.setTitleColor(.black900Zt, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         return button
     }()
     
     // 저장 버튼
     private let saveButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Save", for: .normal)
+        button.setTitle("주머니에 넣기", for: .normal)
+        button.backgroundColor = .white100Zt
+        button.layer.cornerRadius = 10
+        button.setTitleColor(.black900Zt, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         return button
     }()
     
@@ -102,7 +120,7 @@ final class DetailView: UIView {
     }()
     
     private lazy var brandStackView = {
-        let stackView = UIStackView(arrangedSubviews: [brandLabel, shareButton])
+        let stackView = UIStackView(arrangedSubviews: [brandButton, shareButton])
         stackView.axis = .horizontal
         stackView.spacing = 10
         stackView.alignment = .center
