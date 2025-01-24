@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ClientID</key>
-	<string>$(ClientID)</string>
-	<key>ClientSecret</key>
-	<string>$(ClientSecret)</string>
 	<key>CFBundleExecutable</key>
 	<string>zzimtory</string>
 	<key>CFBundleIdentifier</key>
@@ -16,6 +12,10 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>ClientID</key>
+	<string>$(ClientID)</string>
+	<key>ClientSecret</key>
+	<string>$(ClientSecret)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -35,6 +35,8 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UILaunchStoryboardName</key>
+	<string>zzimtory/App/LaunchScreen</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
