@@ -9,12 +9,11 @@ import UIKit
 import SnapKit
 
 class DetailViewController: UIViewController {
-    private var detailView = DetailView()
+    private var detailView = DetailView(frame: view.frame)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view = detailView
-        view.backgroundColor = .systemGray
     }
 }

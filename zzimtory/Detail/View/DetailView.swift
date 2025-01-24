@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class DetailView: UIView {
+final class DetailView: ZTView {
     
     // 뒤로가기 버튼
     private let backButton: UIButton = {
