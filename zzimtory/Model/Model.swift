@@ -48,7 +48,6 @@ struct Pocket {
     let items: [Item]
 }
 
-
 // MARK: - API Response 참고용 JSON (추후 삭제 요망)
 //{
 //    "lastBuildDate": "Tue, 21 Jan 2025 10:20:29 +0900",
