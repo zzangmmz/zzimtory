@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>ClientID</key>
-	<string>DPftpJ7EAv4KOluVEnzx</string>
+	<string>$(ClientID)</string>
 	<key>ClientSecret</key>
-	<string>G7XwJd1Oyh</string>
+	<string>$(ClientSecret)</string>
 	<key>CFBundleExecutable</key>
 	<string>zzimtory</string>
 	<key>CFBundleIdentifier</key>
