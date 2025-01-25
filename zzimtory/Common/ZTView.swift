@@ -41,9 +41,7 @@ class ZTView: UIView {
         super.traitCollectionDidChange(previousTraitCollection)
         
         if #available(iOS 13.0, *) {
-            guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else {
-                return
-            }
+            guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else { return }
             changeGradient()
         }
     }
