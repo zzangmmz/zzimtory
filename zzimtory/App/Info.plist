@@ -12,6 +12,10 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>ClientID</key>
+	<string>$(ClientID)</string>
+	<key>ClientSecret</key>
+	<string>$(ClientSecret)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
@@ -32,7 +36,7 @@
 		</dict>
 	</dict>
 	<key>UILaunchStoryboardName</key>
-	<string>zzimtory/App/LaunchScreen.storyboard</string>
+	<string>zzimtory/App/LaunchScreen</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

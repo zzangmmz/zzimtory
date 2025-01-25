@@ -8,7 +8,7 @@
 import UIKit
 
 class ZTView: UIView {
-    
+
     private let topColor = UIColor.backgroundGradientTop
     private let bottomColor = UIColor.backgroundGradientBottom
     
