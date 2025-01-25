@@ -43,8 +43,8 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCollectionViewCell.id,
-                                                            for: indexPath) as? ItemCollectionViewCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCollectionViewCell.id, for: indexPath)
+                as? ItemCollectionViewCell else { return UICollectionViewCell() }
         
         cell.setCell(with: items[indexPath.item])
         
@@ -52,7 +52,6 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
     }
     
 }
-
 
 extension ItemSearchView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
