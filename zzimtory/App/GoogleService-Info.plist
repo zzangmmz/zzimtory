@@ -2,8 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>752146162744-t5km1qfgvo7ocf0nbvi3f7farf91i1ko.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.752146162744-t5km1qfgvo7ocf0nbvi3f7farf91i1ko</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCMcA4Ug1r7Aiytom6fdUD0qJKkmrnxby0</string>
+	<string>$(APIKey)</string>
 	<key>GCM_SENDER_ID</key>
 	<string>752146162744</string>
 	<key>PLIST_VERSION</key>
@@ -15,15 +19,15 @@
 	<key>STORAGE_BUCKET</key>
 	<string>zzimtory.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:752146162744:ios:d5db3ba28e7ab554d232cd</string>
 </dict>
