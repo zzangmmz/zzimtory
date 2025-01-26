@@ -12,27 +12,35 @@ final class ItemSearchView: ZTView {
     private let itemCollectionView: ItemCollectionView = .init()
     let items = DummyModel.items
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(itemCollectionView)
-        
-        itemCollectionView.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(16)
-            make.top.equalToSuperview().inset(300)
-        }
-        
-        itemCollectionView.register(ItemCollectionViewCell.self,
-                                    forCellWithReuseIdentifier: ItemCollectionViewCell.id)
-        itemCollectionView.dataSource = self
-        itemCollectionView.delegate = self
-        itemCollectionView.isScrollEnabled = true
+        setColletionView()
+        setConstraints()
     }
     
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private functions for binding/datasource
+    private func setColletionView() {
+        itemCollectionView.register(ItemCollectionViewCell.self,
+                                    forCellWithReuseIdentifier: ItemCollectionViewCell.id)
+        itemCollectionView.dataSource = self
+        itemCollectionView.delegate = self
+        itemCollectionView.isScrollEnabled = true
+        
+        addSubview(itemCollectionView)
+    }
+    
+    private func setConstraints() {
+        itemCollectionView.snp.makeConstraints { make in
+            make.bottom.horizontalEdges.equalToSuperview().inset(16)
+            make.top.equalToSuperview().inset(300)
+        }
+    }
 }
 
 extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
@@ -43,7 +51,8 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCollectionViewCell.id, for: indexPath)
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCollectionViewCell.id,
+                                                            for: indexPath)
                 as? ItemCollectionViewCell else { return UICollectionViewCell() }
         
         cell.setCell(with: items[indexPath.item])
