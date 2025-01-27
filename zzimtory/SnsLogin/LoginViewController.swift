@@ -42,6 +42,15 @@ final class LoginViewController: UIViewController {
     }
     
     private func signInWithGoogle() {
-        
+        GoogleAuthManager.shared.login(presenting: self) { [weak self] result in
+            switch result {
+            case .success(let user):
+                print(user)
+                // 로그인 성공 후 로그인 뷰컨 pop
+            case .failure(let error):
+                print(error)
+                // 사용자 예외 처리 필요
+            }
+        }
     }
 }
