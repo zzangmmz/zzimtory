@@ -9,12 +9,12 @@ import UIKit
 import SnapKit
 
 class DetailViewController: UIViewController {
-    private lazy var detailView = DetailView(frame: view.frame)
+    private var detailView: DetailView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view = detailView
+        detailView = DetailView(frame: view.frame)
+        self.view = detailView
         
         setupNavigationBar()
     }
