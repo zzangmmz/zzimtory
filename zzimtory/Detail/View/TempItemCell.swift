@@ -86,7 +86,7 @@ final class TempItemCell: UICollectionViewCell {
         
         // 가격 포맷팅
         if let price = Int(item.price) {
-            priceLabel.text = "\(price.formattedWithSeparator)원"
+            priceLabel.text = "\(price.withSeparator)원"
         }
         
         // 이미지 URL로 이미지 로드
