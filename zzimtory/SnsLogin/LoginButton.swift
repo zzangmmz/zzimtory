@@ -37,9 +37,25 @@ final class LoginButton: UIButton {
     init(type: SnsType) {
         super.init(frame: .zero)
         var config = UIButton.Configuration.filled()
-        config.attributedTitle = AttributedString("\(type.style.name)로 시작하기", attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 16, weight: .semibold)]))
-        config.image = type.style.icon
+        
+        // 에셋에 추가한 아이콘들 리사이징 필요
+        var finalImage = type.style.icon
+        if type != .apple { // 애플은 SF Symbol 사용하므로 제외
+            let size = CGSize(width: 30, height: 30)
+            UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+            type.style.icon?.draw(in: CGRect(origin: .zero, size: size))
+            finalImage = UIGraphicsGetImageFromCurrentImageContext()
+            UIGraphicsEndImageContext()
+        }
+        
+        config.attributedTitle = AttributedString("\(type.style.name)로 시작하기",
+                                                  attributes: AttributeContainer([
+                                                    .font: UIFont.systemFont(ofSize: 16, weight: .semibold)
+                                                  ]))
+        config.image = finalImage
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 20)
         config.imagePlacement = .leading
+        config.imagePadding = 10
         config.baseBackgroundColor = type.style.color
         config.baseForegroundColor = (type == .apple || type == .naver) ? .white : .black
         config.cornerStyle = .medium
