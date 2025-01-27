@@ -28,7 +28,7 @@ final class DetailView: ZTView {
         return button
     }()
     
-    // 상품명
+    // 상품명 레이블
     private let itemNameLabel: UILabel = {
         let label = UILabel()
         
@@ -39,7 +39,7 @@ final class DetailView: ZTView {
         return label
     }()
     
-    // 가격
+    // 가격 레이블
     private let priceLabel: UILabel = {
         let label = UILabel()
         
@@ -92,6 +92,7 @@ final class DetailView: ZTView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
+        // 추후 적용을 위해 주석처리
         // let image = UIImage(named: "PocketBlack", in: Bundle.main, with: config)
         
         button.setButtonDefaultImage(imageName: "tray.fill")
@@ -110,7 +111,7 @@ final class DetailView: ZTView {
         return view
     }()
     
-    // 유사 상품 Label
+    // 유사 상품 레이블
     private let similarItemLabel: UILabel = {
         let label = UILabel()
         
@@ -122,7 +123,7 @@ final class DetailView: ZTView {
         return label
     }()
     
-    // 유사한 제품
+    // 유사한 제품 컬렉션 뷰
     private let similarItemCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         
@@ -138,6 +139,7 @@ final class DetailView: ZTView {
         return collectionView
     }()
     
+    // 브랜드 버튼과 공유 버튼
     private lazy var brandStackView = {
         let stackView = UIStackView(arrangedSubviews: [brandButton, shareButton])
         
@@ -149,6 +151,7 @@ final class DetailView: ZTView {
         return stackView
     }()
     
+    // 웹사이트 버튼과 주머니 넣기 버튼
     private lazy var buttonStackView = {
         let stackView = UIStackView(arrangedSubviews: [websiteButton, saveButton])
         
@@ -160,11 +163,12 @@ final class DetailView: ZTView {
         return stackView
     }()
     
+    // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
     private lazy var topStackView = {
-        let stackView = UIStackView(arrangedSubviews: [/*backButton,*/ itemImageView,
-                                                                       brandStackView,
-                                                                       itemNameLabel,
-                                                                       priceLabel])
+        let stackView = UIStackView(arrangedSubviews: [itemImageView,
+                                                       brandStackView,
+                                                       itemNameLabel,
+                                                       priceLabel])
         stackView.axis = .vertical
         stackView.spacing = 10
         stackView.alignment = .leading
@@ -173,6 +177,7 @@ final class DetailView: ZTView {
         return stackView
     }()
     
+    // [하단 스택] 웹사이트 버튼 및 주머니 넣기 버튼 스택, 구분선, 유사상품 레이블, 유사 상품 컬렌션 뷰
     private lazy var bottomStackView = {
         let stackView = UIStackView(arrangedSubviews: [buttonStackView,
                                                        lineView,
@@ -186,6 +191,7 @@ final class DetailView: ZTView {
         return stackView
     }()
     
+    // 메인 스택 = [상단 스택] + [하단 스택]
     private lazy var mainStackView = {
         let stackView = UIStackView(arrangedSubviews: [topStackView,
                                                        bottomStackView])
@@ -237,6 +243,7 @@ final class DetailView: ZTView {
         }
     }
     
+    // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
     private func setupTopStackView() {
         topStackView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(16)
@@ -259,6 +266,7 @@ final class DetailView: ZTView {
         }
     }
     
+    // [하단 스택] 웹사이트 버튼 및 주머니 넣기 버튼 스택, 구분선, 유사상품 레이블, 유사 상품 컬렌션 뷰
     private func setupBottomStackView() {
         bottomStackView.snp.makeConstraints { make in
             make.leading.trailing.bottom.equalToSuperview().inset(16)
