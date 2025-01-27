@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F3E21BF2D475BE700CE20C1 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 0F3E21BE2D475BE700CE20C1 /* GoogleSignIn */; };
 		0FBBB8BC2D3E5CE6007AD449 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0FBBB8BB2D3E5CE6007AD449 /* SnapKit */; };
 		0FBBB8BF2D3E5E0F007AD449 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0FBBB8BE2D3E5E0F007AD449 /* FirebaseAuth */; };
 		0FBBB8C12D3E5E0F007AD449 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 0FBBB8C02D3E5E0F007AD449 /* FirebaseDatabase */; };
@@ -47,6 +48,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0FD052C32D3E6F8B00D6A3F1 /* RxSwift in Frameworks */,
+				0F3E21BF2D475BE700CE20C1 /* GoogleSignIn in Frameworks */,
 				0FBBB8C12D3E5E0F007AD449 /* FirebaseDatabase in Frameworks */,
 				0FD052C12D3E6F8B00D6A3F1 /* RxCocoa in Frameworks */,
 				0FBBB8BC2D3E5CE6007AD449 /* SnapKit in Frameworks */,
@@ -111,6 +113,7 @@
 				0FD052C22D3E6F8B00D6A3F1 /* RxSwift */,
 				0FED11E62D4369BC00B70A6F /* Moya */,
 				0FED11ED2D4378CA00B70A6F /* RxMoya */,
+				0F3E21BE2D475BE700CE20C1 /* GoogleSignIn */,
 			);
 			productName = zzimtory;
 			productReference = 0FBBB8A12D3E5B7F007AD449 /* zzimtory.app */;
@@ -145,6 +148,7 @@
 				0FBBB8BD2D3E5E0F007AD449 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				0FD052BF2D3E6F8B00D6A3F1 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				0FED11E52D4369BC00B70A6F /* XCRemoteSwiftPackageReference "Moya" */,
+				0F3E21BD2D475BE700CE20C1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0FBBB8A22D3E5B7F007AD449 /* Products */;
@@ -416,6 +420,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0F3E21BD2D475BE700CE20C1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 		0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -451,6 +463,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0F3E21BE2D475BE700CE20C1 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F3E21BD2D475BE700CE20C1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
 		0FBBB8BB2D3E5CE6007AD449 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */;
