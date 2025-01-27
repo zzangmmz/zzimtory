@@ -42,7 +42,7 @@ class MainView: UIView {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Search.."
         searchBar.searchBarStyle = .minimal
-        searchBar.searchTextField.backgroundColor = .white
+        searchBar.searchTextField.backgroundColor = .white100Zt
         return searchBar
     }()
     
