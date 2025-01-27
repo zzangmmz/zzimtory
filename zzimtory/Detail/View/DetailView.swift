@@ -160,7 +160,7 @@ final class DetailView: ZTView {
         stackView.axis = .horizontal
         stackView.spacing = 10
         stackView.alignment = .center
-        stackView.distribution = .fillEqually
+        stackView.distribution = .fill
         
         return stackView
     }()
@@ -273,6 +273,14 @@ final class DetailView: ZTView {
             button.snp.makeConstraints { make in
                 make.height.equalTo(50)
             }
+        }
+        
+        websiteButton.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.4)
+        }
+        
+        saveButton.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.6)
         }
         
         [buttonStackView, lineView, similarItemLabel, similarItemCollectionView].forEach { view in
