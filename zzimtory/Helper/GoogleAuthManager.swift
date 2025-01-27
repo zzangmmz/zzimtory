@@ -26,7 +26,7 @@ final class GoogleAuthManager {
                 return
             }
             guard let user = signInResult?.user else {
-                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "User information not found"])))
+                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "잘못된 사용자 정보입니다."])))
                 return
             }
             completion(.success(user))
