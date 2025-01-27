@@ -7,20 +7,28 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 final class ItemCardsView: UIView {
-    private let items = DummyModel.items
+    private var items: [Item] = []
     private let cardStack = SwipeCardStack()
+    private let disposeBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         addSubview(cardStack)
         cardStack.dataSource = self
+        cardStack.backgroundColor = .pink300Zt
         
         cardStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            
+            make.width.equalTo(UIScreen.main.bounds.width * 0.9)
+            make.height.equalTo(UIScreen.main.bounds.height * 0.7)
+            make.center.equalToSuperview()
         }
+        
+        backgroundColor = .blue300Zt
     }
     
     required init?(coder: NSCoder) {
@@ -31,7 +39,8 @@ final class ItemCardsView: UIView {
         let card = SwipeCard()
         
         card.swipeDirections = [.left, .right, .up]
-        card.content = UIImageView(image: UIImage(systemName: item.image))
+        card.content = UIImageView(image: UIImage(systemName: "gift.fill"))
+        card.contentMode = .scaleAspectFill
         
         let leftOverlay = UIView()
         leftOverlay.backgroundColor = .green
@@ -42,6 +51,21 @@ final class ItemCardsView: UIView {
         card.setOverlays([.left: leftOverlay, .right: rightOverlay])
         
         return card
+    }
+}
+
+extension ItemCardsView: SearchViewModelBindable {
+    func bind(to viewModel: some SearchViewModel) {
+        viewModel.searchResult.observe(on: MainScheduler.instance)
+            .subscribe(
+                onNext: { [weak self] result in
+                    self?.items.append(contentsOf: result)
+                    self?.cardStack.reloadData()
+                },
+                onError: { error in
+                    print("error: \(error)")
+                }
+            ).disposed(by: disposeBag)
     }
 }
 
