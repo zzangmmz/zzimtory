@@ -22,7 +22,7 @@ enum SnsType {
     var style: SnsStyle {
         switch self {
         case .apple:
-            return SnsStyle(name: "애플", color: UIColor(named: "appleColor"), icon: UIImage(named: "appleIcon"))
+            return SnsStyle(name: "애플", color: UIColor(named: "appleColor"), icon: UIImage(systemName: "apple.logo"))
         case .google:
             return SnsStyle(name: "구글", color: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
         case .kakao:
