@@ -11,10 +11,10 @@ import RxCocoa
 
 final class ItemSearchView: ZTView {
     
-    private let searchBar: UISearchBar = .init()
-    private let itemCollectionView: ItemCollectionView = .init()
-    private let itemSearchViewModel: ItemSearchViewModel = .init()
-    private let disposeBag: DisposeBag = .init()
+    private let searchBar = UISearchBar()
+    private let itemCollectionView = ItemCollectionView()
+    private let itemSearchViewModel = ItemSearchViewModel()
+    private let disposeBag = DisposeBag()
     
     var items: [Item] = []
     

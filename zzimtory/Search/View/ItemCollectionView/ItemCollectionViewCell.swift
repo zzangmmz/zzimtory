@@ -54,7 +54,7 @@ final class ItemCollectionViewCell: UICollectionViewCell {
     }
     
     func setCell(with item: Item) {
-        imageView.image = UIImage(systemName: item.image)
+        imageView.image = UIImage(systemName: "gift")
         priceLabel.text = item.price
         titleLabel.text = item.title
     }

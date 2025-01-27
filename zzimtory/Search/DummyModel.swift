@@ -22,6 +22,6 @@ struct DummyModel {
         Item(title: "선물4", link: "", image: "gift", price: "49,800원",
              mallName: "", productID: "", productType: "",
              brand: "", maker: "",
-             category1: "", category2: "", category3: "", category4: ""),
+             category1: "", category2: "", category3: "", category4: "")
     ]
 }
