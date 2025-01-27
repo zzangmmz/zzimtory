@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLSchemes</key>
+	<string>com.googleusercontent.apps.752146162744-07jd2lv51nmknfie41enlm1nlgf540pt</string>
+	<key>GIDClientID</key>
+	<string>$(GIDClientID)</string>
 	<key>CFBundleExecutable</key>
 	<string>zzimtory</string>
 	<key>CFBundleIdentifier</key>
