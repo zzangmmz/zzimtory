@@ -268,6 +268,7 @@ final class DetailView: ZTView {
             make.leading.trailing.bottom.equalToSuperview().inset(16)
         }
         
+        // 화면 내의 비율로 버튼 설정
         [websiteButton, saveButton].forEach { button in
             button.snp.makeConstraints { make in
                 make.height.equalTo(50)
