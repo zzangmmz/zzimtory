@@ -346,9 +346,7 @@ extension DetailView {
         
         // 이미지 URL로 이미지 로드
         if let imageUrl = URL(string: item.image) {
-            if let imageUrl = URL(string: item.image) {
-                itemImageView.loadImage(from: imageUrl)
-            }
+            itemImageView.loadImage(from: imageUrl)
         }
     }
 }
