@@ -42,7 +42,7 @@ final class LoginViewController: UIViewController {
     }
     
     private func signInWithGoogle() {
-        GoogleAuthManager.shared.login(presenting: self) { [weak self] result in
+        GoogleAuthManager.shared.login(presenting: self) { [weak self] result in    // 나중에 뷰컨 pop하기 위해서 weak self 선언해둠
             switch result {
             case .success(let user):
                 print(user)
