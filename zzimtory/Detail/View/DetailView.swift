@@ -11,11 +11,7 @@ import SnapKit
 final class DetailView: ZTView {
     
     // 상품 이미지
-    private let itemImageView: UIImageView = {
-        let imageView = UIImageView()
-                
-        return imageView
-    }()
+    private let itemImageView = UIImageView()
     
     // 브랜드 버튼
     private let brandButton: UIButton = {
