@@ -47,6 +47,19 @@ final class LoginViewController: UIViewController {
             case .success(let user):
                 print(user)
                 // 로그인 성공 후 로그인 뷰컨 pop
+                guard let idToken = user.idToken?.tokenString else { return }
+                let credential = GoogleAuthProvider.credential(
+                    withIDToken: idToken,
+                    accessToken: user.accessToken.tokenString
+                )
+                Auth.auth().signIn(with: credential) { authResult, error in
+                    if let error = error as NSError? {
+                        print("파이어베이스 인증 오류: \(error.localizedDescription)")
+                        print("에러 코드: \(error.code)")
+                        return
+                    }
+                    print("파이어베이스 인증 성공")
+                }
             case .failure(let error):
                 print(error)
                 // 사용자 예외 처리 필요
