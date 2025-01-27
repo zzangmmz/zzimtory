@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import SnapKit
 
-class MainView: UIView {
+class MainView: ZTView {
     
     let logoImageView: UIImageView = {
         let imageView = UIImageView()
@@ -42,7 +42,7 @@ class MainView: UIView {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Search.."
         searchBar.searchBarStyle = .minimal
-        searchBar.searchTextField.backgroundColor = .white100Zt
+        searchBar.searchTextField.backgroundColor = .red
         return searchBar
     }()
     

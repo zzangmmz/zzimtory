@@ -9,20 +9,18 @@ import UIKit
 
 class MainViewController: UIViewController {
     
-    private let mainView = MainView()
     
-    override func loadView() {
-        self.view = mainView
-    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupActions()
+        self.view = MainView(frame: view.frame)
+//        setupActions()
     }
     
-    private func setupActions() {
-        mainView.addPocketButton.addTarget(self, action: #selector(addPocketButtonDidTap), for: .touchUpInside)
-    }
+//    private func setupActions() {
+//        mainView!.addPocketButton.addTarget(self, action: #selector(addPocketButtonDidTap), for: .touchUpInside)
+//    }
     
     @objc private func addPocketButtonDidTap() {
         let alert = UIAlertController(title: "주머니 만들기", message: "새 주머니를 입력하세요.", preferredStyle: .alert)
