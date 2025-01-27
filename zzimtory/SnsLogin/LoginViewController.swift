@@ -10,6 +10,6 @@ import UIKit
 final class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        view = LoginView()
+        view = LoginView(frame: view.frame)
     }
 }
