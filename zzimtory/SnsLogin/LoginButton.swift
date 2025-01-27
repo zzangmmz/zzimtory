@@ -37,7 +37,7 @@ final class LoginButton: UIButton {
     init(type: SnsType) {
         super.init(frame: .zero)
         var config = UIButton.Configuration.filled()
-        config.title = "\(type.style.name)(으)로 시작하기"
+        config.attributedTitle = AttributedString("\(type.style.name)로 시작하기", attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 16, weight: .semibold)]))
         config.image = type.style.icon
         config.imagePlacement = .leading
         config.baseBackgroundColor = type.style.color
