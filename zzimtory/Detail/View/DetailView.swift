@@ -13,9 +13,7 @@ final class DetailView: ZTView {
     // 상품 이미지
     private let itemImageView: UIImageView = {
         let imageView = UIImageView()
-        
-        imageView.image = UIImage(named: "DummyImage")
-        
+                
         return imageView
     }()
     
@@ -23,7 +21,6 @@ final class DetailView: ZTView {
     private let brandButton: UIButton = {
         let button = UIButton()
         
-        button.setTitle("브랜드명 >", for: .normal)
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 13, weight: .medium)
         button.contentHorizontalAlignment = .left
@@ -38,7 +35,6 @@ final class DetailView: ZTView {
         label.font = .systemFont(ofSize: 16, weight: .medium)
         label.textColor = .label
         label.textAlignment = .left
-        label.text = "상품명"
         
         return label
     }()
@@ -50,7 +46,6 @@ final class DetailView: ZTView {
         label.font = .systemFont(ofSize: 18, weight: .bold)
         label.textColor = .label
         label.textAlignment = .left
-        label.text = "가격"
         
         return label
     }()
@@ -214,6 +209,7 @@ final class DetailView: ZTView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
+        configureWithDummyData()
     }
     
     required init?(coder: NSCoder) {
@@ -308,7 +304,7 @@ final class DetailView: ZTView {
 // MARK: - UICollectionViewDelegate, UICollectionViewDataSource
 extension DetailView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return DetailDummyItems.dummyItems.count
     }
     
     func collectionView(
@@ -320,6 +316,35 @@ extension DetailView: UICollectionViewDelegate, UICollectionViewDataSource {
             for: indexPath) as? TempItemCell else {
             return UICollectionViewCell()
         }
+        
+        let item = DetailDummyItems.dummyItems[indexPath.item]
+        cell.configureWithDummyData(with: item)
         return cell
+    }
+}
+
+extension DetailView {
+    private func configureWithDummyData() {
+        let item = DetailDummyItems.dummyItems[3]
+        
+        // 상품 이름
+        let cleanTitle = item.title.removingHTMLTags
+        itemNameLabel.text = cleanTitle
+        
+        // 브랜드/쇼핑몰 이름 설정
+        let brandText = item.brand.isEmpty ? item.mallName : item.brand
+        brandButton.setTitle("\(brandText) >", for: .normal)
+        
+        // 가격 설정
+        if let price = Int(item.price) {
+            priceLabel.text = "\(price.formattedWithSeparator)원"
+        }
+        
+        // 이미지 URL로 이미지 로드
+        if let imageUrl = URL(string: item.image) {
+            if let imageUrl = URL(string: item.image) {
+                itemImageView.loadImage(from: imageUrl)
+            }
+        }
     }
 }

@@ -12,7 +12,6 @@ final class TempItemCell: UICollectionViewCell {
     
     private let itemImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "DummyImage")
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 15
@@ -23,7 +22,6 @@ final class TempItemCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .bold)
         label.textColor = .black900Zt
-        label.text = "200000원"
         return label
     }()
     
@@ -32,7 +30,6 @@ final class TempItemCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 10, weight: .medium)
         label.textColor = .black900Zt
         label.numberOfLines = 2
-        label.text = "초기염리락리락이신발"
         return label
     }()
     
@@ -82,8 +79,19 @@ final class TempItemCell: UICollectionViewCell {
         }
     }
     
-//    func configure(with item: Item) {
-//        titleLabel.text = item.title
-//        priceLabel.text = item.price
-//    }
+    func configureWithDummyData(with item: Item) {
+        // HTML 태그 제거
+        let cleanTitle = item.title.removingHTMLTags
+        itemNameLabel.text = cleanTitle
+        
+        // 가격 포맷팅
+        if let price = Int(item.price) {
+            priceLabel.text = "\(price.formattedWithSeparator)원"
+        }
+        
+        // 이미지 URL로 이미지 로드
+        if let imageUrl = URL(string: item.image) {
+            itemImageView.loadImage(from: imageUrl)
+        }
+    }
 }
