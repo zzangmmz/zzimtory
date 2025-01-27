@@ -13,6 +13,7 @@ final class ItemSearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print("ItemSearchViewController Loaded")
+        navigationController?.navigationBar.isHidden = true
         view = ItemSearchView(frame: view.frame)
     }
     

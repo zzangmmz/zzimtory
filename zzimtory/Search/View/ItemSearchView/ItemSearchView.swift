@@ -6,12 +6,17 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class ItemSearchView: ZTView {
     
     private let searchBar: UISearchBar = .init()
     private let itemCollectionView: ItemCollectionView = .init()
-    let items = DummyModel.items
+    private let itemSearchViewModel: ItemSearchViewModel = .init()
+    private let disposeBag: DisposeBag = .init()
+    
+    var items: [Item] = []
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -20,6 +25,8 @@ final class ItemSearchView: ZTView {
         setSearchBar()
         setColletionView()
         setConstraints()
+        
+        bind(to: itemSearchViewModel)
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -60,9 +67,29 @@ final class ItemSearchView: ZTView {
     }
 }
 
+extension ItemSearchView: SearchViewModelBindable {
+    func bind(to viewModel: some SearchViewModel) {
+        viewModel.searchResult.observe(on: MainScheduler.instance)
+            .subscribe(
+                onNext: { [weak self] result in
+                    self?.items.append(contentsOf: result)
+                    self?.itemCollectionView.reloadData()
+                },
+                onError: { error in
+                    print("error: \(error)")
+                }
+            ).disposed(by: disposeBag)
+    }
+}
+
 extension ItemSearchView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
+        itemSearchViewModel.setQuery(to: searchText)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        itemSearchViewModel.search()
     }
 }
 
