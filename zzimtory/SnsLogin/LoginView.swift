@@ -9,10 +9,10 @@ import UIKit
 import SnapKit
 
 final class LoginView: ZTView {
-    private let appleLoginButton = LoginButton(type: .apple)
-    private let googleLoginButton = LoginButton(type: .google)
-    private let kakaoLoginButton = LoginButton(type: .kakao)
-    private let naverLoginButton = LoginButton(type: .naver)
+    private(set) var appleLoginButton = LoginButton(type: .apple)
+    private(set) var googleLoginButton = LoginButton(type: .google)
+    private(set) var kakaoLoginButton = LoginButton(type: .kakao)
+    private(set) var naverLoginButton = LoginButton(type: .naver)
     
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [appleLoginButton,
