@@ -9,6 +9,7 @@ import UIKit
 
 final class ItemSearchView: ZTView {
     
+    private let searchBar: UISearchBar = .init()
     private let itemCollectionView: ItemCollectionView = .init()
     let items = DummyModel.items
     
@@ -16,6 +17,7 @@ final class ItemSearchView: ZTView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        setSearchBar()
         setColletionView()
         setConstraints()
     }
@@ -25,6 +27,17 @@ final class ItemSearchView: ZTView {
     }
     
     // MARK: - Private functions for binding/datasource
+    private func setSearchBar() {
+        searchBar.delegate = self
+        searchBar.placeholder = "검색"
+
+        searchBar.searchTextField.backgroundColor = .white100Zt
+        searchBar.searchBarStyle = .minimal
+//        searchBar.setSearchFieldBackgroundImage(UIImage(), for: .normal)
+        
+        addSubview(searchBar)
+    }
+    
     private func setColletionView() {
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: ItemCollectionViewCell.id)
@@ -36,10 +49,20 @@ final class ItemSearchView: ZTView {
     }
     
     private func setConstraints() {
+        searchBar.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
         itemCollectionView.snp.makeConstraints { make in
             make.bottom.horizontalEdges.equalToSuperview().inset(16)
-            make.top.equalToSuperview().inset(300)
+            make.top.equalTo(searchBar.snp.bottom).offset(48)
         }
+    }
+}
+
+extension ItemSearchView: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print(searchText)
     }
 }
 
