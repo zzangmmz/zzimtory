@@ -13,10 +13,23 @@ final class ItemSearchView: ZTView {
     
     private let searchBar = UISearchBar()
     private let itemCollectionView = ItemCollectionView()
+    
+    private let itemCardsView = ItemCardsView()
+    
     private let itemSearchViewModel = ItemSearchViewModel()
     private let disposeBag = DisposeBag()
     
     var items: [Item] = []
+    
+    // MARK: - Background layer
+    private lazy var dimLayer: CALayer = {
+        let layer = CALayer()
+        
+        layer.frame = self.bounds
+        layer.backgroundColor = CGColor(gray: 0.1, alpha: 0.7)
+        
+        return layer
+    }()
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -90,6 +103,10 @@ extension ItemSearchView: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         itemSearchViewModel.search()
+        layer.addSublayer(dimLayer)
+        addSubview(itemCardsView)
+        itemCardsView.bind(to: itemSearchViewModel)
+        itemCardsView.frame = self.frame
     }
 }
 

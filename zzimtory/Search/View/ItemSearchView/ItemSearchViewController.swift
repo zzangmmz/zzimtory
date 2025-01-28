@@ -15,7 +15,6 @@ final class ItemSearchViewController: UIViewController {
         print("ItemSearchViewController Loaded")
         navigationController?.navigationBar.isHidden = true
         view = ItemSearchView(frame: view.frame)
-//        view = ItemCardsView(frame: view.frame)
     }
     
 }

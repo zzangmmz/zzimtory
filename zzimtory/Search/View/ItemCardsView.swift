@@ -28,7 +28,7 @@ final class ItemCardsView: UIView {
             make.center.equalToSuperview()
         }
         
-        backgroundColor = .blue300Zt
+        backgroundColor = .clear
     }
     
     required init?(coder: NSCoder) {
@@ -39,16 +39,19 @@ final class ItemCardsView: UIView {
         let card = SwipeCard()
         
         card.swipeDirections = [.left, .right, .up]
-        card.content = UIImageView(image: UIImage(systemName: "gift.fill"))
+        card.content = ItemCardContents(item: item)
         card.contentMode = .scaleAspectFill
         
         let leftOverlay = UIView()
-        leftOverlay.backgroundColor = .green
+        leftOverlay.backgroundColor = .red
         
         let rightOverlay = UIView()
-        rightOverlay.backgroundColor = .red
+        rightOverlay.backgroundColor = .green
         
-        card.setOverlays([.left: leftOverlay, .right: rightOverlay])
+        let upOverlay = UIView()
+        upOverlay.backgroundColor = .blue400ZtPrimary
+        
+        card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
         
         return card
     }
