@@ -13,7 +13,6 @@ final class ItemCardContents: UIView {
     let item: Item
     
     // MARK: - UI components
-    
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         
@@ -88,6 +87,7 @@ final class ItemCardContents: UIView {
     }
 }
 
+// PR 올리기 전에 지울 것.
 extension UIImageView {
     func loadImage(from url: URL) {
         // URLSession을 통해 URL에서 비동기적으로 데이터를 가져오는 방법

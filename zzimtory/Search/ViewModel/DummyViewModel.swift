@@ -7,11 +7,14 @@
 
 import RxSwift
 
+// ItemSearchView, ItemCardsView와 바인딩하여 사용하는 ItemSearchViewModel입니다.
+// SearchViewModel 프로토콜에 대한 설명은 SearchViewModel+Bindable 파일에 기재되어 있습니다.
 final class ItemSearchViewModel: SearchViewModel {
+    
     let searchResult = BehaviorSubject(value: [Item]())
     
     private var query = ""
-    private let disposeBag = DisposeBag()
+    internal let disposeBag = DisposeBag()
     private let shoppingRepository = ShoppingRepository()
     
     func search() {
@@ -30,4 +33,5 @@ final class ItemSearchViewModel: SearchViewModel {
     func setQuery(to string: String) {
         query = string
     }
+    
 }

@@ -46,7 +46,7 @@ final class ItemSearchView: ZTView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Private functions for binding/datasource
+    // MARK: - Private functions
     private func setSearchBar() {
         searchBar.delegate = self
         searchBar.placeholder = "검색"
@@ -78,8 +78,11 @@ final class ItemSearchView: ZTView {
             make.top.equalTo(searchBar.snp.bottom).offset(48)
         }
     }
+    
 }
 
+// ItemSearchView를 ViewModel에 바인딩해주기 위한 프로토콜 적용입니다.
+// 자세한 설명은 SearchViewModel+Bindable 참고 바랍니다.
 extension ItemSearchView: SearchViewModelBindable {
     func bind(to viewModel: some SearchViewModel) {
         viewModel.searchResult.observe(on: MainScheduler.instance)
@@ -142,4 +145,5 @@ extension ItemSearchView: UICollectionViewDelegateFlowLayout {
 
         return CGSize(width: cellWidth, height: 200)
     }
+    
 }

@@ -31,6 +31,7 @@ final class ItemCollectionViewCell: UICollectionViewCell {
         
         return label
     }()
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         
@@ -53,13 +54,13 @@ final class ItemCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI functions
     func setCell(with item: Item) {
         imageView.image = UIImage(systemName: "gift")
         priceLabel.text = item.price
         titleLabel.text = item.title
     }
     
-    // MARK: - UI functions
     private func setUI() {
         contentView.layer.cornerRadius = 16
         contentView.backgroundColor = .white100Zt
@@ -88,5 +89,7 @@ final class ItemCollectionViewCell: UICollectionViewCell {
             make.horizontalEdges.equalTo(imageView)
             make.bottom.equalToSuperview().inset(12)
         }
+        
     }
+    
 }
