@@ -68,10 +68,10 @@ class CardStackStateManager: CardStackStateManagable {
 
   func insert(_ index: Int, at position: Int) {
     precondition(index >= 0, "Attempt to insert card at index \(index)")
-    //swiftlint:disable:next line_length
+    // swiftlint:disable:next line_length
     precondition(index <= totalIndexCount, "Attempt to insert card at index \(index), but there are only \(totalIndexCount + 1) cards after the update")
     precondition(position >= 0, "Attempt to insert card at position \(position)")
-    //swiftlint:disable:next line_length
+    // swiftlint:disable:next line_length
     precondition(position <= remainingIndices.count, "Attempt to insert card at position \(position), but there are only \(remainingIndices.count + 1) cards remaining in the stack after the update")
 
     // Increment all stored indices greater than or equal to index by 1
@@ -85,7 +85,7 @@ class CardStackStateManager: CardStackStateManagable {
 
   func delete(_ index: Int) {
     precondition(index >= 0, "Attempt to delete card at index \(index)")
-    //swiftlint:disable:next line_length
+    // swiftlint:disable:next line_length
     precondition(index < totalIndexCount, "Attempt to delete card at index \(index), but there are only \(totalIndexCount) cards before the update")
 
     swipes.removeAll { return $0.index == index }
@@ -115,7 +115,7 @@ class CardStackStateManager: CardStackStateManagable {
 
   func delete(indexAtPosition position: Int) {
     precondition(position >= 0, "Attempt to delete card at position \(position)")
-    //swiftlint:disable:next line_length
+    // swiftlint:disable:next line_length
     precondition(position < remainingIndices.count, "Attempt to delete card at position \(position), but there are only \(remainingIndices.count) cards remaining in the stack before the update")
 
     // Decrement all stored indices greater than or equal to index by 1

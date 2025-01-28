@@ -7,25 +7,14 @@
 
 import RxSwift
 
-protocol SearchViewModel {
-    var searchResult: BehaviorSubject<[Item]> { get set }
-    
-    func setQuery(to string: String)
-    func search()
-}
-
-protocol SearchViewModelBindable {
-    func bind(to viewModel: some SearchViewModel)
-}
-
 final class ItemSearchViewModel: SearchViewModel {
-    var searchResult = BehaviorSubject(value: [Item]())
+    let searchResult = BehaviorSubject(value: [Item]())
     
     private var query = ""
     private let disposeBag = DisposeBag()
     private let shoppingRepository = ShoppingRepository()
     
-    private func fetchResponse() {
+    func search() {
         shoppingRepository.fetchSearchData(query: query)
             .subscribe(
                 onSuccess: { [weak self] (result: ShoppingAPIResponse) in
@@ -40,9 +29,5 @@ final class ItemSearchViewModel: SearchViewModel {
     
     func setQuery(to string: String) {
         query = string
-    }
-    
-    func search() {
-        fetchResponse()
     }
 }

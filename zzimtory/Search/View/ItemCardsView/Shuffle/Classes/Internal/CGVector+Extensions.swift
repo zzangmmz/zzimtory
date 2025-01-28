@@ -69,32 +69,26 @@ extension CGVector {
   }
 
   static func += (lhs: inout CGVector, rhs: CGVector) {
-    // swiftlint:disable:next shorthand_operator
     lhs = lhs + rhs
   }
 
   static func -= (lhs: inout CGVector, rhs: CGVector) {
-    // swiftlint:disable:next shorthand_operator
     lhs = lhs - rhs
   }
 
   static func *= (vector: inout CGVector, scalar: CGFloat) {
-    // swiftlint:disable:next shorthand_operator
     vector = vector * scalar
   }
 
   static func *= (vector: inout CGVector, scalar: Int) {
-    // swiftlint:disable:next shorthand_operator
     vector = vector * scalar
   }
 
   static func /= (vector: inout CGVector, scalar: CGFloat) {
-    // swiftlint:disable:next shorthand_operator
     vector = vector / scalar
   }
 
   static func /= (vector: inout CGVector, scalar: Int) {
-    // swiftlint:disable:next shorthand_operator
     vector = vector / scalar
   }
 
