@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NATIVE_APP_KEY</key>
+	<string>$(NATIVE_APP_KEY)</string>
 	<key>CFBundleExecutable</key>
 	<string>zzimtory</string>
 	<key>CFBundleIdentifier</key>
@@ -27,7 +29,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kakao${NATIVE_APP_KEY}</string>
+				<string>kakao$(NATIVE_APP_KEY)</string>
 			</array>
 		</dict>
 	</array>

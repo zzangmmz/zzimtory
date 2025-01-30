@@ -22,15 +22,10 @@ struct APIKey {
         return clientSecret
     }()
     
-    static let firebase: String = {
-        guard let filePath = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
-              let plistDict = NSDictionary(contentsOfFile: filePath) as? [String: Any] else {
-            fatalError("GoogleService-Info.plist를 찾지 못했습니다.")
+    static let nativeAppKey: String = {
+        guard let appKey = Bundle.main.infoDictionary?["NATIVE_APP_KEY"] as? String else {
+            fatalError("NATIVE_APP_KEY을 읽어오지 못했습니다.")
         }
-        
-        guard let apiKey = plistDict["API_KEY"] as? String else {
-            fatalError("Firebase API Key를 받아오지 못했습니다.")
-        }
-        return apiKey
+        return appKey
     }()
 }
