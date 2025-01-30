@@ -8,11 +8,11 @@
 import Foundation
 import Moya
 
-enum NaverAPI {
+enum NaverLoginAPI {
     case getUserInfo(tokenType: String, accessToken: String)
 }
 
-extension NaverAPI: TargetType {
+extension NaverLoginAPI: TargetType {
     var baseURL: URL {
         return URL(string: "https://openapi.naver.com")!
     }
@@ -33,7 +33,7 @@ extension NaverAPI: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .getUserInfo:
+        default:
             return .requestPlain
         }
     }
