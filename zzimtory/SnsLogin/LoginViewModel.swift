@@ -17,8 +17,7 @@ final class LoginViewModel {
     }
     
     func signInWithGoogle(on viewContorller: UIViewController) {
-        let googleAuthManager = GoogleAuthManager()
-        googleAuthManager.login(presenting: viewContorller) { [weak self] result in    // 나중에 뷰컨 pop하기 위해서 weak self 선언해둠
+        GoogleAuthManager.shared.login(presenting: viewContorller) { [weak self] result in    // 나중에 뷰컨 pop하기 위해서 weak self 선언해둠
             switch result {
             case .success(let user):
                 print(user)
@@ -46,5 +45,23 @@ final class LoginViewModel {
     func signInWithKakao() {
         let kakaoAuthManager = KakaoAuthManager()
         kakaoAuthManager.login()
+    }
+    
+    func signInWithNaver() {
+        let naverAuthManager = NaverAuthManager()
+        naverAuthManager.delegate = self
+        naverAuthManager.login()
+    }
+}
+
+extension LoginViewModel: NaverAuthManagerDelegate {
+    func didFinishLogin(id: String, email: String) {
+        // 추후 로그인 이후 처리 로직 추가
+        print("로그인 성공!")
+        print("이메일: \(email)")
+    }
+    
+    func didFailLogin(with error: Error) {
+        print("로그인 실패: \(error.localizedDescription)")
     }
 }
