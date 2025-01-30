@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         FirebaseApp.configure()
         GoogleAuthManager.shared.configure()
-        KakaoSDK.initSDK(appKey: APIKey.nativeAppKey)
+        KakaoSDK.initSDK(appKey: AuthClientID.nativeAppKey)
         return true
     }
     
