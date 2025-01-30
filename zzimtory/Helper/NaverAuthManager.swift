@@ -50,11 +50,6 @@ final class NaverAuthManager: NSObject {
         provider.request(.getUserInfo(tokenType: tokenType, accessToken: accessToken)) { [weak self] result in
             switch result {
             case .success(let response):
-                
-                if let jsonString = String(data: response.data, encoding: .utf8) {
-                    print("Received JSON: \(jsonString)")
-                }
-                
                 do {
                     let naverResponse = try response.map(NaverLoginResponse.self)
                     self?.delegate?.didFinishLogin(
@@ -74,8 +69,8 @@ final class NaverAuthManager: NSObject {
     private func firebaseLogin(email: String, id: String) {
         let password = "NAVER_\(id)"
         
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] _, error in
-            if let error = error {
+        Auth.auth().signIn(withEmail: email, password: password) { _, error in
+            if let _ = error {
                 // 계정이 없는 경우 새로 생성
                 Auth.auth().createUser(withEmail: email, password: password) { _, createError in
                     if let createError = createError {
