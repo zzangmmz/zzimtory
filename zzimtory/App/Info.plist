@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>kakaokompassauth</string>
-	</array>
-	<key>GIDClientID</key>
-	<string>$(GIDClientID)</string>
 	<key>CFBundleExecutable</key>
 	<string>zzimtory</string>
 	<key>CFBundleIdentifier</key>
@@ -28,6 +22,7 @@
 				<string>com.googleusercontent.apps.752146162744-t5km1qfgvo7ocf0nbvi3f7farf91i1ko</string>
 			</array>
 		</dict>
+		<dict/>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
@@ -35,6 +30,13 @@
 	<string>$(ClientID)</string>
 	<key>ClientSecret</key>
 	<string>$(ClientSecret)</string>
+	<key>GIDClientID</key>
+	<string>$(GIDClientID)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>kakaokompassauth</string>
+		<string>kakaotalk</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
