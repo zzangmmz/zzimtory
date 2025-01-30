@@ -12,6 +12,13 @@ import GoogleSignIn
 
 final class LoginViewModel {
     
+    private let naverAuthManager: NaverAuthManager
+    
+    init() {
+        self.naverAuthManager = NaverAuthManager()
+        self.naverAuthManager.delegate = self
+    }
+    
     func signInWithApple() {
         
     }
@@ -48,15 +55,12 @@ final class LoginViewModel {
     }
     
     func signInWithNaver() {
-        let naverAuthManager = NaverAuthManager()
-        naverAuthManager.delegate = self
         naverAuthManager.login()
     }
 }
 
 extension LoginViewModel: NaverAuthManagerDelegate {
     func didFinishLogin(id: String, email: String) {
-        // 추후 로그인 이후 처리 로직 추가
         print("로그인 성공!")
         print("이메일: \(email)")
     }
