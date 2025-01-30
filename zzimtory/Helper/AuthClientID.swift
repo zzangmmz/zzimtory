@@ -15,4 +15,11 @@ struct AuthClientID {
         }
         return gid
     }()
+    
+    static let nativeAppKey: String = {
+        guard let appKey = Bundle.main.infoDictionary?["NATIVE_APP_KEY"] as? String else {
+            fatalError("NATIVE_APP_KEY을 읽어오지 못했습니다.")
+        }
+        return appKey
+    }()
 }
