@@ -6,7 +6,7 @@
 //
 
 import NaverThirdPartyLogin
-import Moya
+import RxSwift
 import FirebaseAuth
 
 protocol NaverAuthManagerDelegate: AnyObject {
@@ -17,6 +17,7 @@ protocol NaverAuthManagerDelegate: AnyObject {
 final class NaverAuthManager: NSObject {
     private let instance = NaverThirdPartyLoginConnection.getSharedInstance()
     private let repository: NaverLoginRepositoryProtocol
+    private let disposeBag = DisposeBag()
     
     weak var delegate: NaverAuthManagerDelegate?
     
@@ -46,24 +47,18 @@ final class NaverAuthManager: NSObject {
             return
         }
         
-        let provider = MoyaProvider<NaverLoginAPI>()
-        provider.request(.getUserInfo(tokenType: tokenType, accessToken: accessToken)) { [weak self] result in
-            switch result {
-            case .success(let response):
-                do {
-                    let naverResponse = try response.map(NaverLoginResponse.self)
-                    self?.delegate?.didFinishLogin(
-                        id: naverResponse.value.id,
-                        email: naverResponse.value.email
-                    )
-                    self?.firebaseLogin(email: naverResponse.value.email, id: naverResponse.value.id)
-                } catch {
-                    self?.delegate?.didFailLogin(with: error)
-                }
-            case .failure(let error):
+        repository.getUserInfo(tokenType: tokenType, accessToken: accessToken)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] response in
+                self?.delegate?.didFinishLogin(
+                    id: response.value.id,
+                    email: response.value.email
+                )
+                self?.firebaseLogin(email: response.value.email, id: response.value.id)
+            }, onFailure: { [weak self] error in
                 self?.delegate?.didFailLogin(with: error)
-            }
-        }
+            })
+            .disposed(by: disposeBag)
     }
     
     private func firebaseLogin(email: String, id: String) {
