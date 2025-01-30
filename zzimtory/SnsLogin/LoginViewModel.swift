@@ -17,7 +17,8 @@ final class LoginViewModel {
     }
     
     func signInWithGoogle(on viewContorller: UIViewController) {
-        GoogleAuthManager.shared.login(presenting: viewContorller) { [weak self] result in    // 나중에 뷰컨 pop하기 위해서 weak self 선언해둠
+        let googleAuthManager = GoogleAuthManager()
+        googleAuthManager.login(presenting: viewContorller) { [weak self] result in    // 나중에 뷰컨 pop하기 위해서 weak self 선언해둠
             switch result {
             case .success(let user):
                 print(user)
@@ -43,6 +44,7 @@ final class LoginViewModel {
     }
     
     func signInWithKakao() {
-        KakaoAuthManager.shared.login()
+        let kakaoAuthManager = KakaoAuthManager()
+        kakaoAuthManager.login()
     }
 }

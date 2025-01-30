@@ -9,10 +9,6 @@ import Foundation
 import GoogleSignIn
 
 final class GoogleAuthManager {
-    static let shared = GoogleAuthManager()
-    
-    private init() {}
-    
     /// 구글 로그인 초기 설정 메서드
     func configure() {
         GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: AuthClientID.google)

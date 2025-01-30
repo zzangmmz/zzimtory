@@ -12,10 +12,6 @@ import KakaoSDKCommon
 import FirebaseAuth
 
 final class KakaoAuthManager {
-    static let shared = KakaoAuthManager()
-    
-    private init() {}
-    
     /// 카카오 로그인.  토큰 존재 여부로 기존 로그인 여부 확인.
     func login() {
         if AuthApi.hasToken() {
