@@ -49,6 +49,9 @@
 	<string>$(GIDClientID)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>naversearchthirdlogin</string>
+		<string>naversearchapp</string>
+		<string>kakaotalk</string>
 		<string>kakaokompassauth</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
