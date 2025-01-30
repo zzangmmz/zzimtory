@@ -38,6 +38,11 @@ final class LoginViewController: UIViewController {
                 self?.viewModel.signInWithKakao()
             })
             .disposed(by: disposeBag)
+        loginView?.naverLoginButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.signInWithNaver()
+            })
+            .disposed(by: disposeBag)
     }
     
 }
