@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         KakaoSDK.initSDK(appKey: AuthClientID.nativeAppKey)
         
         let instance = NaverThirdPartyLoginConnection.getSharedInstance()
-        instance?.isNaverAppOauthEnable = true  // 네이버 앱으로 인즈
+        instance?.isNaverAppOauthEnable = true  // 네이버 앱으로 인증
         instance?.isInAppOauthEnable = true     // 사파리로 인증
         instance?.setOnlyPortraitSupportInIphone(true)  // 세로모드에서만 활성화
         
