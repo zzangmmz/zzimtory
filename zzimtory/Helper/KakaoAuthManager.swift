@@ -16,7 +16,7 @@ final class KakaoAuthManager {
     func login() {
         if AuthApi.hasToken() {
             UserApi.shared.accessTokenInfo { userInfo, error in
-                if let error = error {
+                if let _ = error {
                     // 토큰 있으나 만료된 토큰이거나, 기타 에러.
                     self.kakaoLogin()
                 } else {
@@ -37,7 +37,7 @@ final class KakaoAuthManager {
                 if let error = error {
                     print(error)
                 } else {
-                    if let token = oAuthToken {
+                    if let _ = oAuthToken {
                         print("카카오톡으로 로그인하기 성공~~")
                         self.firebaseLogin()
                     }
@@ -50,7 +50,7 @@ final class KakaoAuthManager {
                 if let error = error {
                     print(error)
                 } else {
-                    if let token = oAuthToken {
+                    if let _ = oAuthToken {
                         print("카카오 계정으로 로그인하기 성공~~")
                         self.firebaseLogin()
                     }
