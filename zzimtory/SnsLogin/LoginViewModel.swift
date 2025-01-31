@@ -17,7 +17,6 @@ final class LoginViewModel {
     init() {
         self.googleAuthManager = GoogleAuthManager()
         self.naverAuthManager = NaverAuthManager()
-        self.naverAuthManager.delegate = self
     }
     
     func signInWithApple() {
@@ -35,16 +34,5 @@ final class LoginViewModel {
     
     func signInWithNaver() {
         naverAuthManager.login()
-    }
-}
-
-extension LoginViewModel: NaverAuthManagerDelegate {
-    func didFinishLogin(id: String, email: String) {
-        print("로그인 성공!")
-        print("이메일: \(email)")
-    }
-    
-    func didFailLogin(with error: Error) {
-        print("로그인 실패: \(error.localizedDescription)")
     }
 }
