@@ -11,7 +11,7 @@ struct ShoppingAPIResponse: Decodable {
     let items: [Item]
 }
 
-struct Item: Decodable {
+struct Item: Codable {
     let title: String
     let link: String
     let image: String
