@@ -11,48 +11,59 @@ import KakaoSDKUser
 import KakaoSDKCommon
 import FirebaseAuth
 
-final class KakaoAuthManager: ThirdPartyAuthProtocol {
+final class KakaoAuthManager {
     /// 카카오 로그인.  토큰 존재 여부로 기존 로그인 여부 확인.
-    func login() {
+    private func validateToken(completion: @escaping (Bool) -> Void) {
         if AuthApi.hasToken() {
-            UserApi.shared.accessTokenInfo { userInfo, error in
+            UserApi.shared.accessTokenInfo { _, error in
                 if let _ = error {
                     // 만료된 토큰 or 기타 에러.
-                    self.kakaoLogin()
+                    completion(false)
                 } else {
                     print("유효한 토큰 존재")
+                    completion(true)
                 }
             }
         } else {
             // 토큰 없음. 로그인 필요.
-            self.kakaoLogin()
+            completion(false)
         }
     }
-    
+}
+
+extension KakaoAuthManager: ThirdPartyAuthProtocol {
     /// 웹 혹은 앱으로 카카오 로그인
-    private func kakaoLogin() {
-        // 카톡 앱으로 로그인이 가능한 경우
-        if UserApi.isKakaoTalkLoginAvailable() {
-            UserApi.shared.loginWithKakaoTalk { (oAuthToken, error ) in
-                if let error = error {
-                    print("카카오톡으로 로그인 실패: \(error)")
-                } else {
-                    if let _ = oAuthToken {
-                        print("카카오톡으로 로그인 성공")
-                        self.firebaseLogin()
+    func login() {
+        validateToken { isValid in
+            if isValid {
+                // 토큰 유효한 경우 바로 파이어베이스 로그인으로 넘어감
+                self.firebaseLogin()
+                return
+            }
+            
+            // 카톡 앱으로 로그인이 가능한 경우
+            if UserApi.isKakaoTalkLoginAvailable() {
+                UserApi.shared.loginWithKakaoTalk { (oAuthToken, error ) in
+                    if let error = error {
+                        print("카카오톡으로 로그인 실패: \(error)")
+                    } else {
+                        if let _ = oAuthToken {
+                            print("카카오톡으로 로그인 성공")
+                            self.firebaseLogin()
+                        }
                     }
                 }
             }
-        }
-        // 카톡 앱이 없는 경우 카톡 계정으로 웹 로그인
-        else {
-            UserApi.shared.loginWithKakaoAccount { (oAuthToken, error) in
-                if let error = error {
-                    print("카카오 계정으로 로그인 실패: \(error)")
-                } else {
-                    if let _ = oAuthToken {
-                        print("카카오 계정으로 로그인 성공")
-                        self.firebaseLogin()
+            // 카톡 앱이 없는 경우 카톡 계정으로 웹 로그인
+            else {
+                UserApi.shared.loginWithKakaoAccount { (oAuthToken, error) in
+                    if let error = error {
+                        print("카카오 계정으로 로그인 실패: \(error)")
+                    } else {
+                        if let _ = oAuthToken {
+                            print("카카오 계정으로 로그인 성공")
+                            self.firebaseLogin()
+                        }
                     }
                 }
             }
