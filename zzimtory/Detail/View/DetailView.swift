@@ -54,12 +54,9 @@ final class DetailView: ZTView {
     // 공유 버튼
     private let shareButton: UIButton = {
         let button = UIButton()
-        
-        button.backgroundColor = .systemBackground.withAlphaComponent(0.8)
-        button.layer.cornerRadius = 20
-        
+
+        button.setAsIconButton()
         button.setButtonDefaultImage(imageName: "square.and.arrow.up")
-        button.setButtonDefaultShadow()
         
         return button
     }()

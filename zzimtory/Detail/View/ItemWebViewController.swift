@@ -47,10 +47,8 @@ final class ItemWebViewController: UIViewController {
     
     private func configureNavigationButton(imageName: String, action: Selector) -> UIButton {
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        button.backgroundColor = .systemBackground.withAlphaComponent(0.8)
-        button.layer.cornerRadius = 20
+        button.setAsIconButton()
         button.setButtonDefaultImage(imageName: imageName)
-        button.setButtonDefaultShadow()
         button.addTarget(self, action: action, for: .touchUpInside)
         return button
     }
