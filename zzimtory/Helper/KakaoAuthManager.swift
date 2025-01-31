@@ -19,6 +19,8 @@ final class KakaoAuthManager: ThirdPartyAuthProtocol {
                 if let _ = error {
                     // 만료된 토큰 or 기타 에러.
                     self.kakaoLogin()
+                } else {
+                    print("유효한 토큰 존재")
                 }
             }
         } else {
