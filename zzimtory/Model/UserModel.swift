@@ -8,6 +8,7 @@
 struct User {
     let email: String
     let nickname: String
+    let uid: String
     var pockets: [Pocket]
 }
 
