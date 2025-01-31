@@ -9,7 +9,7 @@ import NaverThirdPartyLogin
 import RxSwift
 import FirebaseAuth
 
-final class NaverAuthManager: NSObject, ThirdPartyAuthProtocol {
+final class NaverAuthManager: NSObject {
     private let instance = NaverThirdPartyLoginConnection.getSharedInstance()
     private let repository: NaverLoginRepositoryProtocol
     private let disposeBag = DisposeBag()
@@ -38,7 +38,9 @@ final class NaverAuthManager: NSObject, ThirdPartyAuthProtocol {
             })
             .disposed(by: disposeBag)
     }
-    
+}
+
+extension NaverAuthManager: ThirdPartyAuthProtocol {
     func login() {
         instance?.requestThirdPartyLogin()
     }
