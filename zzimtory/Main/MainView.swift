@@ -5,7 +5,6 @@
 //  Created by t2023-m0072 on 1/24/25.
 //
 
-import Foundation
 import UIKit
 import SnapKit
 
@@ -13,7 +12,7 @@ class MainView: ZTView {
     
     let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "figure.child") // 추후 변경 예정
+        imageView.image = UIImage(systemName: "figure.child")
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -32,9 +31,9 @@ class MainView: ZTView {
         button.setImage(zzimtoryimage, for: .normal)
         button.backgroundColor = .white100Zt
         button.setTitle(" 주머니 추가", for: .normal)
-        button.layer.cornerRadius = 10
-        button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .medium)
+        button.layer.cornerRadius = 6
+        button.setTitleColor(.black900Zt, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
         return button
     }()
     
@@ -42,14 +41,47 @@ class MainView: ZTView {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Search.."
         searchBar.searchBarStyle = .minimal
-        searchBar.searchTextField.backgroundColor = .red
+        searchBar.searchTextField.backgroundColor = .systemBackground
         return searchBar
+    }()
+    
+    let pocketCountLabel: UILabel = {
+        let label = UILabel()
+        label.text = "주머니 0개"
+        label.textColor = .black900Zt
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        return label
+    }()
+    
+    let sortButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)
+        button.tintColor = .black900Zt
+        return button
+    }()
+    
+    let editButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "pencil"), for: .normal)
+        button.tintColor = .black900Zt
+        return button
+    }()
+    
+    let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 10
+        layout.minimumInteritemSpacing = 10
+        layout.itemSize = CGSize(width: 160, height: 200)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.register(PocketCell.self, forCellWithReuseIdentifier: "PocketCell")
+        return collectionView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        
     }
     
     required init?(coder: NSCoder) {
@@ -58,30 +90,40 @@ class MainView: ZTView {
     
     private func setupUI() {
         
-        addSubview(addPocketButton)
-        addSubview(searchBar)
-        addSubview(logoImageView)
-        addSubview(logoLabel)
+        let logoStackView = UIStackView(arrangedSubviews: [logoImageView, logoLabel])
+        logoStackView.axis = .horizontal
+        logoStackView.spacing = 8
+        logoStackView.alignment = .center
         
-        logoImageView.snp.makeConstraints { make in
+        let topStackView = UIStackView(arrangedSubviews: [logoStackView, addPocketButton])
+        topStackView.axis = .horizontal
+        topStackView.spacing = 16
+        topStackView.alignment = .center
+        topStackView.distribution = .equalSpacing
+        
+        let actionStackView = UIStackView(arrangedSubviews: [sortButton, editButton])
+        actionStackView.axis = .horizontal
+        actionStackView.spacing = 8
+        actionStackView.alignment = .center
+        
+        let pocKetCountStackView = UIStackView(arrangedSubviews: [pocketCountLabel, actionStackView])
+        pocKetCountStackView.axis = .horizontal
+        pocKetCountStackView.spacing = 8
+        pocKetCountStackView.alignment = .center
+        pocKetCountStackView.distribution = .equalSpacing
+        
+        let mainStackView = UIStackView(arrangedSubviews: [topStackView, searchBar, pocKetCountStackView, collectionView])
+        mainStackView.axis = .vertical
+        mainStackView.spacing = 16
+        mainStackView.alignment = .fill
+        mainStackView.distribution = .fill
+        
+        addSubview(mainStackView)
+        
+        mainStackView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(10)
-            make.leading.equalToSuperview().offset(16)
-            make.width.equalTo(50)
-            make.height.equalTo(44)
-        }
-        
-        logoLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(logoImageView)
-            make.leading.equalTo(logoImageView.snp.trailing).offset(8)
-        }
-        
-        addPocketButton.snp.makeConstraints { make in
-            make.centerY.equalTo(logoImageView)
-            make.trailing.equalToSuperview().offset(-16)
-        }
-        searchBar.snp.makeConstraints { make in
-            make.top.equalTo(logoImageView.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().inset(10)
         }
     }
 }
