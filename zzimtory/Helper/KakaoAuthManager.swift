@@ -11,7 +11,7 @@ import KakaoSDKUser
 import KakaoSDKCommon
 import FirebaseAuth
 
-final class KakaoAuthManager {
+final class KakaoAuthManager: ThirdPartyAuthProtocol {
     /// 카카오 로그인.  토큰 존재 여부로 기존 로그인 여부 확인.
     func login() {
         if AuthApi.hasToken() {
@@ -19,8 +19,6 @@ final class KakaoAuthManager {
                 if let _ = error {
                     // 토큰 있으나 만료된 토큰이거나, 기타 에러.
                     self.kakaoLogin()
-                } else {
-                    // 토큰 있고 유효하기 때문에 로그인 불필요.
                 }
             }
         } else {
@@ -35,10 +33,10 @@ final class KakaoAuthManager {
         if UserApi.isKakaoTalkLoginAvailable() {
             UserApi.shared.loginWithKakaoTalk { (oAuthToken, error ) in
                 if let error = error {
-                    print(error)
+                    print("카카오톡으로 로그인 실패: \(error)")
                 } else {
                     if let _ = oAuthToken {
-                        print("카카오톡으로 로그인하기 성공~~")
+                        print("카카오톡으로 로그인 성공")
                         self.firebaseLogin()
                     }
                 }
@@ -48,10 +46,10 @@ final class KakaoAuthManager {
         else {
             UserApi.shared.loginWithKakaoAccount { (oAuthToken, error) in
                 if let error = error {
-                    print(error)
+                    print("카카오 계정으로 로그인 실패: \(error)")
                 } else {
                     if let _ = oAuthToken {
-                        print("카카오 계정으로 로그인하기 성공~~")
+                        print("카카오 계정으로 로그인 성공")
                         self.firebaseLogin()
                     }
                 }
@@ -60,7 +58,7 @@ final class KakaoAuthManager {
     }
     
     /// 파이어베이스에 카카오 로그인 아이디, 비번(유저 아이디) 등록
-    private func firebaseLogin() {
+    func firebaseLogin() {
         UserApi.shared.me { (user, error) in
             if let error = error {
                 print(error)
@@ -78,5 +76,13 @@ final class KakaoAuthManager {
                 }
             }
         }
+    }
+    
+    func logout() {
+        
+    }
+    
+    func disconnect() {
+        
     }
 }
