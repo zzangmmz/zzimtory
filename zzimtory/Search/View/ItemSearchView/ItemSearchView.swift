@@ -110,6 +110,13 @@ extension ItemSearchView: UISearchBarDelegate {
         addSubview(itemCardsView)
         itemCardsView.bind(to: itemSearchViewModel)
         itemCardsView.frame = self.frame
+        itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
+    }
+    
+    @objc func onTap() {
+        print("ItemCardsView Tapped")
+        itemCardsView.removeFromSuperview()
+        dimLayer.removeFromSuperlayer()
     }
 }
 
