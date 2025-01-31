@@ -18,6 +18,7 @@ struct NaverLoginResponse: Decodable {
 }
 
 struct NaverUserInfo: Decodable {
-    let id: String
     let email: String
+    let id: String
+    let nickname: String
 }
