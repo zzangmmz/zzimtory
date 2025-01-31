@@ -70,9 +70,9 @@ final class KakaoAuthManager {
                         if let error = error {
                             print(error)
                             Auth.auth().signIn(withEmail: (user.kakaoAccount?.email)!, password: "\(String(describing: user.id))")
-                            
+                            print("파이어베이스 로그인 성공")
                         } else {
-                            print("파이어베이스에 회원 가입 성공")
+                            print("파이어베이스 회원가입 성공")
                         }
                     }
                 }
