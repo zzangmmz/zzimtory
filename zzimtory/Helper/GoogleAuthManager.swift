@@ -12,8 +12,8 @@ import FirebaseAuth
 final class GoogleAuthManager: NativeAuthProtocol {
     private let instance = GIDSignIn.sharedInstance
     
-    /// 구글 로그인 초기 설정 메서드
-    func configure() {
+    init() {
+        // 구글 로그인 초기화
         instance.configuration = GIDConfiguration(clientID: AuthClientID.google)
     }
     

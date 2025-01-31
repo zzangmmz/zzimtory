@@ -16,7 +16,6 @@ final class LoginViewModel {
     
     init() {
         self.googleAuthManager = GoogleAuthManager()
-        self.googleAuthManager.configure()
         self.naverAuthManager = NaverAuthManager()
         self.naverAuthManager.delegate = self
     }
