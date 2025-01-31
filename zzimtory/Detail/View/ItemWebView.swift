@@ -23,7 +23,7 @@ final class ItemWebView: UIView {
     }()
     
     // 페이지 뒤로가기 버튼
-    private lazy var websiteBackButton: UIButton = {
+    private let websiteBackButton: UIButton = {
         let button = UIButton()
         
         button.setButtonDefaultImage(imageName: "chevron.left")
@@ -32,7 +32,7 @@ final class ItemWebView: UIView {
     }()
     
     // 페이지 앞으로 가기 버튼
-    private lazy var websiteForwardButton: UIButton = {
+    private let websiteForwardButton: UIButton = {
         let button = UIButton()
         
         button.setButtonDefaultImage(imageName: "chevron.right")
@@ -125,7 +125,7 @@ final class ItemWebView: UIView {
         }
         
         progressBar.snp.makeConstraints { make in
-            make.top.equalTo(self.safeAreaLayoutGuide.snp.top).inset(14)
+            make.top.equalTo(self.safeAreaLayoutGuide.snp.top).offset(16)
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(2)
         }
