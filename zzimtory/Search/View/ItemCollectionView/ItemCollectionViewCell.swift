@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class ItemCollectionViewCell: UICollectionViewCell {
     
@@ -56,9 +57,9 @@ final class ItemCollectionViewCell: UICollectionViewCell {
     
     // MARK: - UI functions
     func setCell(with item: Item) {
-        imageView.image = UIImage(systemName: "gift")
         priceLabel.text = item.price
         titleLabel.text = item.title
+        imageView.kf.setImage(with: URL(string: item.image))
     }
     
     private func setUI() {

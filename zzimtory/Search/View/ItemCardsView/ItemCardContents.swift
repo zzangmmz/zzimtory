@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class ItemCardContents: UIView {
     
@@ -16,9 +17,7 @@ final class ItemCardContents: UIView {
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         
-        guard let url = URL(string: item.image) else { return imageView }
-        
-        imageView.loadImage(from: url)
+        imageView.kf.setImage(with: URL(string: item.image))
         imageView.contentMode = .scaleAspectFit
         
         return imageView
