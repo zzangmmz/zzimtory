@@ -5,14 +5,14 @@
 //  Created by 이명지 on 1/31/25.
 //
 
-struct User: Codable {
+struct User {
     let email: String
     let nickname: String
     let uid: String
-    var pockets: [Pocket] = []
+    var pockets: [Pocket]
 }
 
-struct Pocket: Codable {
+struct Pocket {
     var title: String
     var items: [Item]
 }
