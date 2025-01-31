@@ -17,7 +17,7 @@ final class KakaoAuthManager: ThirdPartyAuthProtocol {
         if AuthApi.hasToken() {
             UserApi.shared.accessTokenInfo { userInfo, error in
                 if let _ = error {
-                    // 토큰 있으나 만료된 토큰이거나, 기타 에러.
+                    // 만료된 토큰 or 기타 에러.
                     self.kakaoLogin()
                 }
             }
@@ -68,7 +68,7 @@ final class KakaoAuthManager: ThirdPartyAuthProtocol {
                         if let error = error {
                             print(error)
                             Auth.auth().signIn(withEmail: (user.kakaoAccount?.email)!, password: "\(String(describing: user.id))")
-                            
+                            print("파어에베이스에 로그인 성공")
                         } else {
                             print("파이어베이스에 회원 가입 성공")
                         }
@@ -79,10 +79,22 @@ final class KakaoAuthManager: ThirdPartyAuthProtocol {
     }
     
     func logout() {
-        
+        UserApi.shared.logout { error in
+            if let error = error {
+                print("카카오 로그아웃 실패: \(error)")
+            } else {
+                print("카카오 로그아웃 성공")
+            }
+        }
     }
     
     func disconnect() {
-        
+        UserApi.shared.unlink { error in
+            if let error = error {
+                print("카카오 로그인 연결끊기 실패: \(error)")
+            } else {
+                print("카카오 로그인 연결끊기 성공")
+            }
+        }
     }
 }
