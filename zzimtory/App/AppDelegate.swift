@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseCore
+import FirebaseDatabase
 import GoogleSignIn
 import KakaoSDKCommon
 import RxKakaoSDKAuth
@@ -20,6 +21,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         FirebaseApp.configure()
         GoogleAuthManager.shared.configure()
+        
+        // 파이어베이스 참조 설정
+        var ref: DatabaseReference!
+        ref = Database.database().reference()
+        
         KakaoSDK.initSDK(appKey: AuthClientID.nativeAppKey)
         
         let instance = NaverThirdPartyLoginConnection.getSharedInstance()
