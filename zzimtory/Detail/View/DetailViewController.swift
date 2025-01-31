@@ -32,8 +32,8 @@ class DetailViewController: UIViewController {
         navigationController?.navigationBar.compactScrollEdgeAppearance = appearance
         
         // 커스텀 백버튼 생성
-        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        
+        let button = UIButton()
+
         button.setAsIconButton()
         button.setButtonDefaultImage(imageName: "chevron.left")
         button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
