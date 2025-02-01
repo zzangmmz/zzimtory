@@ -30,6 +30,7 @@ class ZTView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        changeGradient()
         layer.addSublayer(gradientLayer)
     }
     
