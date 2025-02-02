@@ -93,6 +93,7 @@ final class DatabaseManager {
         }
     }
     
+    /// DB에서 유저 삭제하는 메서드
     func deleteUser(completion: @escaping (Bool) -> Void) {
         guard let uid = self.userUID else { return }
         
@@ -103,6 +104,37 @@ final class DatabaseManager {
             } else {
                 print("유저 삭제 성공")
                 completion(true)
+            }
+        }
+    }
+    
+    /// DB에서 유저의 주머니를 삭제하는 메서드
+    func deletePocketData(title: String, completion: @escaping (Bool) -> Void) {
+        guard let uid = self.userUID else { return }
+        
+        ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
+            guard var userData = snapshot.value as? [String: Any],
+                  var pockets = userData["pockets"] as? [Pocket] else {
+                completion(false)
+                return
+            }
+            
+            if let indexToRemove = pockets.firstIndex(where: { $0.title == title }) {
+                pockets.remove(at: indexToRemove)
+                
+                userData["pockets"] = pockets
+                self.ref.child("users").child(uid).updateChildValues(userData) { error, _ in
+                    if let error = error {
+                        print("유저 주머니 삭제 실패")
+                        completion(false)
+                    } else {
+                        print("유저 주머니 삭제 성공")
+                        completion(true)
+                    }
+                }
+            } else {
+                print("해당 타이틀의 주머니가 없습니다.")
+                completion(false)
             }
         }
     }
