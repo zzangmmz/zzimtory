@@ -92,4 +92,18 @@ final class DatabaseManager {
             }
         }
     }
+    
+    func deleteUser(completion: @escaping (Bool) -> Void) {
+        guard let uid = self.userUID else { return }
+        
+        ref.child("users").child(uid).removeValue() { error, _ in
+            if let error = error {
+                print("유저 삭제 실패")
+                completion(false)
+            } else {
+                print("유저 삭제 성공")
+                completion(true)
+            }
+        }
+    }
 }
