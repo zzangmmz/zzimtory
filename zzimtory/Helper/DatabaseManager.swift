@@ -27,6 +27,7 @@ final class DatabaseManager {
         self.userUID = currentUser.uid
     }
     
+    // MARK: - Data Create Method
     /// DB에 유저 등록하는 메서드
     func createUser(user: User) {
         guard let uid = self.userUID else { return }
@@ -53,6 +54,7 @@ final class DatabaseManager {
         }
     }
     
+    // MARK: - Data Read Method
     /// DB에서 유저 읽어오는 메서드
     func readUserData(completion: @escaping (User?) -> Void) {
         guard let uid = self.userUID else { return }
@@ -76,6 +78,7 @@ final class DatabaseManager {
         }
     }
     
+    // MARK: - Data Update Methods
     /// DB에 유저 주머니 데이터 업데이트 하는 메서드
     func updateUserPockets(newPockets: [Pocket], completion: @escaping (Bool) -> Void) {
         guard let uid = self.userUID else { return }
@@ -108,6 +111,7 @@ final class DatabaseManager {
         }
     }
     
+    // MARK: - Data Delete Methods
     /// DB에서 유저 삭제하는 메서드
     func deleteUser(completion: @escaping (Bool) -> Void) {
         guard let uid = self.userUID else { return }
