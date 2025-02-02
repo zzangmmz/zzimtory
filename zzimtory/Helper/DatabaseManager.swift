@@ -93,6 +93,21 @@ final class DatabaseManager {
         }
     }
     
+    /// 유저 주머니 타이틀 업데이트 하는 메서드
+    func updatePocketTitle(newTitle: String) {
+        guard let uid = self.userUID else { return }
+        
+        let updateTitle = ["title": newTitle]
+        
+        ref.child("users").child(uid).updateChildValues(updateTitle) { error, _ in
+            if let error = error {
+                print("주머니 타이틀 업데이트 실패: \(error.localizedDescription)")
+            } else {
+                print("주머니 타이틀 업데이트 성공")
+            }
+        }
+    }
+    
     /// DB에서 유저 삭제하는 메서드
     func deleteUser(completion: @escaping (Bool) -> Void) {
         guard let uid = self.userUID else { return }
