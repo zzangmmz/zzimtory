@@ -28,14 +28,14 @@ final class DatabaseManager {
     }
     
     /// DB에 유저 등록하는 메서드
-    func createUser(email: String, nickname: String) {
+    func createUser(user: User) {
         guard let uid = self.userUID else { return }
         
         let userData: [String: Any] = [
-            "email": email,
-            "nickname": nickname,
-            "uid": uid,
-            "pockets": []
+            "email": user.email,
+            "nickname": user.nickname,
+            "uid": user.uid,
+            "pockets": user.pockets
         ]
         
         ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
