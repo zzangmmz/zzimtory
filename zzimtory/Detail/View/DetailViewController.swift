@@ -37,16 +37,12 @@ final class DetailViewController: UIViewController {
     private func bind() {
         // 타이틀 바인딩
         viewModel.itemTitle
-            .subscribe(onNext: { [weak self] text in
-                self?.detailView.itemNameLabel.text = text
-            })
+            .bind(to: detailView.itemNameLabel.rx.text)
             .disposed(by: disposeBag)
         
         // 브랜드명 바인딩
-        viewModel.itemBrand
-            .subscribe(onNext: { [weak self] text in
-                self?.detailView.brandButton.setTitle(text, for: .normal)
-            })
+        viewModel.itemPrice
+            .bind(to: detailView.priceLabel.rx.text)
             .disposed(by: disposeBag)
         
         // 가격 바인딩
@@ -67,16 +63,18 @@ final class DetailViewController: UIViewController {
         
         // 유사 상품 바인딩
         viewModel.similarItems
-            .subscribe(onNext: { [weak self] items in
-                self?.detailView.updateSimilarItems(items)
-            })
+            .bind(to: detailView.similarItemCollectionView.rx.items(
+                cellIdentifier: ItemCollectionViewCell.id,
+                cellType: ItemCollectionViewCell.self
+            )) { _, item, cell in
+                cell.setCell(with: item)
+            }
             .disposed(by: disposeBag)
         
         // 유사 상품 선택 시 처리
-        detailView.similarItemCollectionView.rx.itemSelected
-            .subscribe(onNext: { [weak self] indexPath in
-                guard let selectedItem = self?.detailView.similarItems[indexPath.item] else { return }
-                let detailVC = DetailViewController(item: selectedItem)
+        detailView.similarItemCollectionView.rx.modelSelected(Item.self)
+            .subscribe(onNext: { [weak self] item in
+                let detailVC = DetailViewController(item: item)
                 self?.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
@@ -95,15 +93,13 @@ final class DetailViewController: UIViewController {
         // 공유 버튼 탭 처리
         detailView.shareButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
+                guard let self = self,
+                      let url = URL(string: self.viewModel.currentItem.link) else { return }
                 
                 let shareText = "주머니에서 꺼내왔습니다!!"
-                let shareURL = URL(string: self.viewModel.currentItem.link)
                 var shareItems: [Any] = [shareText]
                 
-                if let url = shareURL {
-                    shareItems.append(url)
-                }
+                shareItems.append(url)
                 
                 // 기본 공유시트 사용
                 let shareActivityViewController = UIActivityViewController(

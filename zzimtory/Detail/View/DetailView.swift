@@ -136,6 +136,8 @@ final class DetailView: ZTView {
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         
+        collectionView.register(ItemCollectionViewCell.self, forCellWithReuseIdentifier: ItemCollectionViewCell.id)
+        
         return collectionView
     }()
     
@@ -227,7 +229,7 @@ final class DetailView: ZTView {
         setupScrollView()
         setupTopStackView()
         setupBottomStackView()
-        setupCollectionView()
+        // setupCollectionView()
     }
     
     private func setupScrollView() {
@@ -304,41 +306,41 @@ final class DetailView: ZTView {
         }
     }
     
-    private func setupCollectionView() {
-        similarItemCollectionView.delegate = self
-        similarItemCollectionView.dataSource = self
-        similarItemCollectionView.register(TempItemCell.self, forCellWithReuseIdentifier: TempItemCell.id)
-    }
+//    private func setupCollectionView() {
+//        similarItemCollectionView.delegate = self
+//        similarItemCollectionView.dataSource = self
+//        similarItemCollectionView.register(TempItemCell.self, forCellWithReuseIdentifier: TempItemCell.id)
+//    }
 }
 
-extension DetailView {
-    func updateSimilarItems(_ items: [Item]) {
-        self.similarItems = items
-        similarItemCollectionView.reloadData()
-    }
-}
+//extension DetailView {
+//    func updateSimilarItems(_ items: [Item]) {
+//        self.similarItems = items
+//        similarItemCollectionView.reloadData()
+//    }
+//}
 
 // MARK: - UICollectionViewDelegate, UICollectionViewDataSource
-extension DetailView: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return similarItems.count
-    }
-    
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: TempItemCell.id,
-            for: indexPath) as? TempItemCell else {
-            return UICollectionViewCell()
-        }
-        
-        let item = similarItems[indexPath.item]
-        cell.configureData(with: item)
-        return cell
-    }
-}
+//extension DetailView: UICollectionViewDelegate, UICollectionViewDataSource {
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return similarItems.count
+//    }
+//    
+//    func collectionView(
+//        _ collectionView: UICollectionView,
+//        cellForItemAt indexPath: IndexPath
+//    ) -> UICollectionViewCell {
+//        guard let cell = collectionView.dequeueReusableCell(
+//            withReuseIdentifier: TempItemCell.id,
+//            for: indexPath) as? TempItemCell else {
+//            return UICollectionViewCell()
+//        }
+//        
+//        let item = similarItems[indexPath.item]
+//        cell.configureData(with: item)
+//        return cell
+//    }
+//}
 
 // 추후 삭제 예정
 //extension DetailView {
