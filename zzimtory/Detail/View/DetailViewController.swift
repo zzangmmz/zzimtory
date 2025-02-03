@@ -37,35 +37,39 @@ final class DetailViewController: UIViewController {
     private func bind() {
         // 타이틀 바인딩
         viewModel.itemTitle
-            .bind(to: detailView.itemNameLabel.rx.text)
+            .subscribe(onNext: { [weak self] text in
+                self?.detailView.itemNameLabel.text = text
+            })
             .disposed(by: disposeBag)
         
         // 브랜드명 바인딩
         viewModel.itemBrand
-            .bind { [weak self] text in
+            .subscribe(onNext: { [weak self] text in
                 self?.detailView.brandButton.setTitle(text, for: .normal)
-            }
+            })
             .disposed(by: disposeBag)
         
         // 가격 바인딩
         viewModel.itemPrice
-            .bind(to: detailView.priceLabel.rx.text)
+            .subscribe(onNext: { [weak self] text in
+                self?.detailView.priceLabel.text = text
+            })
             .disposed(by: disposeBag)
         
         // 이미지 바인딩
         viewModel.itemImageUrl
-            .bind { [weak self] urlString in
+            .subscribe(onNext: { [weak self] urlString in
                 if let url = URL(string: urlString) {
                     self?.detailView.itemImageView.loadImage(from: url)
                 }
-            }
+            })
             .disposed(by: disposeBag)
         
         // 유사 상품 바인딩
         viewModel.similarItems
-            .bind { [weak self] items in
+            .subscribe(onNext: { [weak self] items in
                 self?.detailView.updateSimilarItems(items)
-            }
+            })
             .disposed(by: disposeBag)
         
         // 유사 상품 선택 시 처리
@@ -89,11 +93,27 @@ final class DetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         // 공유 버튼 탭 처리
-//        detailView.shareButton.rx.tap
-//            .subscribe(onNext: { [weak self] in
-//                // 공유 기능 구현 필요
-//            })
-//            .disposed(by: disposeBag)
+        detailView.shareButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                
+                let shareText = "주머니에서 꺼내왔습니다!!"
+                let shareURL = URL(string: self.viewModel.currentItem.link)
+                var shareItems: [Any] = [shareText]
+                
+                if let url = shareURL {
+                    shareItems.append(url)
+                }
+                
+                // 기본 공유시트 사용
+                let shareActivityViewController = UIActivityViewController(
+                    activityItems: shareItems,
+                    applicationActivities: nil
+                )
+                
+                self.present(shareActivityViewController, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
