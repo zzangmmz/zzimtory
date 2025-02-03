@@ -79,11 +79,33 @@ extension KakaoAuthManager: ThirdPartyAuthProtocol {
                 if let user = user {
                     Auth.auth().createUser(withEmail: (user.kakaoAccount?.email)!, password: "\(String(describing: user.id))") { result, error in
                         if let error = error {
-                            print(error)
-                            Auth.auth().signIn(withEmail: (user.kakaoAccount?.email)!, password: "\(String(describing: user.id))")
-                            print("파어에베이스에 로그인 성공")
+                            Auth.auth().signIn(withEmail: (user.kakaoAccount?.email)!, password: "\(String(describing: user.id))") { authResult, error in
+                                if let error = error {
+                                    print("파이어베이스 인증 오류: \(error.localizedDescription)")
+                                } else {
+                                    guard let authUser = authResult?.user else { return }
+                                    let newUser = User(
+                                        email: authUser.email ?? "",
+                                        nickname: authUser.displayName ?? "",
+                                        uid: authUser.uid,
+                                        pockets: []
+                                    )
+                                    DatabaseManager.shared.createUser(user: newUser)
+                                    print("파이어베이스 로그인 성공")
+                                    print(newUser)
+                                }
+                            }
                         } else {
-                            print("파이어베이스에 회원 가입 성공")
+                            guard let authUser = result?.user else { return }
+                            let newUser = User(
+                                email: authUser.email ?? "",
+                                nickname: authUser.displayName ?? "",
+                                uid: authUser.uid,
+                                pockets: []
+                            )
+                            DatabaseManager.shared.createUser(user: newUser)
+                            print(newUser)
+                            print("파이어베이스 회원가입 성공")
                         }
                     }
                 }
