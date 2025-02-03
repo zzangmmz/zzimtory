@@ -82,7 +82,11 @@ final class PocketSelectionViewController: UIViewController {
             if let name = alert.textFields?.first?.text {
                 let newPocket = Pocket(title: name, items: self.selectedItems)
                 
-                DummyModel.shared.pockets.append(newPocket)
+//                DummyModel.shared.pockets.append(newPocket)
+                
+                DatabaseManager.shared.createPocket(title: name)
+                DatabaseManager.shared.updateUserPocket(newPocket: Pocket(title: name, items: selectedItems))
+                
                 self.pocketColletionView.reloadData()
                 self.informLabel.userDidPutItem(in: newPocket,
                                            onComplete: { self.dismiss(animated: true) })

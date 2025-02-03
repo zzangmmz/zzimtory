@@ -104,7 +104,7 @@ final class DatabaseManager {
     func updateUserPocket(newPocket: Pocket) {
         guard let uid = self.userUID else { return }
         
-        let updatePocket: [String: Pocket] = [newPocket.title: newPocket]
+        let updatePocket: [String: [NSDictionary]] = [newPocket.title: newPocket.items.map { $0.asNSDictionary() }]
         
         ref.child("users").child(uid).child("pockets").child(newPocket.title).updateChildValues(updatePocket) { error, _ in
             if let error = error {
