@@ -7,42 +7,51 @@
 
 import Foundation
 import GoogleSignIn
+import FirebaseAuth
 
-final class GoogleAuthManager {
+final class GoogleAuthManager: NativeAuthProtocol {
+    private let instance = GIDSignIn.sharedInstance
     
-    static let shared = GoogleAuthManager()
-    
-    private init() {}
-    
-    /// 구글 로그인 초기 설정 메서드
-    func configure() {
-        GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: AuthClientID.google)
+    init() {
+        // 구글 로그인 초기화
+        instance.configuration = GIDConfiguration(clientID: AuthClientID.google)
     }
     
     /// 로그인 메서드
-    func login(presenting viewController: UIViewController, completion: @escaping (Result<GIDGoogleUser, Error>) -> Void) {
-        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { signInResult, error in
+    func login(from viewController: UIViewController) {
+        instance.signIn(withPresenting: viewController) { signInResult, error in
             if let error = error {
-                completion(.failure(error))
+                print(error)
                 return
             }
             guard let user = signInResult?.user else {
-                completion(.failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "잘못된 사용자 정보입니다."])))
+                print("잘못된 사용자 정보입니다.")
                 return
             }
-            completion(.success(user))
+            guard let idToken = user.idToken?.tokenString else { return }
+            let credential = GoogleAuthProvider.credential(
+                withIDToken: idToken,
+                accessToken: user.accessToken.tokenString
+            )
+            Auth.auth().signIn(with: credential) { _, error in
+                if let error = error as NSError? {
+                    print("파이어베이스 인증 오류: \(error.localizedDescription)")
+                    return
+                }
+                print("파이어베이스 인증 성공")
+            }
         }
     }
     
     /// 로그아웃 메서드
     func logout() {
-        GIDSignIn.sharedInstance.signOut()
+        instance.signOut()
     }
     
     /// 계정의 구글 로그인 연동 끊는 메서드
-    func disconnect(completion: @escaping (Error?) -> Void) {
-        GIDSignIn.sharedInstance.disconnect { error in
-            completion(error)
+    func disconnect() {
+        instance.disconnect { error in
+            print("error: \(String(describing: error))")
         }
     }
 }
