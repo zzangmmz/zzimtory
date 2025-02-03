@@ -17,7 +17,6 @@ final class DetailViewController: UIViewController {
     
     init(item: Item) {
         self.viewModel = DetailViewModel(item: item)
-        // self.viewModel = DetailViewModel(item: DetailDummyItems.dummyItems[0])
         super.init(nibName: nil, bundle: nil)
     }
     

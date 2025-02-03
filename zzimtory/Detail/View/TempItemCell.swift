@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 
+// 해당 파일 추후 삭제 예정
 final class TempItemCell: UICollectionViewCell {
     
     static let id = "TempItemCell"

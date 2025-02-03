@@ -7,12 +7,8 @@
 
 import UIKit
 import SnapKit
-// import RxSwift
-// import RxCocoa
 
 final class DetailView: ZTView {
-    // private let disposeBag = DisposeBag()
-    // let item = DetailDummyItems.dummyItems[3] // 임시 데이터
     
     // 유사 상품 데이터 저장 배열
     var similarItems: [Item] = []
@@ -217,8 +213,6 @@ final class DetailView: ZTView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
-        // configureWithDummyData()
-        // bind()
     }
     
     required init?(coder: NSCoder) {
@@ -229,7 +223,6 @@ final class DetailView: ZTView {
         setupScrollView()
         setupTopStackView()
         setupBottomStackView()
-        // setupCollectionView()
     }
     
     private func setupScrollView() {
@@ -305,85 +298,4 @@ final class DetailView: ZTView {
             make.height.equalTo(190)
         }
     }
-    
-//    private func setupCollectionView() {
-//        similarItemCollectionView.delegate = self
-//        similarItemCollectionView.dataSource = self
-//        similarItemCollectionView.register(TempItemCell.self, forCellWithReuseIdentifier: TempItemCell.id)
-//    }
 }
-
-//extension DetailView {
-//    func updateSimilarItems(_ items: [Item]) {
-//        self.similarItems = items
-//        similarItemCollectionView.reloadData()
-//    }
-//}
-
-// MARK: - UICollectionViewDelegate, UICollectionViewDataSource
-//extension DetailView: UICollectionViewDelegate, UICollectionViewDataSource {
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return similarItems.count
-//    }
-//    
-//    func collectionView(
-//        _ collectionView: UICollectionView,
-//        cellForItemAt indexPath: IndexPath
-//    ) -> UICollectionViewCell {
-//        guard let cell = collectionView.dequeueReusableCell(
-//            withReuseIdentifier: TempItemCell.id,
-//            for: indexPath) as? TempItemCell else {
-//            return UICollectionViewCell()
-//        }
-//        
-//        let item = similarItems[indexPath.item]
-//        cell.configureData(with: item)
-//        return cell
-//    }
-//}
-
-// 추후 삭제 예정
-//extension DetailView {
-//    private func configureWithDummyData() {
-//        let item = DetailDummyItems.dummyItems[3]
-//        
-//        // 상품 이름
-//        let cleanTitle = item.title.removingHTMLTags
-//        itemNameLabel.text = cleanTitle
-//        
-//        // 브랜드/쇼핑몰 이름 설정
-//        let brandText = item.brand.isEmpty ? item.mallName : item.brand
-//        brandButton.setTitle("\(brandText) >", for: .normal)
-//        
-//        // 가격 설정
-//        if let price = Int(item.price) {
-//            priceLabel.text = "\(price.withSeparator)원"
-//        }
-//        
-//        // 이미지 URL로 이미지 로드
-//        if let imageUrl = URL(string: item.image) {
-//            itemImageView.loadImage(from: imageUrl)
-//        }
-//    }
-//}
-
-// bind view에서 제거 추후 삭제 예정
-//extension DetailView {
-//    //bind 임시 구현
-//    private func bind() {
-//        websiteButton.rx.tap
-//            .subscribe(onNext: { [weak self] in
-//                guard let self = self, let url = URL(string: self.item.link) else { return }
-//                let webVC = ItemWebViewController(urlString: url.absoluteString)
-//                
-//                // 모달 전환
-////                let navController = UINavigationController(rootViewController: webVC)
-////                self.window?.rootViewController?.present(navController, animated: true)
-//                
-//                // 페이지 전환
-//                if let navigationController = self.window?.rootViewController as? UINavigationController {
-//                    navigationController.pushViewController(webVC, animated: true)
-//                }
-//            }).disposed(by: disposeBag)
-//    }
-//}
