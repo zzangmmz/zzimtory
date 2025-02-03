@@ -57,6 +57,8 @@ class MainView: ZTView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)
         button.tintColor = .black900Zt
+        button.layer.cornerRadius = 20
+        button.backgroundColor = .white100Zt
         return button
     }()
     
@@ -64,6 +66,8 @@ class MainView: ZTView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "pencil"), for: .normal)
         button.tintColor = .black900Zt
+        button.layer.cornerRadius = 20
+        button.backgroundColor = .white100Zt
         return button
     }()
     
@@ -103,7 +107,7 @@ class MainView: ZTView {
         
         let actionStackView = UIStackView(arrangedSubviews: [sortButton, editButton])
         actionStackView.axis = .horizontal
-        actionStackView.spacing = 8
+        actionStackView.spacing = 16
         actionStackView.alignment = .center
         
         let pocKetCountStackView = UIStackView(arrangedSubviews: [pocketCountLabel, actionStackView])
@@ -124,6 +128,13 @@ class MainView: ZTView {
             make.top.equalTo(safeAreaLayoutGuide).offset(10)
             make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview().inset(10)
+        }
+        sortButton.snp.makeConstraints { make in
+            make.width.height.equalTo(40) // 크기 조정
+        }
+        
+        editButton.snp.makeConstraints { make in
+            make.width.height.equalTo(40) // 크기 조정
         }
     }
 }
