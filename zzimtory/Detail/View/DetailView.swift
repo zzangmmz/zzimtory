@@ -7,19 +7,21 @@
 
 import UIKit
 import SnapKit
-import RxSwift
-import RxCocoa
+// import RxSwift
+// import RxCocoa
 
 final class DetailView: ZTView {
+    // private let disposeBag = DisposeBag()
+    // let item = DetailDummyItems.dummyItems[3] // 임시 데이터
     
-    private let disposeBag = DisposeBag()
-    let item = DetailDummyItems.dummyItems[3] // 임시 데이터
+    // 유사 상품 데이터 저장 배열
+    var similarItems: [Item] = []
     
     // 상품 이미지
-    private let itemImageView = UIImageView()
+    let itemImageView = UIImageView()
     
     // 브랜드 버튼
-    private let brandButton: UIButton = {
+    let brandButton: UIButton = {
         let button = UIButton()
         
         button.setTitleColor(.black900Zt, for: .normal)
@@ -30,7 +32,7 @@ final class DetailView: ZTView {
     }()
     
     // 상품명 레이블
-    private let itemNameLabel: UILabel = {
+    let itemNameLabel: UILabel = {
         let label = UILabel()
         
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -41,7 +43,7 @@ final class DetailView: ZTView {
     }()
     
     // 가격 레이블
-    private let priceLabel: UILabel = {
+    let priceLabel: UILabel = {
         let label = UILabel()
         
         label.font = .systemFont(ofSize: 18, weight: .bold)
@@ -52,7 +54,7 @@ final class DetailView: ZTView {
     }()
     
     // 공유 버튼
-    private let shareButton: UIButton = {
+    let shareButton: UIButton = {
         let button = UIButton()
 
         button.setAsIconButton()
@@ -62,7 +64,7 @@ final class DetailView: ZTView {
     }()
     
     // 웹사이트 이동 버튼
-    private let websiteButton: UIButton = {
+    let websiteButton: UIButton = {
         let button = UIButton()
         
         button.setTitle("웹사이트 이동", for: .normal)
@@ -80,7 +82,7 @@ final class DetailView: ZTView {
     }()
     
     // 저장 버튼
-    private let saveButton: UIButton = {
+    let saveButton: UIButton = {
         let button = UIButton()
         
         button.setTitle("주머니에 넣기", for: .normal)
@@ -122,7 +124,7 @@ final class DetailView: ZTView {
     }()
     
     // 유사한 제품 컬렉션 뷰
-    private let similarItemCollectionView: UICollectionView = {
+    let similarItemCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         
         layout.scrollDirection = .horizontal
@@ -209,12 +211,12 @@ final class DetailView: ZTView {
         
         return scrollView
     }()
-        
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
-        configureWithDummyData()
-        bind()
+        // configureWithDummyData()
+        // bind()
     }
     
     required init?(coder: NSCoder) {
@@ -292,11 +294,11 @@ final class DetailView: ZTView {
                 make.leading.trailing.equalToSuperview()
             }
         }
-
+        
         lineView.snp.makeConstraints { make in
             make.height.equalTo(1)
         }
-
+        
         similarItemCollectionView.snp.makeConstraints { make in
             make.height.equalTo(190)
         }
@@ -305,14 +307,21 @@ final class DetailView: ZTView {
     private func setupCollectionView() {
         similarItemCollectionView.delegate = self
         similarItemCollectionView.dataSource = self
-        similarItemCollectionView.register(TempItemCell.self, forCellWithReuseIdentifier: "tempItemCell")
+        similarItemCollectionView.register(TempItemCell.self, forCellWithReuseIdentifier: TempItemCell.id)
+    }
+}
+
+extension DetailView {
+    func updateSimilarItems(_ items: [Item]) {
+        self.similarItems = items
+        similarItemCollectionView.reloadData()
     }
 }
 
 // MARK: - UICollectionViewDelegate, UICollectionViewDataSource
 extension DetailView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return DetailDummyItems.dummyItems.count
+        return similarItems.count
     }
     
     func collectionView(
@@ -320,57 +329,59 @@ extension DetailView: UICollectionViewDelegate, UICollectionViewDataSource {
         cellForItemAt indexPath: IndexPath
     ) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: "tempItemCell",
+            withReuseIdentifier: TempItemCell.id,
             for: indexPath) as? TempItemCell else {
             return UICollectionViewCell()
         }
         
-        let item = DetailDummyItems.dummyItems[indexPath.item]
-        cell.configureWithDummyData(with: item)
+        let item = similarItems[indexPath.item]
+        cell.configureData(with: item)
         return cell
     }
 }
 
-extension DetailView {
-    private func configureWithDummyData() {
-        let item = DetailDummyItems.dummyItems[3]
-        
-        // 상품 이름
-        let cleanTitle = item.title.removingHTMLTags
-        itemNameLabel.text = cleanTitle
-        
-        // 브랜드/쇼핑몰 이름 설정
-        let brandText = item.brand.isEmpty ? item.mallName : item.brand
-        brandButton.setTitle("\(brandText) >", for: .normal)
-        
-        // 가격 설정
-        if let price = Int(item.price) {
-            priceLabel.text = "\(price.withSeparator)원"
-        }
-        
-        // 이미지 URL로 이미지 로드
-        if let imageUrl = URL(string: item.image) {
-            itemImageView.loadImage(from: imageUrl)
-        }
-    }
-}
+// 추후 삭제 예정
+//extension DetailView {
+//    private func configureWithDummyData() {
+//        let item = DetailDummyItems.dummyItems[3]
+//        
+//        // 상품 이름
+//        let cleanTitle = item.title.removingHTMLTags
+//        itemNameLabel.text = cleanTitle
+//        
+//        // 브랜드/쇼핑몰 이름 설정
+//        let brandText = item.brand.isEmpty ? item.mallName : item.brand
+//        brandButton.setTitle("\(brandText) >", for: .normal)
+//        
+//        // 가격 설정
+//        if let price = Int(item.price) {
+//            priceLabel.text = "\(price.withSeparator)원"
+//        }
+//        
+//        // 이미지 URL로 이미지 로드
+//        if let imageUrl = URL(string: item.image) {
+//            itemImageView.loadImage(from: imageUrl)
+//        }
+//    }
+//}
 
-extension DetailView {
-    //bind 임시 구현
-    private func bind() {
-        websiteButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self, let url = URL(string: self.item.link) else { return }
-                let webVC = ItemWebViewController(urlString: url.absoluteString)
-                
-                // 모달 전환
-//                let navController = UINavigationController(rootViewController: webVC)
-//                self.window?.rootViewController?.present(navController, animated: true)
-                
-                // 페이지 전환
-                if let navigationController = self.window?.rootViewController as? UINavigationController {
-                    navigationController.pushViewController(webVC, animated: true)
-                }
-            }).disposed(by: disposeBag)
-    }
-}
+// bind view에서 제거 추후 삭제 예정
+//extension DetailView {
+//    //bind 임시 구현
+//    private func bind() {
+//        websiteButton.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                guard let self = self, let url = URL(string: self.item.link) else { return }
+//                let webVC = ItemWebViewController(urlString: url.absoluteString)
+//                
+//                // 모달 전환
+////                let navController = UINavigationController(rootViewController: webVC)
+////                self.window?.rootViewController?.present(navController, animated: true)
+//                
+//                // 페이지 전환
+//                if let navigationController = self.window?.rootViewController as? UINavigationController {
+//                    navigationController.pushViewController(webVC, animated: true)
+//                }
+//            }).disposed(by: disposeBag)
+//    }
+//}
