@@ -11,7 +11,7 @@ struct ShoppingAPIResponse: Decodable {
     let items: [Item]
 }
 
-struct Item: Decodable {
+struct Item: Codable {
     let title: String
     let link: String
     let image: String
@@ -25,6 +25,7 @@ struct Item: Decodable {
     let category2: String
     let category3: String
     let category4: String
+//    let saveDate: String?
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -43,10 +44,6 @@ struct Item: Decodable {
     }
 }
 
-struct Pocket {
-    let title: String
-    var items: [Item]
-}
 
 // MARK: - API Response 참고용 JSON (추후 삭제 요망)
 //{

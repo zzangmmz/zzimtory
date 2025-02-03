@@ -12,14 +12,16 @@ import GoogleSignIn
 
 final class LoginViewModel {
     private let googleAuthManager: GoogleAuthManager
+    private let kakaoAuthManager: KakaoAuthManager
     private let naverAuthManager: NaverAuthManager
     
     init() {
         self.googleAuthManager = GoogleAuthManager()
+        self.kakaoAuthManager = KakaoAuthManager()
         self.naverAuthManager = NaverAuthManager()
     }
     
-    func signInWithApple() {
+    func signInWithApple(on viewContorller: UIViewController) {
         
     }
     
@@ -28,7 +30,6 @@ final class LoginViewModel {
     }
     
     func signInWithKakao() {
-        let kakaoAuthManager = KakaoAuthManager()
         kakaoAuthManager.login()
     }
     
