@@ -52,17 +52,33 @@ extension NaverAuthManager: ThirdPartyAuthProtocol {
             let id = response.value.id
             let nickname = response.value.nickname
             
-            Auth.auth().signIn(withEmail: email, password: id) { _, error in
+            Auth.auth().signIn(withEmail: email, password: id) { signInResult, error in
                 if let _ = error {
                     // 계정이 없는 경우 새로 생성
-                    Auth.auth().createUser(withEmail: email, password: id) { _, createError in
+                    Auth.auth().createUser(withEmail: email, password: id) { createResult, createError in
                         if let createError = createError {
                             print("Firebase 계정 생성 실패: \(createError.localizedDescription)")
                         } else {
+                            guard let authUser = createResult?.user else { return }
+                            let newUser = User(
+                                email: authUser.email ?? "",
+                                nickname: authUser.displayName ?? "",
+                                uid: authUser.uid,
+                                pockets: []
+                            )
+                            DatabaseManager.shared.createUser(user: newUser)
                             print("Firebase 계정 생성 성공")
                         }
                     }
                 } else {
+                    guard let authUser = signInResult?.user else { return }
+                    let newUser = User(
+                        email: authUser.email ?? "",
+                        nickname: authUser.displayName ?? "",
+                        uid: authUser.uid,
+                        pockets: []
+                    )
+                    DatabaseManager.shared.createUser(user: newUser)
                     print("Firebase 로그인 성공")
                 }
             }

@@ -92,6 +92,7 @@ extension KakaoAuthManager: ThirdPartyAuthProtocol {
                                     )
                                     DatabaseManager.shared.createUser(user: newUser)
                                     print("파이어베이스 로그인 성공")
+                                    print(newUser)
                                 }
                             }
                         } else {
@@ -103,6 +104,7 @@ extension KakaoAuthManager: ThirdPartyAuthProtocol {
                                 pockets: []
                             )
                             DatabaseManager.shared.createUser(user: newUser)
+                            print(newUser)
                             print("파이어베이스 회원가입 성공")
                         }
                     }
