@@ -7,16 +7,19 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UICollectionViewDataSource {
+class MainViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
     private var mainView: MainView? {
         return self.view as? MainView
     }
     
-    private let viewModel = MainPoketViewModel() // ViewModel
+    private let viewModel = MainPocketViewModel() // ViewModel
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view = MainView(frame: view.frame)
+        
+        mainView?.collectionView.register(ItemCollectionViewCell.self, forCellWithReuseIdentifier: ItemCollectionViewCell.id)
+        
         setupActions()
         setupCollectionView()
         bindViewModel()
@@ -30,6 +33,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource {
     
     private func setupCollectionView() {
         mainView?.collectionView.dataSource = self
+        mainView?.collectionView.delegate = self
     }
     
     private func bindViewModel() {
@@ -80,4 +84,19 @@ class MainViewController: UIViewController, UICollectionViewDataSource {
         cell.configure(with: pocket.name, images: pocket.images)
         return cell
     }
-}
+    // UICollectionViewDelegate 메서드 구현
+        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+            let pocket = viewModel.pockets[indexPath.item]
+            
+            if pocket.name == "전체보기" {
+                print("전체보기 주머니가 클릭됨")
+                
+                // "전체보기" 클릭 시 PocketDetailViewController로 이동
+                let detailViewModel = PocketDetailViewModel(pocketTitle: pocket.name, items: DummyModel.items)  // 새로운 viewModel 생성
+                        let detailVC = PocketDetailViewController(viewModel: detailViewModel) // 생성자 호출
+                        navigationController?.pushViewController(detailVC, animated: true)
+            } else {
+                print("\(pocket.name) 이 클릭됨")
+            }
+        }
+    }

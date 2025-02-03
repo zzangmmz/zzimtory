@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MainPoketViewModel {
+class MainPocketViewModel {
     // 주머니 이름과 이미지 배열을 함께 관리
     private(set) var pockets: [(name: String, images: [UIImage])] = [
         (name: "전체보기", images: [
