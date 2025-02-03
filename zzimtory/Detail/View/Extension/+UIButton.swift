@@ -27,4 +27,12 @@ extension UIButton {
         self.imageEdgeInsets = .init(top: 0, left: -8, bottom: 0, right: 0)
         self.titleEdgeInsets = .init(top: 0, left: 8, bottom: 0, right: 0)
     }
+    
+    func setAsIconButton(size: CGFloat = 40) {
+        setButtonDefaultShadow()
+        backgroundColor = .systemBackground.withAlphaComponent(0.8)
+        layer.cornerRadius = size / 2
+        frame.size = CGSize(width: size, height: size) // 버튼 크기 설정
+        layer.masksToBounds = false
+    }
 }

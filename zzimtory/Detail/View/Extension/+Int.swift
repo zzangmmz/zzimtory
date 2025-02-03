@@ -9,7 +9,7 @@ import Foundation
 
 extension Int {
     // 천 단위로 설정
-    var formattedWithSeparator: String {
+    var withSeparator: String {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         return numberFormatter.string(from: NSNumber(value: self)) ?? String(self)

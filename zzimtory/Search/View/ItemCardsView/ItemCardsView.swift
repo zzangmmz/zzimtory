@@ -58,6 +58,10 @@ final class ItemCardsView: UIView {
         
         return card
     }
+    
+    func setDelegate(to target: SwipeCardStackDelegate) {
+        cardStack.delegate = target
+    }
 }
 
 // ItemCardsView를 ViewModel에 바인딩해주기 위한 프로토콜 적용입니다.

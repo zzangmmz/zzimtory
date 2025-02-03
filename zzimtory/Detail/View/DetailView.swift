@@ -7,15 +7,16 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 final class DetailView: ZTView {
     
+    private let disposeBag = DisposeBag()
+    let item = DetailDummyItems.dummyItems[3] // 임시 데이터
+    
     // 상품 이미지
-    private let itemImageView: UIImageView = {
-        let imageView = UIImageView()
-                
-        return imageView
-    }()
+    private let itemImageView = UIImageView()
     
     // 브랜드 버튼
     private let brandButton: UIButton = {
@@ -53,12 +54,9 @@ final class DetailView: ZTView {
     // 공유 버튼
     private let shareButton: UIButton = {
         let button = UIButton()
-        
-        button.backgroundColor = .systemBackground.withAlphaComponent(0.8)
-        button.layer.cornerRadius = 20
-        
+
+        button.setAsIconButton()
         button.setButtonDefaultImage(imageName: "square.and.arrow.up")
-        button.setButtonDefaultShadow()
         
         return button
     }()
@@ -216,6 +214,7 @@ final class DetailView: ZTView {
         super.init(frame: frame)
         configureUI()
         configureWithDummyData()
+        bind()
     }
     
     required init?(coder: NSCoder) {
@@ -279,6 +278,7 @@ final class DetailView: ZTView {
             }
         }
         
+        // 양옆 오프셋 20 , 중간 12 --> 이래도 안되는지 확인
         websiteButton.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.4)
         }
@@ -345,14 +345,32 @@ extension DetailView {
         
         // 가격 설정
         if let price = Int(item.price) {
-            priceLabel.text = "\(price.formattedWithSeparator)원"
+            priceLabel.text = "\(price.withSeparator)원"
         }
         
         // 이미지 URL로 이미지 로드
         if let imageUrl = URL(string: item.image) {
-            if let imageUrl = URL(string: item.image) {
-                itemImageView.loadImage(from: imageUrl)
-            }
+            itemImageView.loadImage(from: imageUrl)
         }
+    }
+}
+
+extension DetailView {
+    //bind 임시 구현
+    private func bind() {
+        websiteButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self, let url = URL(string: self.item.link) else { return }
+                let webVC = ItemWebViewController(urlString: url.absoluteString)
+                
+                // 모달 전환
+//                let navController = UINavigationController(rootViewController: webVC)
+//                self.window?.rootViewController?.present(navController, animated: true)
+                
+                // 페이지 전환
+                if let navigationController = self.window?.rootViewController as? UINavigationController {
+                    navigationController.pushViewController(webVC, animated: true)
+                }
+            }).disposed(by: disposeBag)
     }
 }
