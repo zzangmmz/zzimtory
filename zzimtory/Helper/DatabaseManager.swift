@@ -55,6 +55,29 @@ final class DatabaseManager {
         }
     }
     
+    func createPocket(title: String) {
+        guard let uid = self.userUID else { return }
+        
+        let newPocket: [String: Any] = [
+            "title": title,
+            "items": [Item]()
+        ]
+        
+        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+            if !snapshot.exists() {
+                self.ref.child("users").child(uid).child("pockets").setValue(newPocket) { error, _ in
+                    if let error = error {
+                        print("주머니 생성 실패: \(error.localizedDescription)")
+                    } else {
+                        print("주머니 생성 성공")
+                    }
+                }
+            } else {
+                print("이미 존재하는 주머니")
+            }
+        }
+    }
+    
     // MARK: - Data Read Method
     /// DB에서 유저 읽어오는 메서드
     func readUserData() {
