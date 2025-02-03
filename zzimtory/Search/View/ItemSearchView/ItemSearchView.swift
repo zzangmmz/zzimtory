@@ -121,7 +121,8 @@ extension ItemSearchView: SwipeCardStackDelegate {
     }
     
     func didSwipeAllCards(_ cardStack: SwipeCardStack) {
-
+        itemCardsView.removeFromSuperview()
+        dimLayer.removeFromSuperlayer()
     }
     
 }
