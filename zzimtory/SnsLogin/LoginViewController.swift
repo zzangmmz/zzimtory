@@ -24,7 +24,7 @@ final class LoginViewController: UIViewController {
     private func bind() {
         loginView?.appleLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                self?.viewModel.signInWithApple()
+                self?.viewModel.signInWithApple(on: self!)
             })
             .disposed(by: disposeBag)
         
