@@ -7,9 +7,23 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
-class DetailViewController: UIViewController {
-    private var detailView: DetailView?
+final class DetailViewController: UIViewController {
+    private var detailView = DetailView()
+    private let viewModel: DetailViewModel
+    private let disposeBag = DisposeBag()
+    
+    init(item: Item) {
+        self.viewModel = DetailViewModel(item: item)
+        // self.viewModel = DetailViewModel(item: DetailDummyItems.dummyItems[0])
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,8 +31,74 @@ class DetailViewController: UIViewController {
         self.view = detailView
         
         setupNavigationBar()
+        bind()
     }
+    
+    private func bind() {
+        // 타이틀 바인딩
+        viewModel.itemTitle
+            .bind(to: detailView.itemNameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        // 브랜드명 바인딩
+        viewModel.itemBrand
+            .bind { [weak self] text in
+                self?.detailView.brandButton.setTitle(text, for: .normal)
+            }
+            .disposed(by: disposeBag)
+        
+        // 가격 바인딩
+        viewModel.itemPrice
+            .bind(to: detailView.priceLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        // 이미지 바인딩
+        viewModel.itemImageUrl
+            .bind { [weak self] urlString in
+                if let url = URL(string: urlString) {
+                    self?.detailView.itemImageView.loadImage(from: url)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        // 유사 상품 바인딩
+        viewModel.similarItems
+            .bind { [weak self] items in
+                self?.detailView.updateSimilarItems(items)
+            }
+            .disposed(by: disposeBag)
+        
+        // 유사 상품 선택 시 처리
+        detailView.similarItemCollectionView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let selectedItem = self?.detailView.similarItems[indexPath.item] else { return }
+                let detailVC = DetailViewController(item: selectedItem)
+                self?.navigationController?.pushViewController(detailVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        // 웹사이트 버튼 탭 처리
+        detailView.websiteButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self,
+                      let url = URL(string: self.viewModel.currentItem.link) else { return }
+                
+                let webVC = ItemWebViewController(urlString: url.absoluteString)
+                self.navigationController?.pushViewController(webVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        // 공유 버튼 탭 처리
+//        detailView.shareButton.rx.tap
+//            .subscribe(onNext: { [weak self] in
+//                // 공유 기능 구현 필요
+//            })
+//            .disposed(by: disposeBag)
+    }
+}
 
+extension DetailViewController {
+    
     private func setupNavigationBar() {
         // 네비게이션 바를 투명하게 설정 (시도 중)
         let appearance = UINavigationBarAppearance()
