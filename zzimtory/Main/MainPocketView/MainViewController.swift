@@ -59,7 +59,8 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             title: "확인",
             style: .default
         ) { [weak self] _ in
-            guard let self = self, let textField = alert.textFields?.first, let name = textField.text, !name.isEmpty else { return }
+            guard let self = self, let textField = alert.textFields?.first,
+                  let name = textField.text, !name.isEmpty else { return }
             self.viewModel.addPocket(named: name)
         }
         
@@ -96,7 +97,8 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         return viewModel.pocketCount()
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PocketCell", for: indexPath) as? PocketCell else {
             fatalError("Unable to dequeue PocketCell")
         }

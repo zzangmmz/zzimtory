@@ -116,7 +116,8 @@ class MainView: ZTView {
         pocKetCountStackView.alignment = .center
         pocKetCountStackView.distribution = .equalSpacing
         
-        let mainStackView = UIStackView(arrangedSubviews: [topStackView, searchBar, pocKetCountStackView, collectionView])
+        let mainStackView = UIStackView(arrangedSubviews: [topStackView,
+                                                           searchBar, pocKetCountStackView, collectionView])
         mainStackView.axis = .vertical
         mainStackView.spacing = 16
         mainStackView.alignment = .fill

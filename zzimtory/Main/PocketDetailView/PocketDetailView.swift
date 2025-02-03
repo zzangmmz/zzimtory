@@ -5,11 +5,12 @@
 //  Created by t2023-m0072 on 2/2/25.
 //
 
+//  PocketDetailView.swift
 import UIKit
 import SnapKit
 
 class PocketDetailView: ZTView {
-    
+
     var titleLabel: UILabel!
     var countLabel: UILabel!
     var itemCollectionView: ItemCollectionView!
@@ -62,14 +63,12 @@ class PocketDetailView: ZTView {
         return stackView
     }()
     
-    // titleLabel과 countAndButtonStackView를 묶은 수직 StackView
-    private lazy var titleAndCountStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, countAndButtonStackView])
-        stackView.axis = .vertical
-        stackView.spacing = 8
-        stackView.alignment = .fill
-        stackView.distribution = .fill
-        return stackView
+    // 서치바
+    var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.isHidden = true
+        searchBar.placeholder = "상품명을 입력하세요"
+        return searchBar
     }()
     
     override init(frame: CGRect) {
@@ -90,20 +89,34 @@ class PocketDetailView: ZTView {
         countLabel.font = .systemFont(ofSize: 16)
         countLabel.textColor = .black900Zt
         
-        // titleAndCountStackView 추가
-        addSubview(titleAndCountStackView)
+        // titleLabel 추가
+        addSubview(titleLabel)
         
-        titleAndCountStackView.snp.makeConstraints { make in
+        // countLabel과 버튼들을 묶은 stackView 추가
+        addSubview(countAndButtonStackView)
+        addSubview(searchBar)
+        
+        titleLabel.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(20)
             make.leading.equalToSuperview().inset(16)
+        }
+        
+        countAndButtonStackView.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.leading.equalToSuperview().inset(16)
             make.trailing.equalToSuperview().inset(16)
+        }
+        
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(countAndButtonStackView.snp.bottom).offset(8)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         
         itemCollectionView = ItemCollectionView()
         addSubview(itemCollectionView)
         
         itemCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(titleAndCountStackView.snp.bottom).offset(20)
+            make.top.equalTo(searchBar.snp.bottom).offset(20)
             make.leading.trailing.bottom.equalToSuperview().inset(16)
         }
         
@@ -136,5 +149,9 @@ class PocketDetailView: ZTView {
     
     func configureCollectionView(items: [Item]) {
         itemCollectionView.reloadData() // ItemCollectionView 데이터 업데이트
+    }
+    
+    func toggleSearchBar() {
+        searchBar.isHidden = !searchBar.isHidden
     }
 }

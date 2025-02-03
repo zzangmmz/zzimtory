@@ -58,7 +58,6 @@ class PocketCell: UICollectionViewCell {
         titleImageStackView.alignment = .fill
         titleImageStackView.distribution = .fill
         
-        
         contentView.addSubview(titleImageStackView)
         contentView.addSubview(countLabel)
         
