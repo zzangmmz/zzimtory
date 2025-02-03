@@ -7,7 +7,7 @@
 
 struct DetailDummyItems {
     static let dummyItems: [Item] = [
-           Item(title: "&lt;b&gt;동물의숲&lt;/b&gt; &lt;b&gt;문리나&lt;/b&gt; &lt;b&gt;탁호&lt;/b&gt; &lt;b&gt;인형&lt;/b&gt; 키링 문어 모여봐요 &lt;b&gt;동물의숲&lt;/b&gt; 모동숲 피규어 핑크",
+           Item(title: "<b>동물의숲</b> <b>문리나</b> <b>탁호</b> <b>인형</b> 키링 문어 모여봐요 <b>동물의숲</b> 모동숲 피규어 핑크",
                 link: "https://smartstore.naver.com/main/products/10358869934",
                 image: "https://shopping-phinf.pstatic.net/main_8790337/87903374567.jpg",
                 price: "29630",
