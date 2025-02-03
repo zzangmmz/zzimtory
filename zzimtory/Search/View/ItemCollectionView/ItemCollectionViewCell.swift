@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class ItemCollectionViewCell: UICollectionViewCell {
     
@@ -18,6 +19,7 @@ final class ItemCollectionViewCell: UICollectionViewCell {
         
         imageView.layer.cornerRadius = 15
         imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         
         return imageView
     }()
@@ -56,9 +58,9 @@ final class ItemCollectionViewCell: UICollectionViewCell {
     
     // MARK: - UI functions
     func setCell(with item: Item) {
-        imageView.image = UIImage(systemName: "gift")
-        priceLabel.text = item.price
-        titleLabel.text = item.title
+        imageView.kf.setImage(with: URL(string: item.image))
+        priceLabel.text = Int(item.price)?.withSeparator
+        titleLabel.text = item.title.removingHTMLTags
     }
     
     private func setUI() {

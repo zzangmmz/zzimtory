@@ -45,7 +45,7 @@ struct Item: Decodable {
 
 struct Pocket {
     let title: String
-    let items: [Item]
+    var items: [Item]
 }
 
 // MARK: - API Response 참고용 JSON (추후 삭제 요망)
