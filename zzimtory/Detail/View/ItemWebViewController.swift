@@ -64,6 +64,28 @@ final class ItemWebViewController: UIViewController {
                 self?.saveToPocket()
             })
             .disposed(by: disposeBag)
+        
+        itemWebView.shareButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                
+                let shareText = "주머니에서 꺼내왔습니다!!"
+                let shareURL = URL(string: self.urlString)
+                var shareItems: [Any] = [shareText]
+                
+                if let url = shareURL {
+                    shareItems.append(url)
+                }
+                
+                // 기본 공유시트 사용
+                let shareActivityViewController = UIActivityViewController(
+                    activityItems: shareItems,
+                    applicationActivities: nil
+                )
+                
+                self.present(shareActivityViewController, animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func saveToPocket() {

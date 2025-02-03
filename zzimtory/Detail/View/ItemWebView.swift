@@ -41,7 +41,7 @@ final class ItemWebView: UIView {
     }()
     
     // 공유 버튼
-    private let shareButton: UIButton = {
+    let shareButton: UIButton = {
         let button = UIButton()
         
         button.setButtonDefaultImage(imageName: "square.and.arrow.up")
