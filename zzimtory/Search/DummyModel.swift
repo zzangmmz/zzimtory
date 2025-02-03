@@ -34,13 +34,13 @@ struct DummyModel {
     var pockets: [Pocket] = [
         Pocket(title: "호주에서쓰는돈은호주머니", items: []),
         Pocket(title: "도라에몽주머니", items: []),
-        Pocket(title: "빵주머니", items: []),
-        Pocket(title: "복주머니", items: []),
-        Pocket(title: "뒷주머니", items: []),
-        Pocket(title: "앞주머니", items: []),
-        Pocket(title: "낡은주머니", items: []),
-        Pocket(title: "가죽주머니", items: []),
-        Pocket(title: "라탄주머니", items: []),
-        Pocket(title: "간식주머니", items: []),
+//        Pocket(title: "빵주머니", items: []),
+//        Pocket(title: "복주머니", items: []),
+//        Pocket(title: "뒷주머니", items: []),
+//        Pocket(title: "앞주머니", items: []),
+//        Pocket(title: "낡은주머니", items: []),
+//        Pocket(title: "가죽주머니", items: []),
+//        Pocket(title: "라탄주머니", items: []),
+//        Pocket(title: "간식주머니", items: []),
     ]
 }
