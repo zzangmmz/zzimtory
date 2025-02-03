@@ -69,7 +69,30 @@ final class PocketSelectionViewController: UIViewController {
     // MARK: - Functions
     @objc private func onTap() {
         print("AddPocket button tapped")
-        // 알럿 추가 후 주머니 이름 받고 해당하는 주머니 생성하는 로직 구현 필요
+        let alert = UIAlertController(title: "주머니 이름 임력",
+                                      message: "새로 추가할 주머니의 이름을 입력해주세요.",
+                                      preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.placeholder = "주머니 이름"
+        }
+        
+        alert.addAction(UIAlertAction(title: "저장",
+                                      style: .default,
+                                      handler: { [unowned self] _ in
+            if let name = alert.textFields?.first?.text {
+                let newPocket = Pocket(title: name, items: self.selectedItems)
+                
+                DummyModel.shared.pockets.append(newPocket)
+                self.pocketColletionView.reloadData()
+                self.informLabel.userDidPutItem(in: newPocket,
+                                           onComplete: { self.dismiss(animated: true) })
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        
+        present(alert, animated: true)
+        
     }
     
     private func setCollectionView() {
