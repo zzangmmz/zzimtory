@@ -95,6 +95,14 @@ extension KakaoAuthManager: ThirdPartyAuthProtocol {
                                 }
                             }
                         } else {
+                            guard let authUser = result?.user else { return }
+                            let newUser = User(
+                                email: authUser.email ?? "",
+                                nickname: authUser.displayName ?? "",
+                                uid: authUser.uid,
+                                pockets: []
+                            )
+                            DatabaseManager.shared.createUser(user: newUser)
                             print("파이어베이스 회원가입 성공")
                         }
                     }
