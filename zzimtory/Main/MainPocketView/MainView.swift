@@ -27,7 +27,7 @@ class MainView: ZTView {
     
     let addPocketButton: UIButton = {
         let button = UIButton()
-        let zzimtoryimage = UIImage(systemName: "figure.child")!
+        let zzimtoryimage = UIImage(named: "PocketBlack")!
         button.setImage(zzimtoryimage, for: .normal)
         button.backgroundColor = .white100Zt
         button.setTitle(" 주머니 추가", for: .normal)
@@ -130,6 +130,7 @@ class MainView: ZTView {
             make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview().inset(10)
         }
+      
         sortButton.snp.makeConstraints { make in
             make.width.height.equalTo(40) // 크기 조정
         }

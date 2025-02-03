@@ -33,7 +33,7 @@ class PocketDetailViewController: UIViewController,
         
         // PocketDetailView에 viewModel 데이터 전달
         pocketDetailView.configure(with: viewModel.pocketTitle, itemCount: viewModel.items.count)
-        pocketDetailView.searchBar.delegate = self // 서치바 delegate 설정
+//        pocketDetailView.searchBar.delegate = self // 서치바 delegate 설정
     }
     
     private func setupActions() {
@@ -44,7 +44,7 @@ class PocketDetailViewController: UIViewController,
         pocketDetailView.deleteButton.addTarget(self, action: #selector(deleteButtonDidTap), for: .touchUpInside)
         
         // 서치버튼
-        pocketDetailView.searchButton.addTarget(self, action: #selector(searchButtonDidTap), for: .touchUpInside)
+//        pocketDetailView.searchButton.addTarget(self, action: #selector(searchButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
@@ -76,7 +76,7 @@ class PocketDetailViewController: UIViewController,
     
     // 서치버튼 클릭 시 서치바 표시/숨기기
     @objc private func searchButtonDidTap() {
-        pocketDetailView.searchBar.isHidden = !pocketDetailView.searchBar.isHidden
+//        pocketDetailView.searchBar.isHidden = !pocketDetailView.searchBar.isHidden
         
         if !pocketDetailView.searchBar.isHidden {
             pocketDetailView.searchBar.becomeFirstResponder()
