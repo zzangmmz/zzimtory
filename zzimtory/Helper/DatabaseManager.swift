@@ -63,9 +63,9 @@ final class DatabaseManager {
             "items": [Item]()
         ]
         
-        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+        ref.child("users").child(uid).child("pockets").child(title).observeSingleEvent(of: .value) { snapshot in
             if !snapshot.exists() {
-                self.ref.child("users").child(uid).child("pockets").setValue(newPocket) { error, _ in
+                self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
                     if let error = error {
                         print("주머니 생성 실패: \(error.localizedDescription)")
                     } else {
@@ -100,13 +100,13 @@ final class DatabaseManager {
     }
     
     // MARK: - Data Update Methods
-    /// DB에 유저 주머니 데이터 업데이트 하는 메서드
-    func updateUserPockets(newPockets: [Pocket]) {
+    /// 주머니에 아이템 추가하는 메서드
+    func updateUserPocket(newPocket: Pocket) {
         guard let uid = self.userUID else { return }
         
-        let updateData = ["pockets": newPockets]
+        let updatePocket: [String: Pocket] = [newPocket.title: newPocket]
         
-        ref.child("users").child(uid).updateChildValues(updateData) { error, _ in
+        ref.child("users").child(uid).child("pockets").child(newPocket.title).updateChildValues(updatePocket) { error, _ in
             if let error = error {
                 print("주머니 업데이트 실패: \(error.localizedDescription)")
             } else {
