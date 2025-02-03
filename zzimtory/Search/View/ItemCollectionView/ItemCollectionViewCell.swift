@@ -59,7 +59,7 @@ final class ItemCollectionViewCell: UICollectionViewCell {
     // MARK: - UI functions
     func setCell(with item: Item) {
         imageView.kf.setImage(with: URL(string: item.image))
-        priceLabel.text = Int(item.price)?.formattedWithSeparator
+        priceLabel.text = Int(item.price)?.withSeparator
         titleLabel.text = item.title.removingHTMLTags
     }
     
