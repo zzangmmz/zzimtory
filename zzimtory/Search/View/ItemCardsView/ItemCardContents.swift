@@ -26,7 +26,7 @@ final class ItemCardContents: UIView {
     private lazy var priceLabel: UILabel = {
         let label = UILabel()
         
-        label.text = item.price
+        label.text = Int(item.price)?.formattedWithSeparator
         label.font = .systemFont(ofSize: 25, weight: .bold)
         label.textAlignment = .left
         label.textColor = .black900Zt
@@ -37,7 +37,7 @@ final class ItemCardContents: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         
-        label.text = item.title
+        label.text = item.title.removingHTMLTags
         label.font = .systemFont(ofSize: 25, weight: .bold)
         label.textAlignment = .left
         label.textColor = .black900Zt

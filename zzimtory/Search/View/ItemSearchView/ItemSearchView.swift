@@ -40,6 +40,7 @@ final class ItemSearchView: ZTView {
         setConstraints()
         
         bind(to: itemSearchViewModel)
+        itemCardsView.setDelegate(to: self)
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -98,6 +99,33 @@ extension ItemSearchView: SearchViewModelBindable {
     }
 }
 
+extension ItemSearchView: SwipeCardStackDelegate {
+    func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
+        // 웹뷰로 넘겨주기?
+    }
+    
+    func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
+        switch direction {
+        case .right: DummyModel.shared.defaultPocket.items.append(items[index])
+        case .left: break
+        case .up:
+            self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
+                                                     animated: true)
+  
+        default: print("Undefined swipe action")
+        }
+    }
+    
+    func cardStack(_ cardStack: SwipeCardStack, didUndoCardAt index: Int, from direction: SwipeDirection) {
+        
+    }
+    
+    func didSwipeAllCards(_ cardStack: SwipeCardStack) {
+
+    }
+    
+}
+
 extension ItemSearchView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
@@ -150,7 +178,7 @@ extension ItemSearchView: UICollectionViewDelegateFlowLayout {
         let availableWidth = collectionView.bounds.width - totalSpacing
         let cellWidth = availableWidth / numberOfCellsInRow
 
-        return CGSize(width: cellWidth, height: 200)
+        return CGSize(width: cellWidth, height: cellWidth * 1.25)
     }
     
 }
