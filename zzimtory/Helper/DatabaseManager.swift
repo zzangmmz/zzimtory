@@ -16,7 +16,7 @@ final class DatabaseManager {
     
     private init() {
         // 파이어베이스 참조 설정
-        ref = Database.database().reference()
+        ref = Database.database(url: "https://zzimtory-default-rtdb.asia-southeast1.firebasedatabase.app").reference()
         getUserUID()
     }
     
