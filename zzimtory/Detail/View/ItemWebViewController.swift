@@ -67,15 +67,13 @@ final class ItemWebViewController: UIViewController {
         
         itemWebView.shareButton.rx.tap
             .subscribe(onNext: { [weak self] in
-                guard let self = self else { return }
+                guard let self = self,
+                      let url = URL(string: self.urlString) else { return }
                 
                 let shareText = "주머니에서 꺼내왔습니다!!"
-                let shareURL = URL(string: self.urlString)
                 var shareItems: [Any] = [shareText]
                 
-                if let url = shareURL {
-                    shareItems.append(url)
-                }
+                shareItems.append(url)
                 
                 // 기본 공유시트 사용
                 let shareActivityViewController = UIActivityViewController(
