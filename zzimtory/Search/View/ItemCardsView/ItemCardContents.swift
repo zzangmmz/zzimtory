@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class ItemCardContents: UIView {
     
@@ -16,9 +17,7 @@ final class ItemCardContents: UIView {
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         
-        guard let url = URL(string: item.image) else { return imageView }
-        
-        imageView.loadImage(from: url)
+        imageView.kf.setImage(with: URL(string: item.image))
         imageView.contentMode = .scaleAspectFit
         
         return imageView
@@ -27,7 +26,7 @@ final class ItemCardContents: UIView {
     private lazy var priceLabel: UILabel = {
         let label = UILabel()
         
-        label.text = item.price
+        label.text = Int(item.price)?.withSeparator
         label.font = .systemFont(ofSize: 25, weight: .bold)
         label.textAlignment = .left
         label.textColor = .black900Zt
@@ -38,7 +37,7 @@ final class ItemCardContents: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         
-        label.text = item.title
+        label.text = item.title.removingHTMLTags
         label.font = .systemFont(ofSize: 25, weight: .bold)
         label.textAlignment = .left
         label.textColor = .black900Zt
