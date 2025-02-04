@@ -149,8 +149,3 @@ class MainView: ZTView {
         }
     }
 }
-
-@available(iOS 17.0, *)
-#Preview {
-    MainViewController()
-}
