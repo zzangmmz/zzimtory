@@ -14,6 +14,12 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     private let viewModel = MainPocketViewModel() // ViewModel
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        DatabaseManager.shared.readUserData()
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view = MainView(frame: view.frame)
@@ -89,9 +95,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         present(alert, animated: true, completion: nil)
     }
     
-    @objc private func editButtonDidTap() {
-        print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
-    }
+   
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.pocketCount()
@@ -119,5 +123,9 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
                                                     items: DummyModel.items)  // 새로운 viewModel 생성
         let detailVC = PocketDetailViewController(viewModel: detailViewModel) // 생성자 호출
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+    @objc private func editButtonDidTap() {
+        print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
+        DatabaseManager.shared.deletePocket(title: "12")
     }
 }

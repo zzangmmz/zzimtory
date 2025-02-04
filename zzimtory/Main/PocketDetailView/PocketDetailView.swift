@@ -161,13 +161,12 @@ class PocketDetailView: ZTView {
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(20)
-            make.leading.equalToSuperview().inset(16)
+            make.leading.trailing.equalToSuperview().inset(24)  
         }
         
         countAndButtonStackView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(8)
-            make.leading.equalToSuperview().offset(16)
-            make.trailing.equalToSuperview().inset(16)
+            make.leading.trailing.equalToSuperview().inset(24)
         }
         
         moveStackView.snp.makeConstraints { make in
@@ -198,21 +197,22 @@ class PocketDetailView: ZTView {
         
         itemCollectionView.snp.makeConstraints { make in
             make.top.equalTo(countAndButtonStackView.snp.bottom).offset(20)
-            make.leading.trailing.bottom.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().inset(16)
+            make.leading.trailing.equalToSuperview().inset(24)
         }
         
         overlayView.snp.makeConstraints { make in
             make.top.leading.trailing.bottom.equalToSuperview()  // 배경을 화면 전체로 채움
         }
 
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
-        layout.itemSize = CGSize(width: (UIScreen.main.bounds.width - 64) / 2, height: 200) // 두 개씩 배치
-        
-        itemCollectionView.collectionViewLayout = layout
-        
+//        let layout = UICollectionViewFlowLayout()
+//        layout.scrollDirection = .vertical
+//        layout.minimumLineSpacing = 20
+//        layout.minimumInteritemSpacing = 10
+//        layout.itemSize = CGSize(width: 150, height: 190) // 두 개씩 배치
+//        
+//        itemCollectionView.collectionViewLayout = layout
+//        
         // 버튼 사이즈 조정
         
         seedMoveButton.snp.makeConstraints { make in
@@ -290,3 +290,4 @@ class PocketDetailView: ZTView {
             }
     }
 }
+

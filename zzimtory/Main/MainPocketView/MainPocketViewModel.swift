@@ -29,6 +29,7 @@ class MainPocketViewModel {
         // 새 주머니 추가
         let newPocket: (name: String, images: [UIImage]) = (name: name, images: [])
         pockets.append(newPocket)
+        DatabaseManager.shared.createPocket(title: newPocket.name)
         onDataChanged?()
     }
     

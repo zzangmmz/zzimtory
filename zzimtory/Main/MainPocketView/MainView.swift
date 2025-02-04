@@ -139,4 +139,5 @@ class MainView: ZTView {
             make.width.height.equalTo(40) // 크기 조정
         }
     }
+    
 }

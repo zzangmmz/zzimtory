@@ -148,7 +148,7 @@ final class DatabaseManager {
     func deletePocket(title: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
+        ref.child("users").child(uid).child("pockets").child(title).observeSingleEvent(of: .value) { snapshot in
             guard var userData = snapshot.value as? [String: Any],
                   var pockets = userData["pockets"] as? [Pocket] else {
                 return

@@ -117,4 +117,3 @@ class PocketCell: UICollectionViewCell {
         }
     }
 }
-

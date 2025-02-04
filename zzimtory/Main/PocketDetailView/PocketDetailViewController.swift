@@ -84,3 +84,18 @@ class PocketDetailViewController: UIViewController,
     }
 
 }
+extension PocketDetailViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let numberOfCellsInRow: CGFloat = 2
+        let spacing: CGFloat = 12
+        let totalSpacing = spacing * (numberOfCellsInRow - 1)
+
+        let availableWidth = collectionView.bounds.width - totalSpacing
+        let cellWidth = availableWidth / numberOfCellsInRow
+
+        return CGSize(width: cellWidth, height: cellWidth * 1.25)
+    }
+    
+}
