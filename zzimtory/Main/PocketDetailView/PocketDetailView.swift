@@ -48,7 +48,7 @@ class PocketDetailView: ZTView {
         button.setTitle("X", for: .normal)
         button.setTitleColor(.black900Zt, for: .normal)
         button.backgroundColor = .gray200Zt
-        button.layer.cornerRadius = 14
+        button.layer.cornerRadius = 20
         button.isHidden = true
         return button
     }()
@@ -140,7 +140,6 @@ class PocketDetailView: ZTView {
     
     private func setupUI() {
         titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
-        
         titleLabel.textColor = .black900Zt
         
         countLabel.font = .systemFont(ofSize: 16)
@@ -173,7 +172,7 @@ class PocketDetailView: ZTView {
             make.bottom.equalTo(safeAreaLayoutGuide).inset(100)
             make.centerX.equalToSuperview()
             make.width.equalTo(240)
-            
+
         }
         
         moveCancelButton.snp.makeConstraints { make in
@@ -181,7 +180,7 @@ class PocketDetailView: ZTView {
             make.top.equalTo(safeAreaLayoutGuide).offset(20)
             make.trailing.equalToSuperview().inset(30)
         }
-        // 무브스택뷰 사이즈 설정, x버튼 오토레이아웃 설정 하기
+       
         searchBar.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(8)
             make.top.bottom.equalTo(countAndButtonStackView)
@@ -194,7 +193,6 @@ class PocketDetailView: ZTView {
             make.top.bottom.equalTo(searchBar)
             make.width.equalTo(50)
         }
-        
         
         itemCollectionView.snp.makeConstraints { make in
             make.top.equalTo(countAndButtonStackView.snp.bottom).offset(20)
@@ -214,6 +212,18 @@ class PocketDetailView: ZTView {
         itemCollectionView.collectionViewLayout = layout
         
         // 버튼 사이즈 조정
+        
+        seedMoveButton.snp.makeConstraints { make in
+            make.size.equalTo(50)
+        }
+        seedDeleteButton.snp.makeConstraints { make in
+            make.size.equalTo(50)
+        }
+        
+        moveCancelButton.snp.makeConstraints { make in
+            make.size.equalTo(40)
+        }
+        
         searchButton.snp.makeConstraints { make in
             make.size.equalTo(40) // 크기 조정
         }
