@@ -12,7 +12,7 @@ class MainView: ZTView {
     
     let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "figure.child")
+        imageView.image = UIImage(named: "PocketBlack")!
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
