@@ -12,28 +12,32 @@ class MainView: ZTView {
     
     let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "PocketBlack")!
+        imageView.image = UIImage(named: "logo")!
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
     let logoLabel: UILabel = {
         let label = UILabel()
-        label.text = "zzimtory"
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.text = "찜토리"
+        label.textColor = .black900Zt
+        label.font = .systemFont(ofSize: 14, weight: .regular)
         return label
     }()
     
     let addPocketButton: UIButton = {
         let button = UIButton()
-        let zzimtoryimage = UIImage(named: "PocketBlack")!
-        button.setImage(zzimtoryimage, for: .normal)
-        button.backgroundColor = .white100Zt
-        button.setTitle(" 주머니 추가", for: .normal)
-        button.layer.cornerRadius = 6
-        button.setTitleColor(.black900Zt, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        var config = UIButton.Configuration.filled()
+        config.image = UIImage(named: "PocketBlack")!
+        config.baseBackgroundColor = .white100Zt
+        config.baseForegroundColor = .black900Zt
+        config.imagePadding = 6
+        config.cornerStyle = .large
+        config.attributedTitle = AttributedString("주머니 추가",
+                                                  attributes: AttributeContainer([
+                                                    .font: UIFont.systemFont(ofSize: 14, weight: .regular)
+                                                  ]))
+        button.configuration = config
         return button
     }()
     
@@ -139,5 +143,9 @@ class MainView: ZTView {
             make.width.height.equalTo(40) // 크기 조정
         }
     }
-    
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    MainViewController()
 }
