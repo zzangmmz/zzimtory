@@ -152,10 +152,12 @@ class PocketDetailView: ZTView {
         addSubview(countAndButtonStackView)
         addSubview(searchBar)
         addSubview(cancelButton)
-        addSubview(itemCollectionView)
+       
         addSubview(overlayView)
+        addSubview(itemCollectionView)
         addSubview(moveStackView)
         addSubview(moveCancelButton)
+       
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(20)
