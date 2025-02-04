@@ -13,7 +13,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        viewModel.fetchData()
+        bind()
     }
     
     override func viewDidLoad() {
@@ -23,7 +23,6 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         setupActions()
         setupCollectionView()
-        bindViewModel()
     }
     
     private func setupActions() {
@@ -38,18 +37,14 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         mainView?.collectionView.register(
             PocketCell.self,
             forCellWithReuseIdentifier: "PocketCell"
-        ) // Register PocketCell
+        )
     }
     
-    private func bindViewModel() {
-        viewModel.onDataChanged = { [weak self] in
-            guard let self = self else { return }
-            self.mainView?.pocketCountLabel.text = "주머니 \(self.viewModel.pocketCount())개"
-            self.mainView?.collectionView.reloadData()
+    private func bind() {
+        self.viewModel.fetchData { [weak self] pockets in
+            self?.mainView?.pocketCountLabel.text = "주머니 \(pockets.count)개"
+            self?.mainView?.collectionView.reloadData()
         }
-        
-        // 주머니 개수 초기 표시하는 초기값 설정!
-        mainView?.pocketCountLabel.text = "주머니 \(viewModel.pocketCount())개"
     }
     
     @objc private func addPocketButtonDidTap() {
@@ -64,7 +59,8 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         ) { [weak self] _ in
             guard let self = self, let textField = alert.textFields?.first,
                   let name = textField.text, !name.isEmpty else { return }
-            self.viewModel.addPocket(named: name)
+            self.viewModel.addPocket(title: name)
+            self.bind()
         }
         
         alert.addAction(cancelAction)
@@ -95,7 +91,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.pocketCount()
+        return viewModel.pockets.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -106,7 +102,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         }
         
         let pocket = viewModel.pockets[indexPath.item]
-        cell.configure(with: pocket.title, images: [])
+        cell.configure(with: pocket.title, images: [pocket.image ?? "exampleImage", pocket.image ?? "exampleImage"])
         return cell
     }
     
