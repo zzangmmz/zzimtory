@@ -8,21 +8,13 @@
 import UIKit
 
 class MainViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    private var mainView: MainView? {
-        return self.view as? MainView
-    }
-    
-    private let viewModel = MainPocketViewModel() // ViewModel
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        DatabaseManager.shared.readUserData()
-    }
-    
+    private var mainView: MainView?
+    private let viewModel = MainPocketViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view = MainView(frame: view.frame)
+        self.mainView = MainView(frame: view.frame)
+        self.view = self.mainView
         
         setupActions()
         setupCollectionView()
@@ -95,7 +87,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         present(alert, animated: true, completion: nil)
     }
     
-   
+    
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.pocketCount()
@@ -109,17 +101,17 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         }
         
         let pocket = viewModel.pockets[indexPath.item]
-        cell.configure(with: pocket.name, images: pocket.images)
+        cell.configure(with: pocket.title, images: [])
         return cell
     }
-
+    
     // UICollectionViewDelegate 메서드 구현
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let pocket = viewModel.pockets[indexPath.item]
-        print("\(pocket.name) 이 클릭됨")
+        print("\(pocket.title) 이 클릭됨")
         
         // "전체보기" 클릭 시 PocketDetailViewController로 이동
-        let detailViewModel = PocketDetailViewModel(pocketTitle: pocket.name,
+        let detailViewModel = PocketDetailViewModel(pocketTitle: pocket.title,
                                                     items: DummyModel.items)  // 새로운 viewModel 생성
         let detailVC = PocketDetailViewController(viewModel: detailViewModel) // 생성자 호출
         navigationController?.pushViewController(detailVC, animated: true)
