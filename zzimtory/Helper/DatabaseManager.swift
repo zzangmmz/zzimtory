@@ -84,18 +84,25 @@ final class DatabaseManager {
     func readPocket(completion: @escaping ([Pocket]?) -> Void) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
-            guard let value = snapshot.value as? [String: Any] else {
-                print("유저를 찾지 못했습니다.")
-                completion(nil)
+        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot, error in
+            guard let pocketsDict = snapshot.value as? [String: [String: Any]] else {
                 return
             }
             do {
-                let jsonData = try JSONSerialization.data(withJSONObject: value)
-                let pockets = try JSONDecoder().decode([Pocket].self, from: jsonData)
+                let pockets = try pocketsDict.compactMap { (title, pocketData) -> Pocket? in
+                    // items 배열 추출
+                    guard let itemsArray = pocketData["items"] as? [[String: Any]] else { return nil }
+                    
+                    // items 데이터를 JSON으로 변환 후 디코딩
+                    let itemsData = try JSONSerialization.data(withJSONObject: itemsArray)
+                    let items = try JSONDecoder().decode([Item].self, from: itemsData)
+                    
+                    // Pocket 객체 생성
+                    return Pocket(title: title, items: items)
+                }
                 completion(pockets)
+                
             } catch {
-                print("디코딩 실패")
                 completion(nil)
             }
         }
