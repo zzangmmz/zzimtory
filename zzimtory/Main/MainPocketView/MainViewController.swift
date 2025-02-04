@@ -13,6 +13,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
         bind()
     }
     
@@ -88,8 +89,6 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         present(alert, animated: true, completion: nil)
     }
     
-    
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.pockets.count
     }
@@ -120,5 +119,30 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     @objc private func editButtonDidTap() {
         print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
         DatabaseManager.shared.deletePocket(title: "12")
+    }
+}
+
+extension MainViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let numberOfCellsInRow: CGFloat = 2
+        let spacing: CGFloat = 20
+        let totalSpacing = spacing * (numberOfCellsInRow - 1)
+
+        let availableWidth = collectionView.bounds.width - totalSpacing
+        let cellWidth = availableWidth / numberOfCellsInRow
+
+        return CGSize(width: cellWidth, height: cellWidth * 1.4)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 20
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 16
     }
 }
