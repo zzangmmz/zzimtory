@@ -149,7 +149,7 @@ final class DatabaseManager {
     }
     
     // MARK: - Data Delete Methods
-    /// DB에서 유저 삭제하는 메서드
+    /// 유저 삭제 메서드
     func deleteUser() {
         guard let uid = self.userUID else { return }
         
@@ -162,7 +162,7 @@ final class DatabaseManager {
         }
     }
     
-    /// DB에서 유저의 주머니를 삭제하는 메서드
+    /// 유저 주머니 삭제 메서드
     func deletePocket(title: String) {
         guard let uid = self.userUID else { return }
         
@@ -171,6 +171,38 @@ final class DatabaseManager {
                 print("주머니 삭제 실패: \(error.localizedDescription)")
             } else {
                 print("주머니 \(title) 삭제 성공")
+            }
+        }
+    }
+    
+    func deleteItem(productID: String, from pocketTitle: String) {
+        guard let uid = self.userUID else { return }
+        
+        ref.child("users").child(uid).child("pockets").child(pocketTitle).observeSingleEvent(of: .value) { snapshot in
+            guard let pocket = snapshot.value as? [String: Any],
+                  var items = pocket["items"] as? [String: Any] else {
+                print("주머니 탐색 실패")
+                return
+            }
+            
+            var removeIndex: String?
+            for (index, item) in items {
+                if let itemDict = item as? [String: Any],
+                   let itemProductID = itemDict["productID"] as? String,
+                   itemProductID == productID {
+                    removeIndex = index
+                    break
+                }
+            }
+            
+            if let removeIndex = removeIndex {
+                self.ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items").child(removeIndex).removeValue { error, _ in
+                    if let error = error {
+                        print("아이템 삭제 실패: \(error.localizedDescription)")
+                    } else {
+                        print("아이템 삭제 성공")
+                    }
+                }
             }
         }
     }
