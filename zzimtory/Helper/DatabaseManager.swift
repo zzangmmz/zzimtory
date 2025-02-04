@@ -81,22 +81,23 @@ final class DatabaseManager {
     
     // MARK: - Data Read Method
     /// 유저 주머니 읽어오는 메서드
-    func readPocket(completion: @escaping ([Pocket]?) -> Void) {
+    func readPocket(completion: @escaping ([Pocket]) -> Void) {
         guard let uid = self.userUID else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
-            guard let value = snapshot.value as? [String: Any] else {
-                print("유저를 찾지 못했습니다.")
-                completion(nil)
+            guard let pocketData = snapshot.value as? [[String: Any]] else {
+                print("❌ No data found or wrong format")
+                completion([])
                 return
             }
+            
             do {
-                let jsonData = try JSONSerialization.data(withJSONObject: value)
-                let pockets = try JSONDecoder().decode([Pocket].self, from: jsonData)
-                completion(pockets)
+                let jsonData = try JSONSerialization.data(withJSONObject: pocketData) // Convert Firebase data to JSON
+                let pockets = try JSONDecoder().decode([Pocket].self, from: jsonData) // Decode JSON to Swift struct
+                completion(pockets) // ✅ Successfully converted
             } catch {
-                print("디코딩 실패")
-                completion(nil)
+                print("❌ JSON Decoding Error:", error)
+                completion([])
             }
         }
     }
