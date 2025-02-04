@@ -81,7 +81,6 @@ final class DetailView: ZTView {
     let saveButton: UIButton = {
         let button = UIButton()
         
-        button.setTitle("주머니에 넣기", for: .normal)
         button.backgroundColor = .blue400ZtPrimary
         button.layer.cornerRadius = 10
         
@@ -91,7 +90,6 @@ final class DetailView: ZTView {
         // 추후 적용을 위해 주석처리
         // let image = UIImage(named: "PocketBlack", in: Bundle.main, with: config)
         
-        button.setButtonDefaultImage(imageName: "tray.fill")
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         

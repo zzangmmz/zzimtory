@@ -6,10 +6,14 @@
 //
 
 import RxSwift
+import UIKit
 
 final class DetailViewModel {
     private let disposeBag = DisposeBag()
     private let shoppingRepository = ShoppingRepository()
+    
+    // 임시 로그인 상태 변수
+    static var isLoggedIn: Bool = true
     
     // Input
     let currentItem: Item // 현재 보여줄 아이템
@@ -21,6 +25,9 @@ final class DetailViewModel {
     let itemPrice = BehaviorSubject<String>(value: "")
     let itemImageUrl = BehaviorSubject<String>(value: "")
     let similarItems = BehaviorSubject<[Item]>(value: [])
+    
+    let isInPocket = BehaviorSubject<Bool>(value: false)
+    private var isInPocketStatus: Bool = false
     
     init(item: Item) {
         self.currentItem = item
@@ -84,5 +91,25 @@ final class DetailViewModel {
     func refreshSimilarItems() {
         setupSearchQuery()
         fetchSimilarItems()
+    }
+    
+    func handlePocketButton() -> Bool {
+        // 로그인 체크
+        guard DetailViewModel.isLoggedIn else {
+            return false
+        }
+        
+        // 주머니에 있을 때만 상태 변경
+        if isInPocketStatus {
+            isInPocketStatus = false
+            isInPocket.onNext(false)
+        }
+        
+        return isInPocketStatus
+    }
+    
+    func addToPocket() {
+        isInPocketStatus = true
+        isInPocket.onNext(true)
     }
 }

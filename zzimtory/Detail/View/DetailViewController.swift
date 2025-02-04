@@ -39,17 +39,17 @@ final class DetailViewController: UIViewController {
             .bind(to: detailView.itemNameLabel.rx.text)
             .disposed(by: disposeBag)
         
-        // 브랜드명 바인딩
+        // 가격 바인딩
         viewModel.itemPrice
             .bind(to: detailView.priceLabel.rx.text)
             .disposed(by: disposeBag)
         
-        // 가격 바인딩
-        viewModel.itemPrice
-            .subscribe(onNext: { [weak self] text in
-                self?.detailView.priceLabel.text = text
-            })
-            .disposed(by: disposeBag)
+        //        // 가격 바인딩
+        //        viewModel.itemPrice
+        //            .subscribe(onNext: { [weak self] text in
+        //                self?.detailView.priceLabel.text = text
+        //            })
+        //            .disposed(by: disposeBag)
         
         // 이미지 바인딩
         viewModel.itemImageUrl
@@ -71,6 +71,7 @@ final class DetailViewController: UIViewController {
             .disposed(by: disposeBag)
         
         // 유사 상품 선택 시 처리
+        // 보통은 뷰모델을 거침
         detailView.similarItemCollectionView.rx.modelSelected(Item.self)
             .subscribe(onNext: { [weak self] item in
                 let detailVC = DetailViewController(item: item)
@@ -109,11 +110,54 @@ final class DetailViewController: UIViewController {
                 self.present(shareActivityViewController, animated: true)
             })
             .disposed(by: disposeBag)
+        
+        // 주머니 상태에 따른 버튼 UI 업데이트
+        viewModel.isInPocket
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isInPocket in
+                let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
+                let imageName = isInPocket ? "tray" : "tray.fill"
+                
+                self?.detailView.saveButton.setTitle(title, for: .normal)
+                self?.detailView.saveButton.setButtonDefaultImage(imageName: imageName)
+            })
+            .disposed(by: disposeBag)
+        
+        // 버튼 탭 처리
+        detailView.saveButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                
+                // 로그인 확인
+                guard DetailViewModel.isLoggedIn else {
+                    self.presentLoginView()
+                    return
+                }
+                // 이미 주머니에 있으면 제거
+                if self.viewModel.handlePocketButton() {
+                    return
+                }
+                
+                // 주머니에 없으면 선택 화면으로
+                let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
+                self.present(pocketVC, animated: true)
+                
+//                pocketVC.onComplete = { [weak self] in
+//                    self?.viewModel.addToPocket()
+//                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func presentLoginView() {
+        let loginVC = LoginViewController()
+        let nav = UINavigationController(rootViewController: loginVC)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
 }
 
 extension DetailViewController {
-    
     private func setupNavigationBar() {
         // 네비게이션 바를 투명하게 설정 (시도 중)
         let appearance = UINavigationBarAppearance()
