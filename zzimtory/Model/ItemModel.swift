@@ -48,14 +48,14 @@ struct Item: Codable {
 
 
 extension Item {
-    func asNSDictionary() -> NSDictionary {
+    func asAny() -> Any {
         return [
             "title": self.title,
             "link": self.link,
             "image": self.image,
-            "price": self.price,
+            "lprice": self.price,
             "mallName": self.mallName,
-            "productID": self.productID,
+            "productId": self.productID,
             "productType": self.productType,
             "brand": self.brand,
             "maker": self.maker,
