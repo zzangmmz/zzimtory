@@ -99,7 +99,8 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PocketCell", for: indexPath) as? PocketCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PocketCell",
+                                                            for: indexPath) as? PocketCell else {
             fatalError("Unable to dequeue PocketCell")
         }
         
@@ -114,7 +115,8 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         print("\(pocket.name) 이 클릭됨")
         
         // "전체보기" 클릭 시 PocketDetailViewController로 이동
-        let detailViewModel = PocketDetailViewModel(pocketTitle: pocket.name, items: DummyModel.items)  // 새로운 viewModel 생성
+        let detailViewModel = PocketDetailViewModel(pocketTitle: pocket.name,
+                                                    items: DummyModel.items)  // 새로운 viewModel 생성
         let detailVC = PocketDetailViewController(viewModel: detailViewModel) // 생성자 호출
         navigationController?.pushViewController(detailVC, animated: true)
     }

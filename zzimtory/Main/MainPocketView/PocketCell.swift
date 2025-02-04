@@ -117,7 +117,4 @@ class PocketCell: UICollectionViewCell {
         }
     }
 }
-@available(iOS 17.0, *)
-#Preview {
-    MainViewController()
-}
+
