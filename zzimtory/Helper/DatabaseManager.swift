@@ -61,14 +61,13 @@ final class DatabaseManager {
         guard let uid = self.userUID else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
-            let newIndex = String(snapshot.childrenCount)
-            
             let newPocket: [String: Any] = [
                 "title": title,
-                "items": [:]
+                "items": [:],
+                "image": "sampleImage"
             ]
             
-            self.ref.child("users").child(uid).child("pockets").child(newIndex).setValue(newPocket) { error, _ in
+            self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
                 if let error = error {
                     print("주머니 생성 실패: \(error.localizedDescription)")
                 } else {
@@ -84,7 +83,6 @@ final class DatabaseManager {
         guard let uid = self.userUID else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
-            // Firebase는 pockets를 숫자 키를 가진 딕셔너리 형태로 저장하고 있습니다
             guard let pocketData = snapshot.value as? [String: [String: Any]] else {
                 print("❌ No data found or wrong format")
                 completion([])
@@ -93,7 +91,6 @@ final class DatabaseManager {
             
             var pockets: [Pocket] = []
             
-            // 숫자 키로 정렬된 순서대로 처리하기 위해 키를 정렬합니다
             let sortedKeys = pocketData.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
             
             for key in sortedKeys {
@@ -146,32 +143,32 @@ final class DatabaseManager {
     
     // MARK: - Data Update Methods
     /// 아이템 추가하는 메서드
-    func updatePocketItem(newItem: Item, pocketIndex: String) {
-        guard let uid = self.userUID else { return }
-        
-        // 해당 주머니의 items 참조를 가져옵니다
-        let itemsRef = ref.child("users").child(uid).child("pockets").child(pocketIndex).child("items")
-        
-        // 현재 items의 개수를 확인하여 새로운 인덱스를 결정합니다
-        itemsRef.observeSingleEvent(of: .value) { snapshot in
-            let newIndex = String(snapshot.childrenCount)
-            
-            // 아이템을 딕셔너리로 변환합니다
-            guard let itemDictionary = newItem.asNSDictionary() as? [String: Any] else {
-                print("아이템 변환 실패")
-                return
-            }
-            
-            // 새로운 아이템을 추가합니다
-            itemsRef.child(newIndex).setValue(itemDictionary) { error, _ in
-                if let error = error {
-                    print("아이템 추가 실패: \(error.localizedDescription)")
-                } else {
-                    print("아이템 추가 성공")
-                }
-            }
-        }
-    }
+//    func updatePocketItem(newItem: Item, pocketIndex: String) {
+//        guard let uid = self.userUID else { return }
+//        
+//        // 해당 주머니의 items 참조를 가져옵니다
+//        let itemsRef = ref.child("users").child(uid).child("pockets").child(pocketIndex).child("items")
+//        
+//        // 현재 items의 개수를 확인하여 새로운 인덱스를 결정합니다
+//        itemsRef.observeSingleEvent(of: .value) { snapshot in
+//            let newIndex = String(snapshot.childrenCount)
+//            
+//            // 아이템을 딕셔너리로 변환합니다
+//            guard let itemDictionary = newItem. as? [String: Any] else {
+//                print("아이템 변환 실패")
+//                return
+//            }
+//            
+//            // 새로운 아이템을 추가합니다
+//            itemsRef.child(newIndex).setValue(itemDictionary) { error, _ in
+//                if let error = error {
+//                    print("아이템 추가 실패: \(error.localizedDescription)")
+//                } else {
+//                    print("아이템 추가 성공")
+//                }
+//            }
+//        }
+//    }
     
     // MARK: - Data Delete Methods
     /// 유저 삭제 메서드
