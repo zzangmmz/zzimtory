@@ -33,12 +33,21 @@ final class GoogleAuthManager: NativeAuthProtocol {
                 withIDToken: idToken,
                 accessToken: user.accessToken.tokenString
             )
-            Auth.auth().signIn(with: credential) { _, error in
+            Auth.auth().signIn(with: credential) { authResult, error in
                 if let error = error as NSError? {
                     print("파이어베이스 인증 오류: \(error.localizedDescription)")
                     return
+                } else {
+                    guard let authUser = authResult?.user else { return }
+                    let newUser = User(
+                        email: authUser.email ?? "",
+                        nickname: authUser.displayName ?? "",
+                        uid: authUser.uid,
+                        pockets: []
+                    )
+                    DatabaseManager.shared.createUser(user: newUser)
+                    print("파이어베이스 인증 성공")
                 }
-                print("파이어베이스 인증 성공")
             }
         }
     }

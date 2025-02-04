@@ -5,13 +5,15 @@
 //  Created by t2023-m0072 on 1/21/25.
 //
 
+import Foundation
+
 struct ShoppingAPIResponse: Decodable {
     let start: Int
     let display: Int
     let items: [Item]
 }
 
-struct Item: Decodable {
+struct Item: Codable {
     let title: String
     let link: String
     let image: String
@@ -25,6 +27,7 @@ struct Item: Decodable {
     let category2: String
     let category3: String
     let category4: String
+//    let saveDate: String?
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -43,13 +46,30 @@ struct Item: Decodable {
     }
 }
 
-struct Pocket {
-    let title: String
-    var items: [Item]
+
+extension Item {
+    func asNSDictionary() -> NSDictionary {
+        return [
+            "title": self.title,
+            "link": self.link,
+            "image": self.image,
+            "price": self.price,
+            "mallName": self.mallName,
+            "productID": self.productID,
+            "productType": self.productType,
+            "brand": self.brand,
+            "maker": self.maker,
+            "category1": self.category1,
+            "category2": self.category2,
+            "category3": self.category3,
+            "category4": self.category4
+        ]
+    }
 }
 
+
 // MARK: - API Response 참고용 JSON (추후 삭제 요망)
-// {
+//{
 //    "lastBuildDate": "Tue, 21 Jan 2025 10:20:29 +0900",
 //    "total": 4832140,
 //    "start": 1,
@@ -216,5 +236,5 @@ struct Pocket {
 //            "category4": ""
 //        }
 //    ]
-// }
+//}
 //
