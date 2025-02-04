@@ -29,7 +29,7 @@ final class DatabaseManager {
     }
     
     // MARK: - Data Create Method
-    /// DB에 유저 등록하는 메서드
+    /// 유저 등록하는 메서드
     func createUser(user: User) {
         guard let uid = self.userUID else { return }
         
@@ -55,6 +55,7 @@ final class DatabaseManager {
         }
     }
     
+    /// 주머니 만드는 메서드
     func createPocket(title: String) {
         guard let uid = self.userUID else { return }
         
@@ -155,14 +156,14 @@ final class DatabaseManager {
         
         ref.child("users").child(uid).removeValue() { error, _ in
             if let error = error {
-                print("유저 삭제 실패")
+                print("유저 삭제 실패: \(error.localizedDescription)")
             } else {
                 print("유저 삭제 성공")
             }
         }
     }
     
-    /// 유저 주머니 삭제 메서드
+    /// 주머니 삭제 메서드
     func deletePocket(title: String) {
         guard let uid = self.userUID else { return }
         
@@ -175,6 +176,7 @@ final class DatabaseManager {
         }
     }
     
+    /// 아이템 삭제 메서드
     func deleteItem(productID: String, from pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
