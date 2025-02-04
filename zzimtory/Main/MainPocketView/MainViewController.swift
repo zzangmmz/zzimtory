@@ -11,6 +11,11 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     private var mainView: MainView?
     private let viewModel = MainPocketViewModel()
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.fetchData()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.mainView = MainView(frame: view.frame)
