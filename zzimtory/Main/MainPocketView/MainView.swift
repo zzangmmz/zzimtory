@@ -21,7 +21,7 @@ class MainView: ZTView {
         let label = UILabel()
         label.text = "찜토리"
         label.textColor = .black900Zt
-        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.font = .systemFont(ofSize: 16, weight: .regular)
         return label
     }()
     
@@ -51,9 +51,8 @@ class MainView: ZTView {
     
     let pocketCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "주머니 0개"
         label.textColor = .black900Zt
-        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.font = .systemFont(ofSize: 16, weight: .regular)
         return label
     }()
     
@@ -78,9 +77,6 @@ class MainView: ZTView {
     let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
-        layout.itemSize = CGSize(width: 160, height: 200)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.register(PocketCell.self, forCellWithReuseIdentifier: "PocketCell")
@@ -100,7 +96,7 @@ class MainView: ZTView {
         
         let logoStackView = UIStackView(arrangedSubviews: [logoImageView, logoLabel])
         logoStackView.axis = .horizontal
-        logoStackView.spacing = 8
+        logoStackView.spacing = 10
         logoStackView.alignment = .center
         
         let topStackView = UIStackView(arrangedSubviews: [logoStackView, addPocketButton])
@@ -130,9 +126,9 @@ class MainView: ZTView {
         addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(10)
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.bottom.equalToSuperview().inset(10)
+            make.top.bottom.equalTo(safeAreaLayoutGuide).offset(20)
+            make.leading.trailing.equalToSuperview().inset(24)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
         }
       
         sortButton.snp.makeConstraints { make in
@@ -141,6 +137,15 @@ class MainView: ZTView {
         
         editButton.snp.makeConstraints { make in
             make.width.height.equalTo(40) // 크기 조정
+        }
+        
+        searchBar.searchTextField.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.top.bottom.equalToSuperview().inset(6)
+        }
+        
+        collectionView.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
         }
     }
 }
