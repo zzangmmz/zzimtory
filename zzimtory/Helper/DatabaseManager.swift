@@ -130,7 +130,10 @@ final class DatabaseManager {
                 currentItems = existingItems
             }
             
-            currentItems.append(newItem.asNSDictionary() as! [String: Any])
+            guard let itemDictionary = newItem.asNSDictionary() as? [String: Any] else {
+                return
+            }
+            currentItems.append(itemDictionary)
             
             pocketRef.updateChildValues(["items": currentItems]) { error, _ in
                 if let error = error {
