@@ -100,7 +100,7 @@ class PocketCell: UICollectionViewCell {
         countLabel.layer.masksToBounds = true
     }
     
-    func configure(with title: String, images: [UIImage]) {
+    func configure(with title: String, images: [String]) {
         titleLabel.text = title
         countLabel.text = "\(images.count)개" // 추후 주머니 속 개수로 수정 예정!!
         countLabel.isHidden = images.isEmpty
@@ -109,7 +109,7 @@ class PocketCell: UICollectionViewCell {
         
         for (index, imageView) in previews.enumerated() {
             if index < images.count {
-                imageView.image = images[index]
+                imageView.image = UIImage(named: images[index])
                 imageView.isHidden = false
             } else {
                 imageView.isHidden = true
