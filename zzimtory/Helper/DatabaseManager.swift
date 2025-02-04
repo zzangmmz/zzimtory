@@ -29,7 +29,7 @@ final class DatabaseManager {
     }
     
     // MARK: - Data Create Method
-    /// DB에 유저 등록하는 메서드
+    /// 유저 등록하는 메서드
     func createUser(user: User) {
         guard let uid = self.userUID else { return }
         
@@ -55,6 +55,7 @@ final class DatabaseManager {
         }
     }
     
+    /// 주머니 만드는 메서드
     func createPocket(title: String) {
         guard let uid = self.userUID else { return }
         
@@ -79,118 +80,128 @@ final class DatabaseManager {
     }
     
     // MARK: - Data Read Method
-    /// DB에서 유저 읽어오는 메서드
-    func readUserData() {
+    /// 유저 주머니 읽어오는 메서드
+    func readPocket(completion: @escaping ([Pocket]) -> Void) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
-            guard let value = snapshot.value as? [String: Any] else {
-                print("유저를 찾지 못했습니다.")
+        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+            guard let pocketData = snapshot.value as? [[String: Any]] else {
+                print("❌ No data found or wrong format")
+                completion([])
                 return
             }
             
             do {
-                let jsonData = try JSONSerialization.data(withJSONObject: value)
-                
-                let user = try JSONDecoder().decode(User.self, from: jsonData)
+                let jsonData = try JSONSerialization.data(withJSONObject: pocketData) // Convert Firebase data to JSON
+                let pockets = try JSONDecoder().decode([Pocket].self, from: jsonData) // Decode JSON to Swift struct
+                completion(pockets) // ✅ Successfully converted
             } catch {
-                print("디코딩 실패")
+                print("❌ JSON Decoding Error:", error)
+                completion([])
             }
         }
     }
+    
+    /// 유저 프로필(이메일, 닉네임) 읽어오는 메서드
+    func readUserProfile(completion: @escaping ((email: String, nickname: String)?) -> Void) {
+        guard let uid = self.userUID else { return }
+        
+        ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
+            guard let value = snapshot.value as? [String: Any],
+                  let email = value["email"] as? String,
+                  let nickname = value["nickname"] as? String else {
+                print("프로필 정보를 찾을 수 없습니다.")
+                completion(nil)
+                return
+            }
+            completion((email: email, nickname: nickname))
+        }
+    }
+
     
     // MARK: - Data Update Methods
-    /// 주머니에 아이템 추가하는 메서드
-    func updateUserPocket(newPocket: Pocket) {
+    /// 아이템 추가하는 메서드
+    func updatePocketItem(newItem: Item, pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        let updatePocket: [String: [NSDictionary]] = [newPocket.title: newPocket.items.map { $0.asNSDictionary() }]
-        
-        ref.child("users").child(uid).child("pockets").child(newPocket.title).updateChildValues(updatePocket) { error, _ in
-            if let error = error {
-                print("주머니 업데이트 실패: \(error.localizedDescription)")
-            } else {
-                print("주머니 업데이트 성공")
+        let pocketRef = ref.child("users").child(uid).child("pockets").child(pocketTitle)
+        pocketRef.child("items").observeSingleEvent(of: .value) { snapshot in
+            var currentItems: [[String: Any]] = []
+            if let existingItems = snapshot.value as? [[String: Any]] {
+                currentItems = existingItems
             }
-        }
-    }
-    
-    /// 유저 주머니 타이틀 업데이트 하는 메서드
-    func updatePocketTitle(newTitle: String) {
-        guard let uid = self.userUID else { return }
-        
-        let updateTitle = ["title": newTitle]
-        
-        ref.child("users").child(uid).updateChildValues(updateTitle) { error, _ in
-            if let error = error {
-                print("주머니 타이틀 업데이트 실패: \(error.localizedDescription)")
-            } else {
-                print("주머니 타이틀 업데이트 성공")
+            
+            guard let itemDictionary = newItem.asNSDictionary() as? [String: Any] else {
+                print("NSDictionary로 변환 실패")
+                return
+            }
+            currentItems.append(itemDictionary)
+            
+            pocketRef.updateChildValues(["items": currentItems]) { error, _ in
+                if let error = error {
+                    print("아이템 업데이트 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 업데이트 성공")
+                }
             }
         }
     }
     
     // MARK: - Data Delete Methods
-    /// DB에서 유저 삭제하는 메서드
+    /// 유저 삭제 메서드
     func deleteUser() {
         guard let uid = self.userUID else { return }
         
         ref.child("users").child(uid).removeValue() { error, _ in
             if let error = error {
-                print("유저 삭제 실패")
+                print("유저 삭제 실패: \(error.localizedDescription)")
             } else {
                 print("유저 삭제 성공")
             }
         }
     }
     
-    /// DB에서 유저의 주머니를 삭제하는 메서드
+    /// 주머니 삭제 메서드
     func deletePocket(title: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").child(title).observeSingleEvent(of: .value) { snapshot in
-            guard var userData = snapshot.value as? [String: Any],
-                  var pockets = userData["pockets"] as? [Pocket] else {
-                return
-            }
-            
-            if let indexToRemove = pockets.firstIndex(where: { $0.title == title }) {
-                pockets.remove(at: indexToRemove)
-                
-                userData["pockets"] = pockets
-                self.ref.child("users").child(uid).updateChildValues(userData) { error, _ in
-                    if let error = error {
-                        print("유저 주머니 삭제 실패")
-                    } else {
-                        print("유저 주머니 삭제 성공")
-                    }
-                }
+        ref.child("users").child(uid).child("pockets").child(title).removeValue { error, _ in
+            if let error = error {
+                print("주머니 삭제 실패: \(error.localizedDescription)")
             } else {
-                print("해당 타이틀의 주머니가 없습니다.")
+                print("주머니 \(title) 삭제 성공")
             }
         }
     }
     
-    /// 주머니 여러 개 삭제하는 메서드
-    func deletePockets(titles: [String]) {
+    /// 아이템 삭제 메서드
+    func deleteItem(productID: String, from pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
-            guard var userData = snapshot.value as? [String: Any],
-                  var pockets = userData["pockets"] as? [Pocket] else {
+        ref.child("users").child(uid).child("pockets").child(pocketTitle).observeSingleEvent(of: .value) { snapshot in
+            guard let pocket = snapshot.value as? [String: Any],
+                  var items = pocket["items"] as? [String: Any] else {
+                print("주머니 탐색 실패")
                 return
             }
             
-            pockets.removeAll { pocket in
-                titles.contains(pocket.title)
+            var removeIndex: String?
+            for (index, item) in items {
+                if let itemDict = item as? [String: Any],
+                   let itemProductID = itemDict["productID"] as? String,
+                   itemProductID == productID {
+                    removeIndex = index
+                    break
+                }
             }
             
-            userData["pockets"] = pockets
-            self.ref.child("users").child(uid).updateChildValues(userData) { error, _ in
-                if let error = error {
-                    print("주머니들 삭제 실패")
-                } else {
-                    print("주머니 삭제 성공")
+            if let removeIndex = removeIndex {
+                self.ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items").child(removeIndex).removeValue { error, _ in
+                    if let error = error {
+                        print("아이템 삭제 실패: \(error.localizedDescription)")
+                    } else {
+                        print("아이템 삭제 성공")
+                    }
                 }
             }
         }
