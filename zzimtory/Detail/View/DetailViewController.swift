@@ -44,13 +44,6 @@ final class DetailViewController: UIViewController {
             .bind(to: detailView.priceLabel.rx.text)
             .disposed(by: disposeBag)
         
-        //        // 가격 바인딩
-        //        viewModel.itemPrice
-        //            .subscribe(onNext: { [weak self] text in
-        //                self?.detailView.priceLabel.text = text
-        //            })
-        //            .disposed(by: disposeBag)
-        
         // 이미지 바인딩
         viewModel.itemImageUrl
             .subscribe(onNext: { [weak self] urlString in
