@@ -10,7 +10,35 @@ import SnapKit
 
 // PocketDetailView.swift
 class PocketDetailView: ZTView {
-    var titleLabel = UILabel()
+    let backButton: UIButton = {
+        let button = UIButton()
+        var config = UIButton.Configuration.filled()
+        config.image = UIImage(systemName: "chevron.left")
+        config.baseBackgroundColor = .clear
+        config.baseForegroundColor = .black900Zt
+        button.configuration = config
+        button.snp.makeConstraints { make in
+            make.width.equalTo(30)
+        }
+        return button
+    }()
+    
+    var titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.textColor = .black900Zt
+        return label
+    }()
+    
+    private lazy var titleStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [backButton, titleLabel])
+        stackView.axis = .horizontal
+        stackView.spacing = 6
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        return stackView
+    }()
+    
     var countLabel = UILabel()
     var itemCollectionView = ItemCollectionView()
     
@@ -139,14 +167,12 @@ class PocketDetailView: ZTView {
     }
     
     private func setupUI() {
-        titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
-        titleLabel.textColor = .black900Zt
         
         countLabel.font = .systemFont(ofSize: 16)
         countLabel.textColor = .black900Zt
         
         // titleLabel 추가
-        addSubview(titleLabel)
+        addSubview(titleStackView)
         
         // countLabel과 버튼들을 묶은 stackView 추가
         addSubview(countAndButtonStackView)
@@ -159,9 +185,9 @@ class PocketDetailView: ZTView {
         addSubview(moveCancelButton)
        
         
-        titleLabel.snp.makeConstraints { make in
+        titleStackView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(20)
-            make.leading.trailing.equalToSuperview().inset(24)  
+            make.leading.trailing.equalToSuperview().inset(24)
         }
         
         countAndButtonStackView.snp.makeConstraints { make in
