@@ -132,6 +132,7 @@ final class DatabaseManager {
             }
             
             guard let itemDictionary = newItem.asNSDictionary() as? [String: Any] else {
+                print("NSDictionary로 변환 실패")
                 return
             }
             currentItems.append(itemDictionary)
