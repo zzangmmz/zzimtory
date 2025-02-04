@@ -64,7 +64,7 @@ final class DatabaseManager {
             let newPocket: [String: Any] = [
                 "title": title,
                 "items": [:],
-                "image": "sampleImage"
+                "image": "exampleImage"
             ]
             
             self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
