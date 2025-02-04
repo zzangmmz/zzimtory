@@ -166,25 +166,11 @@ final class DatabaseManager {
     func deletePocket(title: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
-            guard var userData = snapshot.value as? [String: Any],
-                  var pockets = userData["pockets"] as? [Pocket] else {
-                return
-            }
-            
-            if let indexToRemove = pockets.firstIndex(where: { $0.title == title }) {
-                pockets.remove(at: indexToRemove)
-                
-                userData["pockets"] = pockets
-                self.ref.child("users").child(uid).updateChildValues(userData) { error, _ in
-                    if let error = error {
-                        print("유저 주머니 삭제 실패")
-                    } else {
-                        print("유저 주머니 삭제 성공")
-                    }
-                }
+        ref.child("users").child(uid).child("pockets").child(title).removeValue { error, _ in
+            if let error = error {
+                print("주머니 삭제 실패: \(error.localizedDescription)")
             } else {
-                print("해당 타이틀의 주머니가 없습니다.")
+                print("주머니 \(title) 삭제 성공")
             }
         }
     }
