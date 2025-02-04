@@ -5,6 +5,8 @@
 //  Created by t2023-m0072 on 1/21/25.
 //
 
+import Foundation
+
 struct ShoppingAPIResponse: Decodable {
     let start: Int
     let display: Int
@@ -41,6 +43,27 @@ struct Item: Codable {
         case category2
         case category3
         case category4
+    }
+}
+
+
+extension Item {
+    func asNSDictionary() -> NSDictionary {
+        return [
+            "title": self.title,
+            "link": self.link,
+            "image": self.image,
+            "price": self.price,
+            "mallName": self.mallName,
+            "productID": self.productID,
+            "productType": self.productType,
+            "brand": self.brand,
+            "maker": self.maker,
+            "category1": self.category1,
+            "category2": self.category2,
+            "category3": self.category3,
+            "category4": self.category4
+        ]
     }
 }
 
