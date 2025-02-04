@@ -10,10 +10,12 @@ import Foundation
 class PocketDetailViewModel {
     var pocketTitle: String
     var items: [Item]
+    var filteredItems: [Item]
     
     init(pocketTitle: String, items: [Item]) {
         self.pocketTitle = pocketTitle
         self.items = items
+        self.filteredItems = items
     }
     
     var itemCount: String {

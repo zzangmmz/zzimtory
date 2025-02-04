@@ -12,7 +12,7 @@ class MainView: ZTView {
     
     let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "figure.child")
+        imageView.image = UIImage(named: "PocketBlack")!
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -27,7 +27,7 @@ class MainView: ZTView {
     
     let addPocketButton: UIButton = {
         let button = UIButton()
-        let zzimtoryimage = UIImage(systemName: "figure.child")!
+        let zzimtoryimage = UIImage(named: "PocketBlack")!
         button.setImage(zzimtoryimage, for: .normal)
         button.backgroundColor = .white100Zt
         button.setTitle(" 주머니 추가", for: .normal)
@@ -57,6 +57,8 @@ class MainView: ZTView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "slider.horizontal.3"), for: .normal)
         button.tintColor = .black900Zt
+        button.layer.cornerRadius = 20
+        button.backgroundColor = .white100Zt
         return button
     }()
     
@@ -64,6 +66,8 @@ class MainView: ZTView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "pencil"), for: .normal)
         button.tintColor = .black900Zt
+        button.layer.cornerRadius = 20
+        button.backgroundColor = .white100Zt
         return button
     }()
     
@@ -103,7 +107,7 @@ class MainView: ZTView {
         
         let actionStackView = UIStackView(arrangedSubviews: [sortButton, editButton])
         actionStackView.axis = .horizontal
-        actionStackView.spacing = 8
+        actionStackView.spacing = 16
         actionStackView.alignment = .center
         
         let pocKetCountStackView = UIStackView(arrangedSubviews: [pocketCountLabel, actionStackView])
@@ -112,7 +116,8 @@ class MainView: ZTView {
         pocKetCountStackView.alignment = .center
         pocKetCountStackView.distribution = .equalSpacing
         
-        let mainStackView = UIStackView(arrangedSubviews: [topStackView, searchBar, pocKetCountStackView, collectionView])
+        let mainStackView = UIStackView(arrangedSubviews: [topStackView,
+                                                           searchBar, pocKetCountStackView, collectionView])
         mainStackView.axis = .vertical
         mainStackView.spacing = 16
         mainStackView.alignment = .fill
@@ -125,5 +130,14 @@ class MainView: ZTView {
             make.leading.trailing.equalToSuperview().inset(16)
             make.bottom.equalToSuperview().inset(10)
         }
+      
+        sortButton.snp.makeConstraints { make in
+            make.width.height.equalTo(40) // 크기 조정
+        }
+        
+        editButton.snp.makeConstraints { make in
+            make.width.height.equalTo(40) // 크기 조정
+        }
     }
+    
 }
