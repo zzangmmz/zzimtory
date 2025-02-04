@@ -56,48 +56,74 @@ final class DatabaseManager {
     }
     
     /// 주머니 만드는 메서드
+    /// 읽어온 데이터에 append하는 방향으로 수정.
     func createPocket(title: String) {
         guard let uid = self.userUID else { return }
         
-        let newPocket: [String: Any] = [
-            "title": title,
-            "items": [Item]()
-        ]
-        
-        ref.child("users").child(uid).child("pockets").child(title).observeSingleEvent(of: .value) { snapshot in
-            if !snapshot.exists() {
-                self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
-                    if let error = error {
-                        print("주머니 생성 실패: \(error.localizedDescription)")
-                    } else {
-                        print("주머니 생성 성공")
-                    }
+        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+            let newIndex = String(snapshot.childrenCount)
+            
+            let newPocket: [String: Any] = [
+                "title": title,
+                "items": [:]
+            ]
+            
+            self.ref.child("users").child(uid).child("pockets").child(newIndex).setValue(newPocket) { error, _ in
+                if let error = error {
+                    print("주머니 생성 실패: \(error.localizedDescription)")
+                } else {
+                    print("주머니 생성 성공")
                 }
-            } else {
-                print("이미 존재하는 주머니")
             }
         }
     }
     
     // MARK: - Data Read Method
     /// 유저 주머니 읽어오는 메서드
-    func readPocket(completion: @escaping ([Pocket]?) -> Void) {
+    func readPocket(completion: @escaping ([Pocket]) -> Void) {
         guard let uid = self.userUID else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
-            guard let value = snapshot.value as? [String: Any] else {
-                print("유저를 찾지 못했습니다.")
-                completion(nil)
+            // Firebase는 pockets를 숫자 키를 가진 딕셔너리 형태로 저장하고 있습니다
+            guard let pocketData = snapshot.value as? [String: [String: Any]] else {
+                print("❌ No data found or wrong format")
+                completion([])
                 return
             }
-            do {
-                let jsonData = try JSONSerialization.data(withJSONObject: value)
-                let pockets = try JSONDecoder().decode([Pocket].self, from: jsonData)
-                completion(pockets)
-            } catch {
-                print("디코딩 실패")
-                completion(nil)
+            
+            var pockets: [Pocket] = []
+            
+            // 숫자 키로 정렬된 순서대로 처리하기 위해 키를 정렬합니다
+            let sortedKeys = pocketData.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
+            
+            for key in sortedKeys {
+                guard let pocketInfo = pocketData[key],
+                      let title = pocketInfo["title"] as? String else { continue }
+                
+                var items: [Item] = []
+                if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
+                    // items도 숫자 키로 정렬하여 처리합니다
+                    let sortedItemKeys = itemsDict.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
+                    for itemKey in sortedItemKeys {
+                        if let itemData = itemsDict[itemKey] {
+                            do {
+                                let itemJsonData = try JSONSerialization.data(withJSONObject: itemData)
+                                if let item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
+                                    items.append(item)
+                                }
+                            } catch {
+                                print("❌ Item 변환 실패: \(error)")
+                                continue
+                            }
+                        }
+                    }
+                }
+                
+                let pocket = Pocket(title: title, items: items, image: nil)
+                pockets.append(pocket)
             }
+            
+            completion(pockets)
         }
     }
     
@@ -120,23 +146,28 @@ final class DatabaseManager {
     
     // MARK: - Data Update Methods
     /// 아이템 추가하는 메서드
-    func updatePocketItem(newItem: Item, pocketTitle: String) {
+    func updatePocketItem(newItem: Item, pocketIndex: String) {
         guard let uid = self.userUID else { return }
         
-        let pocketRef = ref.child("users").child(uid).child("pockets").child(pocketTitle)
-        pocketRef.child("items").observeSingleEvent(of: .value) { snapshot in
-            var currentItems: [[String: Any]] = []
-            if let existingItems = snapshot.value as? [[String: Any]] {
-                currentItems = existingItems
+        // 해당 주머니의 items 참조를 가져옵니다
+        let itemsRef = ref.child("users").child(uid).child("pockets").child(pocketIndex).child("items")
+        
+        // 현재 items의 개수를 확인하여 새로운 인덱스를 결정합니다
+        itemsRef.observeSingleEvent(of: .value) { snapshot in
+            let newIndex = String(snapshot.childrenCount)
+            
+            // 아이템을 딕셔너리로 변환합니다
+            guard let itemDictionary = newItem.asNSDictionary() as? [String: Any] else {
+                print("아이템 변환 실패")
+                return
             }
             
-            currentItems.append(newItem.asNSDictionary() as! [String: Any])
-            
-            pocketRef.updateChildValues(["items": currentItems]) { error, _ in
+            // 새로운 아이템을 추가합니다
+            itemsRef.child(newIndex).setValue(itemDictionary) { error, _ in
                 if let error = error {
-                    print("아이템 업데이트 실패: \(error.localizedDescription)")
+                    print("아이템 추가 실패: \(error.localizedDescription)")
                 } else {
-                    print("아이템 업데이트 성공")
+                    print("아이템 추가 성공")
                 }
             }
         }

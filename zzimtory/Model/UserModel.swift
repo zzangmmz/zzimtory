@@ -15,4 +15,5 @@ struct User: Codable {
 struct Pocket: Codable {
     var title: String
     var items: [Item]
+    var image: String?
 }
