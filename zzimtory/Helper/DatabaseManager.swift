@@ -119,32 +119,25 @@ final class DatabaseManager {
 
     
     // MARK: - Data Update Methods
-    /// 주머니에 아이템 추가하는 메서드
-    func updateUserPocket(newPocket: Pocket) {
+    /// 아이템 추가하는 메서드
+    func updatePocketItem(newItem: Item, pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        let updatePocket: [String: [NSDictionary]] = [newPocket.title: newPocket.items.map { $0.asNSDictionary() }]
-        
-        ref.child("users").child(uid).child("pockets").child(newPocket.title).updateChildValues(updatePocket) { error, _ in
-            if let error = error {
-                print("주머니 업데이트 실패: \(error.localizedDescription)")
-            } else {
-                print("주머니 업데이트 성공")
+        let pocketRef = ref.child("users").child(uid).child("pockets").child(pocketTitle)
+        pocketRef.child("items").observeSingleEvent(of: .value) { snapshot in
+            var currentItems: [[String: Any]] = []
+            if let existingItems = snapshot.value as? [[String: Any]] {
+                currentItems = existingItems
             }
-        }
-    }
-    
-    /// 유저 주머니 타이틀 업데이트 하는 메서드
-    func updatePocketTitle(newTitle: String) {
-        guard let uid = self.userUID else { return }
-        
-        let updateTitle = ["title": newTitle]
-        
-        ref.child("users").child(uid).updateChildValues(updateTitle) { error, _ in
-            if let error = error {
-                print("주머니 타이틀 업데이트 실패: \(error.localizedDescription)")
-            } else {
-                print("주머니 타이틀 업데이트 성공")
+            
+            currentItems.append(newItem.asNSDictionary() as! [String: Any])
+            
+            pocketRef.updateChildValues(["items": currentItems]) { error, _ in
+                if let error = error {
+                    print("아이템 업데이트 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 업데이트 성공")
+                }
             }
         }
     }
