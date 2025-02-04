@@ -55,6 +55,29 @@ final class DatabaseManager {
         }
     }
     
+    func createPocket(title: String) {
+        guard let uid = self.userUID else { return }
+        
+        let newPocket: [String: Any] = [
+            "title": title,
+            "items": [Item]()
+        ]
+        
+        ref.child("users").child(uid).child("pockets").child(title).observeSingleEvent(of: .value) { snapshot in
+            if !snapshot.exists() {
+                self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
+                    if let error = error {
+                        print("주머니 생성 실패: \(error.localizedDescription)")
+                    } else {
+                        print("주머니 생성 성공")
+                    }
+                }
+            } else {
+                print("이미 존재하는 주머니")
+            }
+        }
+    }
+    
     // MARK: - Data Read Method
     /// DB에서 유저 읽어오는 메서드
     func readUserData() {
@@ -77,13 +100,13 @@ final class DatabaseManager {
     }
     
     // MARK: - Data Update Methods
-    /// DB에 유저 주머니 데이터 업데이트 하는 메서드
-    func updateUserPockets(newPockets: [Pocket]) {
+    /// 주머니에 아이템 추가하는 메서드
+    func updateUserPocket(newPocket: Pocket) {
         guard let uid = self.userUID else { return }
         
-        let updateData = ["pockets": newPockets]
+        let updatePocket: [String: [NSDictionary]] = [newPocket.title: newPocket.items.map { $0.asNSDictionary() }]
         
-        ref.child("users").child(uid).updateChildValues(updateData) { error, _ in
+        ref.child("users").child(uid).child("pockets").child(newPocket.title).updateChildValues(updatePocket) { error, _ in
             if let error = error {
                 print("주머니 업데이트 실패: \(error.localizedDescription)")
             } else {
