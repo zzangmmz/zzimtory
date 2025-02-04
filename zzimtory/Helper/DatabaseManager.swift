@@ -174,29 +174,4 @@ final class DatabaseManager {
             }
         }
     }
-    
-    /// 주머니 여러 개 삭제하는 메서드
-    func deletePockets(titles: [String]) {
-        guard let uid = self.userUID else { return }
-        
-        ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
-            guard var userData = snapshot.value as? [String: Any],
-                  var pockets = userData["pockets"] as? [Pocket] else {
-                return
-            }
-            
-            pockets.removeAll { pocket in
-                titles.contains(pocket.title)
-            }
-            
-            userData["pockets"] = pockets
-            self.ref.child("users").child(uid).updateChildValues(userData) { error, _ in
-                if let error = error {
-                    print("주머니들 삭제 실패")
-                } else {
-                    print("주머니 삭제 성공")
-                }
-            }
-        }
-    }
 }
