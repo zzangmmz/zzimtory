@@ -270,9 +270,9 @@ class PocketDetailView: ZTView {
         moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
     }
     
-    func configure(with title: String, itemCount: Int) {
-        titleLabel.text = title
-        countLabel.text = "씨앗 \(itemCount)개"
+    func configure(with pocket: Pocket) {
+        titleLabel.text = pocket.title
+        countLabel.text = "씨앗 \(pocket.items.count)개"
     }
     
     func configureCollectionView(items: [Item]) {
@@ -316,4 +316,3 @@ class PocketDetailView: ZTView {
             }
     }
 }
-
