@@ -25,7 +25,7 @@ final class DatabaseManager {
             print("현재 인증된 유저가 없습니다.")
             return
         }
-        self.userUID = "JWNx2bta6fepsnGut60u04Er0kI2"
+        self.userUID = currentUser.uid
     }
     
     // MARK: - Data Create Method
@@ -146,7 +146,7 @@ final class DatabaseManager {
     func updatePocketItem(newItem: Item, pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        let itemsRef = ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items")
+        let itemsRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items")
         
         itemsRef.observeSingleEvent(of: .value) { snapshot in
             let newIndex = String("zzimtory\(newItem.productID)")
@@ -186,7 +186,7 @@ final class DatabaseManager {
     func deletePocket(title: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").child(title).removeValue { error, _ in
+        ref.child("users").child(uid).child("pockets").child("pocket\(title)").removeValue { error, _ in
             if let error = error {
                 print("주머니 삭제 실패: \(error.localizedDescription)")
             } else {
@@ -199,7 +199,7 @@ final class DatabaseManager {
     func deleteItem(productID: String, from pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").child(pocketTitle).observeSingleEvent(of: .value) { snapshot in
+        ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").observeSingleEvent(of: .value) { snapshot in
             guard let pocket = snapshot.value as? [String: Any],
                   let items = pocket["items"] as? [String: Any] else {
                 print("주머니 탐색 실패")
@@ -211,7 +211,7 @@ final class DatabaseManager {
             
             // 해당 키가 items에 존재하는지 확인
             if items[itemKey] != nil {
-                self.ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items").child(itemKey).removeValue { error, _ in
+                self.ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items").child(itemKey).removeValue { error, _ in
                     if let error = error {
                         print("아이템 삭제 실패: \(error.localizedDescription)")
                     } else {
