@@ -7,13 +7,14 @@
 
 import RxSwift
 import UIKit
+import FirebaseAuth
 
 final class DetailViewModel {
     private let disposeBag = DisposeBag()
     private let shoppingRepository = ShoppingRepository()
     
     // 임시 로그인 상태 변수
-    static var isLoggedIn: Bool = true
+    // static var isLoggedIn: Bool = true
     
     // Input
     let currentItem: Item // 현재 보여줄 아이템
@@ -27,13 +28,14 @@ final class DetailViewModel {
     let similarItems = BehaviorSubject<[Item]>(value: [])
     
     let isInPocket = BehaviorSubject<Bool>(value: false)
-    private var isInPocketStatus: Bool = false
+    var isInPocketStatus: Bool = false
     
     init(item: Item) {
         self.currentItem = item
         setupData()
         setupSearchQuery()
         fetchSimilarItems()
+        checkItemStatus()
     }
     
     private func setupData() {
@@ -67,7 +69,7 @@ final class DetailViewModel {
             searchQuery = cleanTitle
         }
         
-        print("검색어: \(searchQuery)")
+        // print("검색어: \(searchQuery)")
     }
     
     // 유사 상품 검색
@@ -80,7 +82,7 @@ final class DetailViewModel {
             .subscribe(onSuccess: { [weak self] response in
                 let filteredItems = response.items.filter { $0.productID != self?.currentItem.productID }
                 self?.similarItems.onNext(filteredItems)
-                print(filteredItems)
+                // print(filteredItems)
             }, onFailure: { error in
                 print("유사 상품 검색 실패: \(error)")
             })
@@ -93,19 +95,48 @@ final class DetailViewModel {
         fetchSimilarItems()
     }
     
-    func handlePocketButton() -> Bool {
-        // 로그인 체크
-        guard DetailViewModel.isLoggedIn else {
-            return false
+    private func checkItemStatus() {
+        DatabaseManager.shared.readPocket { [weak self] pockets in
+            guard let self = self else { return }
+            
+            // 모든 주머니를 순회하면서 현재 아이템이 있는지 확인
+            let isInPocket = pockets.contains { pocket in
+                pocket.items.contains { item in
+                    item.productID == self.currentItem.productID
+                }
+            }
+            
+            self.isInPocketStatus = isInPocket
+            self.isInPocket.onNext(isInPocket)
         }
+    }
+    
+    // 로그인 상태 체크를 위한 computed property 추가
+    private var isLoggedIn: Bool {
+        return Auth.auth().currentUser != nil
+    }
+    
+    func handlePocketButton() {
+       // guard DetailViewModel.isLoggedIn else { return }
+        guard isLoggedIn else { return }
         
-        // 주머니에 있을 때만 상태 변경
         if isInPocketStatus {
+            // 아이템이 있는 주머니를 찾아서 삭제
+            DatabaseManager.shared.readPocket { [weak self] pockets in
+                guard let self = self else { return }
+                
+                for pocket in pockets {
+                    if pocket.items.contains(where: { $0.productID == self.currentItem.productID }) {
+                        // 해당 주머니에서 아이템 삭제
+                        DatabaseManager.shared.deleteItem(productID: self.currentItem.productID, from: pocket.title)
+                        print("아이템 삭제됨: \(self.currentItem.title) from \(pocket.title)")
+                        break
+                    }
+                }
+            }
             isInPocketStatus = false
             isInPocket.onNext(false)
         }
-        
-        return isInPocketStatus
     }
     
     func addToPocket() {
