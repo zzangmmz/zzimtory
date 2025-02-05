@@ -65,6 +65,9 @@ final class ItemSearchView: ZTView {
         itemCollectionView.dataSource = self
         itemCollectionView.delegate = self
         itemCollectionView.isScrollEnabled = true
+        itemCollectionView.register(ItemCollectionViewHeader.self,
+                                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                    withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
         
         addSubview(itemCollectionView)
     }
@@ -75,8 +78,8 @@ final class ItemSearchView: ZTView {
         }
         
         itemCollectionView.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(16)
-            make.top.equalTo(searchBar.snp.bottom).offset(48)
+            make.bottom.horizontalEdges.equalToSuperview().inset(12)
+            make.top.equalTo(searchBar.snp.bottom).offset(12)
         }
     }
     
@@ -166,6 +169,17 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                         withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
+                                                                         for: indexPath) as! ItemCollectionViewHeader
+            return header
+        }
+        return UICollectionReusableView()
+    }
 }
 
 extension ItemSearchView: UICollectionViewDelegateFlowLayout {
@@ -175,11 +189,17 @@ extension ItemSearchView: UICollectionViewDelegateFlowLayout {
         let numberOfCellsInRow: CGFloat = 2
         let spacing: CGFloat = 12
         let totalSpacing = spacing * (numberOfCellsInRow - 1)
-
+        
         let availableWidth = collectionView.bounds.width - totalSpacing
         let cellWidth = availableWidth / numberOfCellsInRow
-
+        
         return CGSize(width: cellWidth, height: cellWidth * 1.25)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 50)
     }
     
 }
