@@ -83,42 +83,41 @@ final class ItemWebViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        // DetailViewModel의 isInPocket 상태 구독
+        // 주머니 상태에 따른 버튼 UI 업데이트
         viewModel.isInPocket
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
                 let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? "tray" : "tray.fill"
+                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketBlack"
                 
                 self?.itemWebView.saveButton.setTitle(title, for: .normal)
-                self?.itemWebView.saveButton.setButtonWithSystemImage(imageName: imageName)
+                self?.itemWebView.saveButton.setButtonWithCustomImage(imageName: imageName)
             })
             .disposed(by: disposeBag)
         
-        // 저장 버튼 tap 처리
         itemWebView.saveButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
                 
-//                guard DetailViewModel.isLoggedIn else {
-//                    self.presentLoginView()
-//                    return
-//                }
-                
+                // 로그인 상태 확인
                 guard Auth.auth().currentUser != nil else {
                     self.presentLoginView()
                     return
                 }
                 
+                // 주머니에 이미 존재하는 경우 → handlePocketButton() 호출
                 if self.viewModel.isInPocketStatus {
                     self.viewModel.handlePocketButton()
-                } else {
-                    let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
-                    self.present(pocketVC, animated: true)
-                    
-                    pocketVC.onComplete = { [weak self] in
-                        self?.viewModel.addToPocket()
-                    }
+                    return
+                }
+                
+                // 주머니에 없으면 모달 띄우기
+                let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
+                self.present(pocketVC, animated: true)
+                
+                // 모달에서 주머니 추가 완료 시 ViewModel 업데이트
+                pocketVC.onComplete = { [weak self] in
+                    self?.viewModel.addToPocket()
                 }
             })
             .disposed(by: disposeBag)

@@ -119,40 +119,33 @@ final class DetailViewController: UIViewController {
             .subscribe(onNext: { [weak self] isInPocket in
                 let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
                 let imageName = isInPocket ? "EmptyPocketIcon" : "PocketBlack"
- 
+                
                 self?.detailView.saveButton.setTitle(title, for: .normal)
                 self?.detailView.saveButton.setButtonWithCustomImage(imageName: imageName)
-                // self?.detailView.saveButton.setImageWithSpacing()
             })
             .disposed(by: disposeBag)
-        
-        // 버튼 탭 처리
+
         detailView.saveButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 guard let self = self else { return }
                 
-                // 로그인 확인
-//                guard DetailViewModel.isLoggedIn else {
-//                    self.presentLoginView()
-//                    return
-//                }
-                
-                // 로그인 확인
+                // 로그인 상태 확인
                 guard Auth.auth().currentUser != nil else {
                     self.presentLoginView()
                     return
                 }
                 
-                // 이미 주머니에 있으면 삭제 (모달 X)
+                // 주머니에 이미 존재하는 경우 → handlePocketButton() 호출
                 if self.viewModel.isInPocketStatus {
                     self.viewModel.handlePocketButton()
                     return
                 }
                 
-                // 주머니에 없으면 모달 띄우고 저장
+                // 주머니에 없으면 모달 띄우기
                 let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
                 self.present(pocketVC, animated: true)
                 
+                // 모달에서 주머니 추가 완료 시 ViewModel 업데이트
                 pocketVC.onComplete = { [weak self] in
                     self?.viewModel.addToPocket()
                 }

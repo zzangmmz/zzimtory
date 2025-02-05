@@ -110,16 +110,8 @@ final class DetailViewModel {
             self.isInPocket.onNext(isInPocket)
         }
     }
-    
-    // 로그인 상태 체크를 위한 computed property 추가
-    private var isLoggedIn: Bool {
-        return Auth.auth().currentUser != nil
-    }
-    
+
     func handlePocketButton() {
-       // guard DetailViewModel.isLoggedIn else { return }
-        guard isLoggedIn else { return }
-        
         if isInPocketStatus {
             // 아이템이 있는 주머니를 찾아서 삭제
             DatabaseManager.shared.readPocket { [weak self] pockets in
