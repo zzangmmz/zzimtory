@@ -11,6 +11,8 @@ import SnapKit
 final class PocketSelectionViewController: UIViewController {
     
     let selectedItems: [Item]
+    private var pockets: [Pocket] = []
+    var onComplete: (() -> Void)?
     
     // MARK: - UI Components
     private let informLabel = PocketSelectionInformLabel()
@@ -47,6 +49,19 @@ final class PocketSelectionViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // 뷰가 켜질 때마다 포켓 읽어오기
+        DatabaseManager.shared.readPocket { [weak self] pockets in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.pockets = pockets
+                self.pocketColletionView.reloadData()
+            }
+        }
+    }
+    
     // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,13 +96,10 @@ final class PocketSelectionViewController: UIViewController {
                                       handler: { [unowned self] _ in
             if let name = alert.textFields?.first?.text {
                 let newPocket = Pocket(title: name, items: self.selectedItems)
-                
-//                DummyModel.shared.pockets.append(newPocket)
-                
+                                
                 DatabaseManager.shared.createPocket(title: name)
-                DatabaseManager.shared.updateUserPocket(newPocket: Pocket(title: name, items: selectedItems))
                 
-                self.pocketColletionView.reloadData()
+                // self.pocketColletionView.reloadData()
                 self.informLabel.userDidPutItem(in: newPocket,
                                            onComplete: { self.dismiss(animated: true) })
             }
@@ -139,7 +151,7 @@ final class PocketSelectionViewController: UIViewController {
 extension PocketSelectionViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return DummyModel.shared.pockets.count
+        return pockets.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -148,15 +160,25 @@ extension PocketSelectionViewController: UICollectionViewDataSource, UICollectio
                                                             for: indexPath)
                 as? PocketCollectionViewCell else { return UICollectionViewCell() }
         
-        cell.setCell(with: DummyModel.shared.pockets[indexPath.item])
+        cell.setCell(with: pockets[indexPath.item])
         
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        DummyModel.shared.pockets[indexPath.item].items.append(contentsOf: selectedItems)
-        informLabel.userDidPutItem(in: DummyModel.shared.pockets[indexPath.item],
-                                   onComplete: { self.dismiss(animated: true) })
+        let selectedPocket = pockets[indexPath.item]
+        
+        for item in selectedItems {
+            DatabaseManager.shared.updatePocketItem(newItem: item, pocketTitle: selectedPocket.title)
+        }
+        
+        informLabel.userDidPutItem(in: pockets[indexPath.item]) { [weak self] in
+            self?.onComplete?()  // 완료 콜백 호출
+            self?.dismiss(animated: true)
+        }
+        
+//        informLabel.userDidPutItem(in: pockets[indexPath.item],
+//                                   onComplete: { self.dismiss(animated: true) })
     }
 }
 
