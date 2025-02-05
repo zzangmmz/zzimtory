@@ -283,9 +283,11 @@ class PocketDetailView: ZTView {
         countLabel.text = "씨앗 \(pocket.items.count)개"
         
         if pocket.items.isEmpty {
-            toggleEmtpyPocketLabelHidden()
+            itemCollectionView.isHidden = true
+            emptyPocketLabel.isHidden = false
         } else {
-            toggleEmtpyPocketLabelHidden()
+            itemCollectionView.isHidden = false
+            emptyPocketLabel.isHidden = true
         }
     }
     
@@ -298,10 +300,6 @@ class PocketDetailView: ZTView {
          seedMoveButton,
          moveCancelButton,
          overlayView].forEach { $0.isHidden.toggle() }
-    }
-    
-    private func toggleEmtpyPocketLabelHidden() {
-        [emptyPocketLabel, itemCollectionView].forEach { $0.isHidden.toggle() }
     }
     
     // 서치버튼 클릭 시 서치바가 보이고, 카운트앤버튼스택뷰 숨기기
