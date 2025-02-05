@@ -8,12 +8,18 @@
 import UIKit
 import SnapKit
 
+enum MyPageContents: String {
+    case terms = "이용약관"
+    case logOut = "로그아웃"
+    case deleteAccount = "탈퇴하기"
+}
+
 final class MyPageViewController: UIViewController {
     
-    let tableViewContents: [(name: String, color: UIColor)] = [
-        ("이용약관", .black900Zt),
-        ("로그아웃", .black900Zt),
-        ("탈퇴하기", .systemRed)
+    let tableViewContents: [(name: MyPageContents, color: UIColor)] = [
+        (.terms, .black900Zt),
+        (.logOut, .black900Zt),
+        (.deleteAccount, .systemRed)
     ]
     
     // MARK: - UI Components
@@ -95,10 +101,9 @@ extension MyPageViewController: UITableViewDataSource {
         
         let content = tableViewContents[indexPath.item]
         
-        cell.textLabel?.text = content.name
+        cell.textLabel?.text = content.name.rawValue
         cell.textLabel?.textColor = content.color
         cell.backgroundColor = .white100Zt
-        
         
         return cell
     }
@@ -107,8 +112,17 @@ extension MyPageViewController: UITableViewDataSource {
 
 extension MyPageViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let content = tableViewContents[indexPath.item]
+        tableView.deselectRow(at: indexPath, animated: true)
+        let selectedContent = tableViewContents[indexPath.item]
         
-        print(content.name)
+        switch selectedContent.name {
+        case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
+        case .logOut:
+            GoogleAuthManager().logout()
+            KakaoAuthManager().logout()
+            NaverAuthManager().logout()
+        case .deleteAccount: DatabaseManager.shared.deleteUser()
+        }
+
     }
 }
