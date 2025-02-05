@@ -61,6 +61,17 @@ class PocketCell: UICollectionViewCell {
         return label
     }()
     
+    private let emptyPocketImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .center
+        imageView.clipsToBounds = true
+        imageView.image = UIImage(named: "PocketBlack")
+        imageView.layer.cornerRadius = 15
+        imageView.layer.masksToBounds = true
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = .clear
@@ -102,6 +113,7 @@ class PocketCell: UICollectionViewCell {
         
         contentView.addSubview(titleImageStackView)
         contentView.addSubview(countLabelOnImage)
+        contentView.addSubview(emptyPocketImageView)
         
         titleImageStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -114,7 +126,11 @@ class PocketCell: UICollectionViewCell {
         imageStackView.snp.makeConstraints { make in
             make.height.equalTo(contentView).multipliedBy(0.8)
         }
-  
+        
+        emptyPocketImageView.snp.makeConstraints { make in
+            make.edges.equalTo(imageStackView)
+        }
+        
         countLabelOnImage.snp.makeConstraints { make in
             make.top.equalTo(contentView).offset(10)
             make.trailing.equalTo(contentView).inset(12)
@@ -131,20 +147,26 @@ class PocketCell: UICollectionViewCell {
         }
     }
     
-    func configure(with title: String, images: [String]) {
-        titleLabel.text = title
-        countLabelOnImage.text = "\(images.count)개" // 추후 주머니 속 개수로 수정 예정!!
-        countLabelOnImage.isHidden = images.isEmpty
-        countLabelOnTitle.text = "\(images.count)개"
+    func configure(with pocket: Pocket) {
+        titleLabel.text = pocket.title
+        countLabelOnImage.text = "\(pocket.items.count)개" // 추후 주머니 속 개수로 수정 예정!!
+        countLabelOnTitle.text = "\(pocket.items.count)개"
         
         let previews = [previewImageView1, previewImageView2, previewImageView3, previewImageView4]
         
-        for (index, imageView) in previews.enumerated() {
-            if index < images.count {
-                imageView.image = UIImage(named: images[index])
-                imageView.isHidden = false
-            } else {
-                imageView.isHidden = true
+        if pocket.items.isEmpty {
+            // 주머니 빈 경우 기본 이미지 설정
+            emptyPocketImageView.isHidden = false
+            previews.forEach { $0.isHidden = true }
+        } else {
+            // 아이템 개수에 따라 이미지 설정
+            for (index, imageView) in previews.enumerated() {
+                if index < pocket.items.count {
+                    imageView.image = UIImage(named: pocket.image ?? "exampleImage")
+                    imageView.isHidden = false
+                } else {
+                    imageView.isHidden = true
+                }
             }
         }
     }
