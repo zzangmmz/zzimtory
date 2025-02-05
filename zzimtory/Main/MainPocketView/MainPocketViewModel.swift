@@ -23,11 +23,13 @@ class MainPocketViewModel {
         }
     }
     
-    func addPocket(title: String) {
+    func addPocket(title: String, completion: @escaping () -> Void) {
         // 새 주머니 추가
         let newPocket = Pocket(title: title, items: [Item](), image: "exampleImage")
         self.pockets.append(newPocket)
-        DatabaseManager.shared.createPocket(title: newPocket.title)
+        DatabaseManager.shared.createPocket(title: newPocket.title) {
+            completion()
+        }
     }
     
     func sortPockets(by order: SortOrder) {
