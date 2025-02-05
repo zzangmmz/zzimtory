@@ -72,10 +72,25 @@ class PocketCell: UICollectionViewCell {
         return imageView
     }()
     
+    private let singlePocketImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 15
+        imageView.layer.masksToBounds = true
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     override func prepareForReuse() {
         super.prepareForReuse()
+        
         emptyPocketImageView.image = UIImage(named: "PocketBlack")
-        emptyPocketImageView.contentMode = .center
+        [singlePocketImageView,
+         previewImageView1, previewImageView2, previewImageView3, previewImageView4].forEach {
+            $0.image = nil
+        }
+        
     }
     
     override init(frame: CGRect) {
@@ -120,6 +135,7 @@ class PocketCell: UICollectionViewCell {
         contentView.addSubview(titleImageStackView)
         contentView.addSubview(countLabelOnImage)
         contentView.addSubview(emptyPocketImageView)
+        contentView.addSubview(singlePocketImageView)
         
         titleImageStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -134,6 +150,10 @@ class PocketCell: UICollectionViewCell {
         }
         
         emptyPocketImageView.snp.makeConstraints { make in
+            make.edges.equalTo(imageStackView)
+        }
+        
+        singlePocketImageView.snp.makeConstraints { make in
             make.edges.equalTo(imageStackView)
         }
         
@@ -166,9 +186,9 @@ class PocketCell: UICollectionViewCell {
             previews.forEach { $0.isHidden = true }
         } else {
             if pocket.items.count == 1 {
-                emptyPocketImageView.isHidden = false
-                emptyPocketImageView.contentMode = .scaleAspectFill
-                emptyPocketImageView.loadImage(from: URL(string: pocket.image!)!)
+                emptyPocketImageView.isHidden = true
+                singlePocketImageView.isHidden = false
+                singlePocketImageView.loadImage(from: URL(string: pocket.image!)!)
             } else {
                 emptyPocketImageView.isHidden = true
                 // 아이템 개수에 따라 이미지 설정
