@@ -54,19 +54,6 @@ final class PocketSelectionViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // 뷰가 켜질 때마다 포켓 읽어오기
-        DatabaseManager.shared.readPocket { [weak self] pockets in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                self.pockets = pockets
-                self.pocketColletionView.reloadData()
-            }
-        }
-    }
-    
     // MARK: - View lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,8 +95,13 @@ final class PocketSelectionViewController: UIViewController {
                     }
                     
                     self.pocketColletionView.reloadData()
-                    self.informLabel.userDidPutItem(in: newPocket,
-                                               onComplete: { self.dismiss(animated: true) })
+                    // self.informLabel.userDidPutItem(in: newPocket,
+                                               //onComplete: { self.dismiss(animated: true) })
+                    
+                    self.informLabel.userDidPutItem(in: newPocket) { [weak self] in
+                        self?.onComplete?()  // 완료 콜백 호출
+                        self?.dismiss(animated: true)
+                    }
                     
                 }
 
@@ -182,8 +174,13 @@ extension PocketSelectionViewController: UICollectionViewDataSource, UICollectio
             DatabaseManager.shared.updatePocketItem(newItem: item, pocketTitle: pockets[indexPath.item].title)
         }
         
-        informLabel.userDidPutItem(in: pockets[indexPath.item],
-                                   onComplete: { self.dismiss(animated: true) })
+        informLabel.userDidPutItem(in: pockets[indexPath.item]) { [weak self] in
+            self?.onComplete?()  // 완료 콜백 호출
+            self?.dismiss(animated: true)
+        }
+        
+//        informLabel.userDidPutItem(in: pockets[indexPath.item],
+//                                   onComplete: { self.dismiss(animated: true) })
     }
 }
 
