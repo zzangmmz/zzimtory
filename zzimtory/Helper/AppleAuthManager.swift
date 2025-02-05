@@ -41,6 +41,16 @@ final class AppleAuthManager: NSObject {
         
         return hashString
     }
+    
+    func logout() {
+        let firebaseAuth = Auth.auth()
+        
+        do {
+            try firebaseAuth.signOut()
+        } catch let error as NSError {
+            print("로그아웃 실패: \(error)")
+        }
+    }
 }
 
 extension AppleAuthManager: ASAuthorizationControllerDelegate {
