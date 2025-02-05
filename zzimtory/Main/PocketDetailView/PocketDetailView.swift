@@ -236,7 +236,7 @@ class PocketDetailView: ZTView {
         
         itemCollectionView.snp.makeConstraints { make in
             make.top.equalTo(countAndButtonStackView.snp.bottom).offset(20)
-            make.bottom.equalToSuperview().inset(16)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
             make.leading.trailing.equalToSuperview().inset(24)
         }
         
