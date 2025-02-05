@@ -100,8 +100,17 @@ extension AppleAuthManager {
                     print(error.localizedDescription)
                     return
                 }
+                
                 // 로그인 성공 시
-                print("애플 && 파이어베이스 로그인 성공")
+                guard let authUser = authResult?.user else { return }
+                
+                let newUser = User(
+                    email: authUser.email ?? "",
+                    nickname: authUser.displayName ?? "",
+                    uid: authUser.uid,
+                    pockets: []
+                )
+                DatabaseManager.shared.createUser(user: newUser)
             }
         }
     }
