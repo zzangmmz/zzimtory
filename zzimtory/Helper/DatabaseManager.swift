@@ -66,7 +66,7 @@ final class DatabaseManager {
                 "image": ""
             ]
             
-            self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
+            self.ref.child("users").child(uid).child("pockets").child("pocket\(title)").setValue(newPocket) { error, _ in
                 if let error = error {
                     print("주머니 생성 실패: \(error.localizedDescription)")
                 } else {
