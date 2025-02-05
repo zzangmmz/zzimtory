@@ -23,7 +23,7 @@ final class ItemCardsView: UIView {
         
         addSubview(cardStack)
         cardStack.dataSource = self
-        cardStack.backgroundColor = .pink300Zt
+        cardStack.backgroundColor = .clear
         
         cardStack.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.9)
@@ -46,10 +46,10 @@ final class ItemCardsView: UIView {
         card.contentMode = .scaleAspectFill
         
         let leftOverlay = UIView()
-        leftOverlay.backgroundColor = .red
+        leftOverlay.backgroundColor = .darkGray
         
         let rightOverlay = UIView()
-        rightOverlay.backgroundColor = .green
+        rightOverlay.backgroundColor = .pink400ZtPrimary
         
         let upOverlay = UIView()
         upOverlay.backgroundColor = .blue400ZtPrimary
