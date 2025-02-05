@@ -25,7 +25,7 @@ final class DatabaseManager {
             print("현재 인증된 유저가 없습니다.")
             return
         }
-        self.userUID = currentUser.uid
+        self.userUID = "JWNx2bta6fepsnGut60u04Er0kI2"
     }
     
     // MARK: - Data Create Method
@@ -89,19 +89,17 @@ final class DatabaseManager {
                 return
             }
             
+            print(pocketData)
+            
             var pockets: [Pocket] = []
             
-            let sortedKeys = pocketData.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
-            
-            for key in sortedKeys {
+            for key in pocketData.keys {
                 guard let pocketInfo = pocketData[key],
                       let title = pocketInfo["title"] as? String else { continue }
                 
                 var items: [Item] = []
                 if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
-                    // items도 숫자 키로 정렬하여 처리합니다
-                    let sortedItemKeys = itemsDict.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
-                    for itemKey in sortedItemKeys {
+                    for itemKey in itemsDict.keys {
                         if let itemData = itemsDict[itemKey] {
                             do {
                                 let itemJsonData = try JSONSerialization.data(withJSONObject: itemData)
@@ -116,7 +114,7 @@ final class DatabaseManager {
                     }
                 }
                 
-                let pocket = Pocket(title: title, items: items, image: nil)
+                let pocket = Pocket(title: title, items: items)
                 pockets.append(pocket)
             }
             print("✅ 최종 Pocket 데이터: \(pockets)")
