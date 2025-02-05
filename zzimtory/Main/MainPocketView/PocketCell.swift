@@ -159,13 +159,20 @@ class PocketCell: UICollectionViewCell {
             emptyPocketImageView.isHidden = false
             previews.forEach { $0.isHidden = true }
         } else {
-            // 아이템 개수에 따라 이미지 설정
-            for (index, imageView) in previews.enumerated() {
-                if index < pocket.items.count {
-                    imageView.loadImage(from: URL(string: pocket.image!)!)
-                    imageView.isHidden = false
-                } else {
-                    imageView.isHidden = true
+            if pocket.items.count == 1 {
+                emptyPocketImageView.isHidden = false
+                emptyPocketImageView.contentMode = .scaleAspectFill
+                emptyPocketImageView.loadImage(from: URL(string: pocket.image!)!)
+            } else {
+                emptyPocketImageView.isHidden = true
+                // 아이템 개수에 따라 이미지 설정
+                for (index, imageView) in previews.enumerated() {
+                    if index < pocket.items.count {
+                        imageView.loadImage(from: URL(string: pocket.image!)!)
+                        imageView.isHidden = false
+                    } else {
+                        imageView.isHidden = true
+                    }
                 }
             }
         }
