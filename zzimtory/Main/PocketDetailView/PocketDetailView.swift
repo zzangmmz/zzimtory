@@ -243,17 +243,8 @@ class PocketDetailView: ZTView {
         overlayView.snp.makeConstraints { make in
             make.top.leading.trailing.bottom.equalToSuperview()  // 배경을 화면 전체로 채움
         }
-
-//        let layout = UICollectionViewFlowLayout()
-//        layout.scrollDirection = .vertical
-//        layout.minimumLineSpacing = 20
-//        layout.minimumInteritemSpacing = 10
-//        layout.itemSize = CGSize(width: 150, height: 190) // 두 개씩 배치
-//        
-//        itemCollectionView.collectionViewLayout = layout
-//        
-        // 버튼 사이즈 조정
         
+        // 버튼 사이즈 조정
         seedMoveButton.snp.makeConstraints { make in
             make.size.equalTo(50)
         }
