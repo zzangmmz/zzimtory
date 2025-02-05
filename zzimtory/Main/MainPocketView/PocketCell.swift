@@ -162,7 +162,7 @@ class PocketCell: UICollectionViewCell {
             // 아이템 개수에 따라 이미지 설정
             for (index, imageView) in previews.enumerated() {
                 if index < pocket.items.count {
-                    imageView.image = UIImage(named: pocket.image ?? "exampleImage")
+                    imageView.loadImage(from: URL(string: pocket.image!)!)
                     imageView.isHidden = false
                 } else {
                     imageView.isHidden = true

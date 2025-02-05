@@ -16,5 +16,6 @@ class PocketDetailViewModel {
     
     init(pocket: Pocket) {
         self.pocket = pocket
+        print(self.pocket)
     }
 }
