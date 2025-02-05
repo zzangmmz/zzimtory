@@ -43,6 +43,11 @@ final class PocketSelectionViewController: UIViewController {
     init(selectedItems: [Item]) {
         self.selectedItems = selectedItems
         super.init(nibName: nil, bundle: nil)
+        
+        DatabaseManager.shared.readPocket { pockets in
+            self.pockets = pockets
+            self.pocketColletionView.reloadData()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -96,12 +101,18 @@ final class PocketSelectionViewController: UIViewController {
                                       handler: { [unowned self] _ in
             if let name = alert.textFields?.first?.text {
                 let newPocket = Pocket(title: name, items: self.selectedItems)
-                                
-                DatabaseManager.shared.createPocket(title: name)
                 
-                // self.pocketColletionView.reloadData()
-                self.informLabel.userDidPutItem(in: newPocket,
-                                           onComplete: { self.dismiss(animated: true) })
+                DatabaseManager.shared.createPocket(title: name) {
+                    self.selectedItems.forEach { item in
+                        DatabaseManager.shared.updatePocketItem(newItem: item, pocketTitle: name)
+                    }
+                    
+                    self.pocketColletionView.reloadData()
+                    self.informLabel.userDidPutItem(in: newPocket,
+                                               onComplete: { self.dismiss(animated: true) })
+                    
+                }
+
             }
         }))
         
@@ -166,19 +177,13 @@ extension PocketSelectionViewController: UICollectionViewDataSource, UICollectio
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedPocket = pockets[indexPath.item]
         
-        for item in selectedItems {
-            DatabaseManager.shared.updatePocketItem(newItem: item, pocketTitle: selectedPocket.title)
+        selectedItems.forEach { item in
+            DatabaseManager.shared.updatePocketItem(newItem: item, pocketTitle: pockets[indexPath.item].title)
         }
         
-        informLabel.userDidPutItem(in: pockets[indexPath.item]) { [weak self] in
-            self?.onComplete?()  // 완료 콜백 호출
-            self?.dismiss(animated: true)
-        }
-        
-//        informLabel.userDidPutItem(in: pockets[indexPath.item],
-//                                   onComplete: { self.dismiss(animated: true) })
+        informLabel.userDidPutItem(in: pockets[indexPath.item],
+                                   onComplete: { self.dismiss(animated: true) })
     }
 }
 

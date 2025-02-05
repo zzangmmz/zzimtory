@@ -56,15 +56,14 @@ final class DatabaseManager {
     }
     
     /// 주머니 만드는 메서드
-    /// 읽어온 데이터에 append하는 방향으로 수정.
-    func createPocket(title: String) {
+    func createPocket(title: String, completion: @escaping () -> Void) {
         guard let uid = self.userUID else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
             let newPocket: [String: Any] = [
                 "title": title,
                 "items": [:],
-                "image": "sampleImage"
+                "image": "exampleImage"
             ]
             
             self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
@@ -72,6 +71,7 @@ final class DatabaseManager {
                     print("주머니 생성 실패: \(error.localizedDescription)")
                 } else {
                     print("주머니 생성 성공")
+                    completion()
                 }
             }
         }
@@ -143,33 +143,6 @@ final class DatabaseManager {
     
     // MARK: - Data Update Methods
     /// 아이템 추가하는 메서드
-    //    func updatePocketItem(newItem: Item, pocketTitle: String) {
-    //        guard let uid = self.userUID else { return }
-    //        
-    //        // 해당 주머니의 items 참조를 가져옵니다
-    //        let itemsRef = ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items")
-    //        
-    //        // 현재 items의 개수를 확인하여 새로운 인덱스를 결정합니다
-    //        itemsRef.observeSingleEvent(of: .value) { snapshot in
-    //            let newIndex = String(snapshot.childrenCount)
-    //            
-    //            // 아이템을 딕셔너리로 변환합니다
-    //            guard let itemDictionary = newItem as? [String: Any] else {
-    //                print("아이템 변환 실패")
-    //                return
-    //            }
-    //            
-    //            // 새로운 아이템을 추가합니다
-    //            itemsRef.child("zzimtory\(snapshot.childrenCount)").setValue(itemDictionary) { error, _ in
-    //                if let error = error {
-    //                    print("아이템 추가 실패: \(error.localizedDescription)")
-    //                } else {
-    //                    print("아이템 추가 성공")
-    //                }
-    //            }
-    //        }
-    //    }
-    //    
     func updatePocketItem(newItem: Item, pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
@@ -223,38 +196,6 @@ final class DatabaseManager {
     }
     
     /// 아이템 삭제 메서드
-    //    func deleteItem(productID: String, from pocketTitle: String) {
-    //        guard let uid = self.userUID else { return }
-    //        
-    //        ref.child("users").child(uid).child("pockets").child(pocketTitle).observeSingleEvent(of: .value) { snapshot in
-    //            guard let pocket = snapshot.value as? [String: Any],
-    //                  var items = pocket["items"] as? [String: Any] else {
-    //                print("주머니 탐색 실패")
-    //                return
-    //            }
-    //            
-    //            var removeIndex: String?
-    //            for (index, item) in items {
-    //                if let itemDict = item as? [String: Any],
-    //                   let itemProductID = itemDict["productID"] as? String,
-    //                   itemProductID == productID {
-    //                    removeIndex = index
-    //                    break
-    //                }
-    //            }
-    //            
-    //            if let removeIndex = removeIndex {
-    //                self.ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items").child(removeIndex).removeValue { error, _ in
-    //                    if let error = error {
-    //                        print("아이템 삭제 실패: \(error.localizedDescription)")
-    //                    } else {
-    //                        print("아이템 삭제 성공")
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    
     func deleteItem(productID: String, from pocketTitle: String) {
         guard let uid = self.userUID else { return }
         

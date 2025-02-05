@@ -12,28 +12,32 @@ class MainView: ZTView {
     
     let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "PocketBlack")!
+        imageView.image = UIImage(named: "logo")!
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
     let logoLabel: UILabel = {
         let label = UILabel()
-        label.text = "zzimtory"
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.text = "찜토리"
+        label.textColor = .black900Zt
+        label.font = .systemFont(ofSize: 16, weight: .regular)
         return label
     }()
     
     let addPocketButton: UIButton = {
         let button = UIButton()
-        let zzimtoryimage = UIImage(named: "PocketBlack")!
-        button.setImage(zzimtoryimage, for: .normal)
-        button.backgroundColor = .white100Zt
-        button.setTitle(" 주머니 추가", for: .normal)
-        button.layer.cornerRadius = 6
-        button.setTitleColor(.black900Zt, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        var config = UIButton.Configuration.filled()
+        config.image = UIImage(named: "PocketBlack")!
+        config.baseBackgroundColor = .white100Zt
+        config.baseForegroundColor = .black900Zt
+        config.imagePadding = 6
+        config.cornerStyle = .large
+        config.attributedTitle = AttributedString("주머니 추가",
+                                                  attributes: AttributeContainer([
+                                                    .font: UIFont.systemFont(ofSize: 14, weight: .regular)
+                                                  ]))
+        button.configuration = config
         return button
     }()
     
@@ -47,9 +51,8 @@ class MainView: ZTView {
     
     let pocketCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "주머니 0개"
         label.textColor = .black900Zt
-        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.font = .systemFont(ofSize: 16, weight: .regular)
         return label
     }()
     
@@ -74,9 +77,6 @@ class MainView: ZTView {
     let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
-        layout.itemSize = CGSize(width: 160, height: 200)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.register(PocketCell.self, forCellWithReuseIdentifier: "PocketCell")
@@ -96,7 +96,7 @@ class MainView: ZTView {
         
         let logoStackView = UIStackView(arrangedSubviews: [logoImageView, logoLabel])
         logoStackView.axis = .horizontal
-        logoStackView.spacing = 8
+        logoStackView.spacing = 10
         logoStackView.alignment = .center
         
         let topStackView = UIStackView(arrangedSubviews: [logoStackView, addPocketButton])
@@ -126,9 +126,9 @@ class MainView: ZTView {
         addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(10)
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.bottom.equalToSuperview().inset(10)
+            make.top.bottom.equalTo(safeAreaLayoutGuide).offset(20)
+            make.leading.trailing.equalToSuperview().inset(24)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
         }
       
         sortButton.snp.makeConstraints { make in
@@ -138,6 +138,14 @@ class MainView: ZTView {
         editButton.snp.makeConstraints { make in
             make.width.height.equalTo(40) // 크기 조정
         }
+        
+        searchBar.searchTextField.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.top.bottom.equalToSuperview().inset(6)
+        }
+        
+        collectionView.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+        }
     }
-    
 }
