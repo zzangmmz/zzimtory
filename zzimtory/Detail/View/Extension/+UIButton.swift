@@ -15,9 +15,19 @@ extension UIButton {
         layer.shadowOpacity = 0.2
     }
     
-    func setButtonDefaultImage(imageName: String, imageSize: CGFloat = 20) {
+    // 시스템이미지 사용
+    func setButtonWithSystemImage(imageName: String, imageSize: CGFloat = 20) {
         let config = UIImage.SymbolConfiguration(pointSize: imageSize, weight: .medium)
         if let image = UIImage(systemName: imageName, withConfiguration: config) {
+            self.setImage(image, for: .normal)
+            self.tintColor = .black900Zt
+        }
+    }
+    
+    // Asset에 추가한 커스텀 이미지 사용
+    func setButtonWithCustomImage(imageName: String, imageSize: CGFloat = 20) {
+        let config = UIImage.SymbolConfiguration(pointSize: imageSize, weight: .medium)
+        if let image = UIImage(named: imageName, in: Bundle.main, with: config) {
             self.setImage(image, for: .normal)
             self.tintColor = .black900Zt
         }

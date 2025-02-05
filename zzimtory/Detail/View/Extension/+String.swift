@@ -8,6 +8,6 @@
 extension String {
     // HTML 태그 제거
     var removingHTMLTags: String {
-        return self.replacingOccurrences(of: "&lt;/?b&gt;", with: "", options: .regularExpression)
+        return self.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
     }
 }

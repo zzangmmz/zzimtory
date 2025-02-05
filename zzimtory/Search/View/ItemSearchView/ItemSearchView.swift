@@ -65,6 +65,9 @@ final class ItemSearchView: ZTView {
         itemCollectionView.dataSource = self
         itemCollectionView.delegate = self
         itemCollectionView.isScrollEnabled = true
+        itemCollectionView.register(ItemCollectionViewHeader.self,
+                                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                    withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
         
         addSubview(itemCollectionView)
     }
@@ -75,8 +78,8 @@ final class ItemSearchView: ZTView {
         }
         
         itemCollectionView.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(16)
-            make.top.equalTo(searchBar.snp.bottom).offset(48)
+            make.bottom.horizontalEdges.equalToSuperview().inset(12)
+            make.top.equalTo(searchBar.snp.bottom).offset(12)
         }
     }
     
@@ -101,7 +104,13 @@ extension ItemSearchView: SearchViewModelBindable {
 
 extension ItemSearchView: SwipeCardStackDelegate {
     func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
-        // 웹뷰로 넘겨주기?
+        let selectedItem = items[index]
+        let detailVC = DetailViewController(item: selectedItem)
+        detailVC.hidesBottomBarWhenPushed = true
+
+        if let viewController = self.next as? UIViewController {
+            viewController.navigationController?.pushViewController(detailVC, animated: true)
+        }
     }
     
     func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
@@ -166,6 +175,46 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView,
+                        viewForSupplementaryElementOfKind kind: String,
+                        at indexPath: IndexPath) -> UICollectionReusableView {
+        // 린트 경고 때문에 수정
+        //        if kind == UICollectionView.elementKindSectionHeader {
+        //            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+        //                                                                         withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
+        //                                                                         for: indexPath) as! ItemCollectionViewHeader
+        //            return header
+        //        }
+        //        return UICollectionReusableView()
+        
+        
+        if kind == UICollectionView.elementKindSectionHeader {
+            let reusableView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
+                for: indexPath
+            )
+            
+            guard let header = reusableView as? ItemCollectionViewHeader else {
+                assertionFailure("UICollectionReusableView를 ItemCollectionViewHeader로 캐스팅하는 데 실패함")
+                return UICollectionReusableView()
+            }
+            
+            return header
+        }
+        
+        return UICollectionReusableView()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedItem = items[indexPath.item]
+        let detailVC = DetailViewController(item: selectedItem)
+        detailVC.hidesBottomBarWhenPushed = true
+
+        if let viewController = self.next as? UIViewController {
+            viewController.navigationController?.pushViewController(detailVC, animated: true)
+        }
+    }
 }
 
 extension ItemSearchView: UICollectionViewDelegateFlowLayout {
@@ -175,11 +224,17 @@ extension ItemSearchView: UICollectionViewDelegateFlowLayout {
         let numberOfCellsInRow: CGFloat = 2
         let spacing: CGFloat = 12
         let totalSpacing = spacing * (numberOfCellsInRow - 1)
-
+        
         let availableWidth = collectionView.bounds.width - totalSpacing
         let cellWidth = availableWidth / numberOfCellsInRow
-
+        
         return CGSize(width: cellWidth, height: cellWidth * 1.25)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 50)
     }
     
 }

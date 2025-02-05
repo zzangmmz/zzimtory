@@ -8,25 +8,22 @@
 import UIKit
 
 class MainViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    private var mainView: MainView? {
-        return self.view as? MainView
-    }
-    
-    private let viewModel = MainPocketViewModel() // ViewModel
+    private var mainView: MainView?
+    private let viewModel = MainPocketViewModel()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        DatabaseManager.shared.readUserData()
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+        bind()
     }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view = MainView(frame: view.frame)
+        self.mainView = MainView(frame: view.frame)
+        self.view = self.mainView
         
         setupActions()
         setupCollectionView()
-        bindViewModel()
     }
     
     private func setupActions() {
@@ -41,18 +38,14 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         mainView?.collectionView.register(
             PocketCell.self,
             forCellWithReuseIdentifier: "PocketCell"
-        ) // Register PocketCell
+        )
     }
     
-    private func bindViewModel() {
-        viewModel.onDataChanged = { [weak self] in
-            guard let self = self else { return }
-            self.mainView?.pocketCountLabel.text = "주머니 \(self.viewModel.pocketCount())개"
-            self.mainView?.collectionView.reloadData()
+    private func bind() {
+        self.viewModel.fetchData { [weak self] pockets in
+            self?.mainView?.pocketCountLabel.text = "주머니 \(pockets.count)개"
+            self?.mainView?.collectionView.reloadData()
         }
-        
-        // 주머니 개수 초기 표시하는 초기값 설정!
-        mainView?.pocketCountLabel.text = "주머니 \(viewModel.pocketCount())개"
     }
     
     @objc private func addPocketButtonDidTap() {
@@ -65,9 +58,13 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             title: "확인",
             style: .default
         ) { [weak self] _ in
-            guard let self = self, let textField = alert.textFields?.first,
-                  let name = textField.text, !name.isEmpty else { return }
-            self.viewModel.addPocket(named: name)
+            guard let self = self,
+                  let textField = alert.textFields?.first,
+                  let name = textField.text,
+                  !name.isEmpty else { return }
+            self.viewModel.addPocket(title: name) { [weak self] in
+                self?.bind()
+            }
         }
         
         alert.addAction(cancelAction)
@@ -95,10 +92,8 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         present(alert, animated: true, completion: nil)
     }
     
-   
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.pocketCount()
+        return viewModel.pockets.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -109,23 +104,48 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         }
         
         let pocket = viewModel.pockets[indexPath.item]
-        cell.configure(with: pocket.name, images: pocket.images)
+        cell.configure(with: pocket)
         return cell
     }
-
+    
     // UICollectionViewDelegate 메서드 구현
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let pocket = viewModel.pockets[indexPath.item]
-        print("\(pocket.name) 이 클릭됨")
+        print("\(pocket.title) 이 클릭됨")
         
         // "전체보기" 클릭 시 PocketDetailViewController로 이동
-        let detailViewModel = PocketDetailViewModel(pocketTitle: pocket.name,
-                                                    items: DummyModel.items)  // 새로운 viewModel 생성
+        let detailViewModel = PocketDetailViewModel(pocket: pocket)  // 새로운 viewModel 생성
         let detailVC = PocketDetailViewController(viewModel: detailViewModel) // 생성자 호출
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    
     @objc private func editButtonDidTap() {
         print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
         DatabaseManager.shared.deletePocket(title: "12")
+    }
+}
+
+extension MainViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let numberOfCellsInRow: CGFloat = 2
+        let spacing: CGFloat = 20
+        let totalSpacing = spacing * (numberOfCellsInRow - 1)
+
+        let availableWidth = collectionView.bounds.width - totalSpacing
+        let cellWidth = availableWidth / numberOfCellsInRow
+
+        return CGSize(width: cellWidth, height: cellWidth * 1.4)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                       layout collectionViewLayout: UICollectionViewLayout,
+                       minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 20
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 16
     }
 }
