@@ -72,6 +72,12 @@ class PocketCell: UICollectionViewCell {
         return imageView
     }()
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        emptyPocketImageView.image = UIImage(named: "PocketBlack")
+        emptyPocketImageView.contentMode = .center
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.backgroundColor = .clear
