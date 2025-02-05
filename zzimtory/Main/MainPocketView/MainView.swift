@@ -28,7 +28,7 @@ class MainView: ZTView {
     let addPocketButton: UIButton = {
         let button = UIButton()
         var config = UIButton.Configuration.filled()
-        config.image = UIImage(named: "PocketBlack")!
+        config.image = UIImage(named: "PocketIcon")!
         config.baseBackgroundColor = .white100Zt
         config.baseForegroundColor = .black900Zt
         config.imagePadding = 6
