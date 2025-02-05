@@ -91,6 +91,7 @@ extension AppleAuthManager {
                     return
                 }
                 // 로그인 성공 시
+                print("애플 && 파이어베이스 로그인 성공")
             }
         }
     }
