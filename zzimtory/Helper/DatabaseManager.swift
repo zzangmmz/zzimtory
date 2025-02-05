@@ -63,7 +63,7 @@ final class DatabaseManager {
             let newPocket: [String: Any] = [
                 "title": title,
                 "items": [:],
-                "image": "exampleImage"
+                "image": ""
             ]
             
             self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
@@ -112,6 +112,7 @@ final class DatabaseManager {
                             }
                         }
                     }
+                    items.sort { $0.title < $1.title }
                 }
                 
                 let pocket = Pocket(title: title, items: items)
