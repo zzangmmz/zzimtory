@@ -58,10 +58,13 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             title: "확인",
             style: .default
         ) { [weak self] _ in
-            guard let self = self, let textField = alert.textFields?.first,
-                  let name = textField.text, !name.isEmpty else { return }
-            self.viewModel.addPocket(title: name)
-            self.bind()
+            guard let self = self,
+                  let textField = alert.textFields?.first,
+                  let name = textField.text,
+                  !name.isEmpty else { return }
+            self.viewModel.addPocket(title: name) { [weak self] in
+                self?.bind()
+            }
         }
         
         alert.addAction(cancelAction)

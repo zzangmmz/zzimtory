@@ -57,7 +57,7 @@ final class DatabaseManager {
     
     /// 주머니 만드는 메서드
     /// 읽어온 데이터에 append하는 방향으로 수정.
-    func createPocket(title: String) {
+    func createPocket(title: String, completion: @escaping () -> Void) {
         guard let uid = self.userUID else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
@@ -72,6 +72,7 @@ final class DatabaseManager {
                     print("주머니 생성 실패: \(error.localizedDescription)")
                 } else {
                     print("주머니 생성 성공")
+                    completion()
                 }
             }
         }
