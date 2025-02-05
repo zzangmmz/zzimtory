@@ -32,7 +32,7 @@ class PocketDetailViewController: UIViewController,
         setupCollectionView()
         setupActions()
         
-        pocketDetailView.configure(with: viewModel.pocketTitle, itemCount: viewModel.items.count)
+        pocketDetailView.configure(with: viewModel.pocket)
     }
     
     private func setupActions() {
@@ -48,7 +48,7 @@ class PocketDetailViewController: UIViewController,
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.filteredItems.count
+        return viewModel.pocket.items.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -58,21 +58,19 @@ class PocketDetailViewController: UIViewController,
             fatalError("Unable to dequeue ItemCollectionViewCell")
         }
         
-        let item = viewModel.filteredItems[indexPath.item]
+        let item = viewModel.pocket.items[indexPath.item]
         cell.setCell(with: item)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("아이템 클릭됨: \(viewModel.filteredItems[indexPath.item].title)")
+        print("아이템 클릭됨: \(viewModel.pocket.items[indexPath.item].title)")
     }
     
     // 서치바 텍스트 변경 시 필터링된 결과를 업데이트
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.isEmpty {
-            viewModel.filteredItems = viewModel.items // 텍스트가 없으면 모든 아이템을 표시
-        } else {
-            viewModel.filteredItems = viewModel.items.filter { item in
+        if !searchText.isEmpty {
+            viewModel.pocket.items = viewModel.pocket.items.filter { item in
                 item.title.lowercased().contains(searchText.lowercased()) // 제목에 검색어가 포함되면 필터링
             }
         }
