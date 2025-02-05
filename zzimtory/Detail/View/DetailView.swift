@@ -54,7 +54,7 @@ final class DetailView: ZTView {
         let button = UIButton()
 
         button.setAsIconButton()
-        button.setButtonDefaultImage(imageName: "square.and.arrow.up")
+        button.setButtonWithSystemImage(imageName: "square.and.arrow.up")
         
         return button
     }()
@@ -70,7 +70,7 @@ final class DetailView: ZTView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
-        button.setButtonDefaultImage(imageName: "safari")
+        button.setButtonWithSystemImage(imageName: "safari")
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -81,6 +81,7 @@ final class DetailView: ZTView {
     let saveButton: UIButton = {
         let button = UIButton()
         
+        button.setTitle("주머니에 넣기", for: .normal)
         button.backgroundColor = .blue400ZtPrimary
         button.layer.cornerRadius = 10
         
@@ -90,6 +91,7 @@ final class DetailView: ZTView {
         // 추후 적용을 위해 주석처리
         // let image = UIImage(named: "PocketBlack", in: Bundle.main, with: config)
         
+        button.setButtonWithCustomImage(imageName: "PocketBlack")
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
