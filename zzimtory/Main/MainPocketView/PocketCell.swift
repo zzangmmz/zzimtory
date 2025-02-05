@@ -68,6 +68,7 @@ class PocketCell: UICollectionViewCell {
         imageView.image = UIImage(named: "PocketBlack")
         imageView.layer.cornerRadius = 15
         imageView.layer.masksToBounds = true
+        imageView.backgroundColor = .white100Zt
         imageView.isHidden = true
         return imageView
     }()
