@@ -46,13 +46,13 @@ final class ItemCardsView: UIView {
         card.contentMode = .scaleAspectFill
         
         let leftOverlay = UIView()
-        leftOverlay.backgroundColor = .darkGray
+        leftOverlay.backgroundColor = .clear
         
         let rightOverlay = UIView()
-        rightOverlay.backgroundColor = .pink400ZtPrimary
+        rightOverlay.backgroundColor = .clear
         
         let upOverlay = UIView()
-        upOverlay.backgroundColor = .blue400ZtPrimary
+        upOverlay.backgroundColor = .clear
         
         card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
         
