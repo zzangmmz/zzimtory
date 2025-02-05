@@ -8,17 +8,13 @@
 import Foundation
 
 class PocketDetailViewModel {
-    var pocketTitle: String
-    var items: [Item]
-    var filteredItems: [Item]
-    
-    init(pocketTitle: String, items: [Item]) {
-        self.pocketTitle = pocketTitle
-        self.items = items
-        self.filteredItems = items
-    }
+    var pocket: Pocket
     
     var itemCount: String {
-        return "아이템 개수: \(items.count)"
+        return "아이템 개수: \(pocket.items.count)"
+    }
+    
+    init(pocket: Pocket) {
+        self.pocket = pocket
     }
 }
