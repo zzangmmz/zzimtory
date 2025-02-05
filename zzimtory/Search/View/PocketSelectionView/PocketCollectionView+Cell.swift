@@ -35,7 +35,7 @@ final class PocketCollectionViewCell: UICollectionViewCell {
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         
-        imageView.image = UIImage(systemName: "gift")
+        imageView.image = UIImage(named: "PocketIcon")
         imageView.tintColor = .black900Zt
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = false

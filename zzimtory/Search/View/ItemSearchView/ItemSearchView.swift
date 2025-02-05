@@ -104,7 +104,13 @@ extension ItemSearchView: SearchViewModelBindable {
 
 extension ItemSearchView: SwipeCardStackDelegate {
     func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
-        // 웹뷰로 넘겨주기?
+        let selectedItem = items[index]
+        let detailVC = DetailViewController(item: selectedItem)
+        detailVC.hidesBottomBarWhenPushed = true
+
+        if let viewController = self.next as? UIViewController {
+            viewController.navigationController?.pushViewController(detailVC, animated: true)
+        }
     }
     
     func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
@@ -172,13 +178,42 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
+        // 린트 경고 때문에 수정
+        //        if kind == UICollectionView.elementKindSectionHeader {
+        //            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+        //                                                                         withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
+        //                                                                         for: indexPath) as! ItemCollectionViewHeader
+        //            return header
+        //        }
+        //        return UICollectionReusableView()
+        
+        
         if kind == UICollectionView.elementKindSectionHeader {
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-                                                                         withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
-                                                                         for: indexPath) as! ItemCollectionViewHeader
+            let reusableView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
+                for: indexPath
+            )
+            
+            guard let header = reusableView as? ItemCollectionViewHeader else {
+                assertionFailure("UICollectionReusableView를 ItemCollectionViewHeader로 캐스팅하는 데 실패함")
+                return UICollectionReusableView()
+            }
+            
             return header
         }
+        
         return UICollectionReusableView()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedItem = items[indexPath.item]
+        let detailVC = DetailViewController(item: selectedItem)
+        detailVC.hidesBottomBarWhenPushed = true
+
+        if let viewController = self.next as? UIViewController {
+            viewController.navigationController?.pushViewController(detailVC, animated: true)
+        }
     }
 }
 

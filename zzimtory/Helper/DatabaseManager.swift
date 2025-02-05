@@ -123,7 +123,7 @@ final class DatabaseManager {
             completion(pockets)
         }
     }
-    
+
     /// 유저 프로필(이메일, 닉네임) 읽어오는 메서드
     func readUserProfile(completion: @escaping ((email: String, nickname: String)?) -> Void) {
         guard let uid = self.userUID else { return }

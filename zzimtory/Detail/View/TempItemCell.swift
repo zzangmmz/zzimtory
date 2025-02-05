@@ -8,7 +8,10 @@
 import UIKit
 import SnapKit
 
+// 해당 파일 추후 삭제 예정
 final class TempItemCell: UICollectionViewCell {
+    
+    static let id = "TempItemCell"
     
     private let itemImageView: UIImageView = {
         let imageView = UIImageView()
@@ -79,7 +82,7 @@ final class TempItemCell: UICollectionViewCell {
         }
     }
     
-    func configureWithDummyData(with item: Item) {
+    func configureData(with item: Item) {
         // HTML 태그 제거
         let cleanTitle = item.title.removingHTMLTags
         itemNameLabel.text = cleanTitle

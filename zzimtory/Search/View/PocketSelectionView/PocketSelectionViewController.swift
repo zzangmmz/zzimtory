@@ -11,7 +11,8 @@ import SnapKit
 final class PocketSelectionViewController: UIViewController {
     
     let selectedItems: [Item]
-    var pockets: [Pocket] = []
+    private var pockets: [Pocket] = []
+    var onComplete: (() -> Void)?
     
     // MARK: - UI Components
     private let informLabel = PocketSelectionInformLabel()
@@ -94,8 +95,13 @@ final class PocketSelectionViewController: UIViewController {
                     }
                     
                     self.pocketColletionView.reloadData()
-                    self.informLabel.userDidPutItem(in: newPocket,
-                                               onComplete: { self.dismiss(animated: true) })
+                    // self.informLabel.userDidPutItem(in: newPocket,
+                                               //onComplete: { self.dismiss(animated: true) })
+                    
+                    self.informLabel.userDidPutItem(in: newPocket) { [weak self] in
+                        self?.onComplete?()  // 완료 콜백 호출
+                        self?.dismiss(animated: true)
+                    }
                     
                 }
 
@@ -168,8 +174,13 @@ extension PocketSelectionViewController: UICollectionViewDataSource, UICollectio
             DatabaseManager.shared.updatePocketItem(newItem: item, pocketTitle: pockets[indexPath.item].title)
         }
         
-        informLabel.userDidPutItem(in: pockets[indexPath.item],
-                                   onComplete: { self.dismiss(animated: true) })
+        informLabel.userDidPutItem(in: pockets[indexPath.item]) { [weak self] in
+            self?.onComplete?()  // 완료 콜백 호출
+            self?.dismiss(animated: true)
+        }
+        
+//        informLabel.userDidPutItem(in: pockets[indexPath.item],
+//                                   onComplete: { self.dismiss(animated: true) })
     }
 }
 
