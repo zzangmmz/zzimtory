@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import FirebaseAuth
 
 final class DetailViewController: UIViewController {
     private var detailView = DetailView()
@@ -37,6 +38,13 @@ final class DetailViewController: UIViewController {
         // 타이틀 바인딩
         viewModel.itemTitle
             .bind(to: detailView.itemNameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        // 브랜드명 바인딩
+        viewModel.itemBrand
+            .subscribe(onNext: { [weak self] text in
+                self?.detailView.brandButton.setTitle(text, for: .normal)
+            })
             .disposed(by: disposeBag)
         
         // 가격 바인딩
@@ -78,7 +86,8 @@ final class DetailViewController: UIViewController {
                 guard let self = self,
                       let url = URL(string: self.viewModel.currentItem.link) else { return }
                 
-                let webVC = ItemWebViewController(urlString: url.absoluteString)
+                // let webVC = ItemWebViewController(urlString: url.absoluteString, item: self.viewModel.currentItem)
+                let webVC = ItemWebViewController(urlString: url.absoluteString, viewModel: self.viewModel)
                 self.navigationController?.pushViewController(webVC, animated: true)
             })
             .disposed(by: disposeBag)
@@ -109,10 +118,11 @@ final class DetailViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
                 let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? "tray" : "tray.fill"
-                
+                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketBlack"
+ 
                 self?.detailView.saveButton.setTitle(title, for: .normal)
-                self?.detailView.saveButton.setButtonDefaultImage(imageName: imageName)
+                self?.detailView.saveButton.setButtonWithCustomImage(imageName: imageName)
+                // self?.detailView.saveButton.setImageWithSpacing()
             })
             .disposed(by: disposeBag)
         
@@ -122,22 +132,30 @@ final class DetailViewController: UIViewController {
                 guard let self = self else { return }
                 
                 // 로그인 확인
-                guard DetailViewModel.isLoggedIn else {
+//                guard DetailViewModel.isLoggedIn else {
+//                    self.presentLoginView()
+//                    return
+//                }
+                
+                // 로그인 확인
+                guard Auth.auth().currentUser != nil else {
                     self.presentLoginView()
                     return
                 }
-                // 이미 주머니에 있으면 제거
-                if self.viewModel.handlePocketButton() {
+                
+                // 이미 주머니에 있으면 삭제 (모달 X)
+                if self.viewModel.isInPocketStatus {
+                    self.viewModel.handlePocketButton()
                     return
                 }
                 
-                // 주머니에 없으면 선택 화면으로
+                // 주머니에 없으면 모달 띄우고 저장
                 let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
                 self.present(pocketVC, animated: true)
                 
-//                pocketVC.onComplete = { [weak self] in
-//                    self?.viewModel.addToPocket()
-//                }
+                pocketVC.onComplete = { [weak self] in
+                    self?.viewModel.addToPocket()
+                }
             })
             .disposed(by: disposeBag)
     }
@@ -167,7 +185,7 @@ extension DetailViewController {
         let button = UIButton()
 
         button.setAsIconButton()
-        button.setButtonDefaultImage(imageName: "chevron.left")
+        button.setButtonWithSystemImage(imageName: "chevron.left")
         button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         
         // 네비게이션 아이템으로 설정

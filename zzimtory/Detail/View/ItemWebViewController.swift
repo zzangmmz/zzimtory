@@ -9,14 +9,17 @@ import UIKit
 import RxSwift
 import RxCocoa
 import SnapKit
+import FirebaseAuth
 
 final class ItemWebViewController: UIViewController {
     private let itemWebView = ItemWebView()
     private let urlString: String
+    private let viewModel: DetailViewModel  // DetailViewModel 사용
     private let disposeBag = DisposeBag()
     
-    init(urlString: String) {
+    init(urlString: String, viewModel: DetailViewModel) {  // 생성자 변경
         self.urlString = urlString
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -48,7 +51,7 @@ final class ItemWebViewController: UIViewController {
     private func configureNavigationButton(imageName: String, action: Selector) -> UIButton {
         let button = UIButton()
         button.setAsIconButton()
-        button.setButtonDefaultImage(imageName: imageName)
+        button.setButtonWithSystemImage(imageName: imageName)
         button.addTarget(self, action: action, for: .touchUpInside)
         return button
     }
@@ -59,11 +62,6 @@ final class ItemWebViewController: UIViewController {
     }
     
     private func bind() {
-        itemWebView.saveButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                self?.saveToPocket()
-            })
-            .disposed(by: disposeBag)
         
         itemWebView.shareButton.rx.tap
             .subscribe(onNext: { [weak self] in
@@ -84,10 +82,53 @@ final class ItemWebViewController: UIViewController {
                 self.present(shareActivityViewController, animated: true)
             })
             .disposed(by: disposeBag)
+        
+        // DetailViewModel의 isInPocket 상태 구독
+        viewModel.isInPocket
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] isInPocket in
+                let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
+                let imageName = isInPocket ? "tray" : "tray.fill"
+                
+                self?.itemWebView.saveButton.setTitle(title, for: .normal)
+                self?.itemWebView.saveButton.setButtonWithSystemImage(imageName: imageName)
+            })
+            .disposed(by: disposeBag)
+        
+        // 저장 버튼 tap 처리
+        itemWebView.saveButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                
+//                guard DetailViewModel.isLoggedIn else {
+//                    self.presentLoginView()
+//                    return
+//                }
+                
+                guard Auth.auth().currentUser != nil else {
+                    self.presentLoginView()
+                    return
+                }
+                
+                if self.viewModel.isInPocketStatus {
+                    self.viewModel.handlePocketButton()
+                } else {
+                    let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
+                    self.present(pocketVC, animated: true)
+                    
+                    pocketVC.onComplete = { [weak self] in
+                        self?.viewModel.addToPocket()
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
-    private func saveToPocket() {
-        print("주머니에 저장됨")
+    private func presentLoginView() {
+        let loginVC = LoginViewController()
+        let nav = UINavigationController(rootViewController: loginVC)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
     
     @objc private func backButtonTapped() {
