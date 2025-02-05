@@ -15,5 +15,20 @@ struct User: Codable {
 struct Pocket: Codable {
     var title: String
     var items: [Item]
-    var image: String?
+    var image: String? {
+        if items.isEmpty {
+            return "PocketBlack"
+        } else {
+            return items[0].image
+        }
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case title, items
+    }
+    
+    init(title: String, items: [Item]) {
+        self.title = title
+        self.items = items
+    }
 }

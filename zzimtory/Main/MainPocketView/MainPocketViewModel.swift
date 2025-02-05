@@ -25,7 +25,7 @@ class MainPocketViewModel {
     
     func addPocket(title: String, completion: @escaping () -> Void) {
         // 새 주머니 추가
-        let newPocket = Pocket(title: title, items: [Item](), image: "exampleImage")
+        let newPocket = Pocket(title: title, items: [Item]())
         self.pockets.append(newPocket)
         DatabaseManager.shared.createPocket(title: newPocket.title) {
             completion()
