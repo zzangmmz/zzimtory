@@ -106,9 +106,10 @@ extension ItemSearchView: SwipeCardStackDelegate {
     func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
         let selectedItem = items[index]
         let detailVC = DetailViewController(item: selectedItem)
-        
-        if let navigationController = self.window?.rootViewController as? UINavigationController {
-            navigationController.pushViewController(detailVC, animated: true)
+        detailVC.hidesBottomBarWhenPushed = true
+
+        if let viewController = self.next as? UIViewController {
+            viewController.navigationController?.pushViewController(detailVC, animated: true)
         }
     }
     
@@ -208,9 +209,10 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedItem = items[indexPath.item]
         let detailVC = DetailViewController(item: selectedItem)
-        
-        if let navigationController = self.window?.rootViewController as? UINavigationController {
-            navigationController.pushViewController(detailVC, animated: true)
+        detailVC.hidesBottomBarWhenPushed = true
+
+        if let viewController = self.next as? UIViewController {
+            viewController.navigationController?.pushViewController(detailVC, animated: true)
         }
     }
 }

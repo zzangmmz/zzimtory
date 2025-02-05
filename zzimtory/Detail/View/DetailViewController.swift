@@ -29,7 +29,7 @@ final class DetailViewController: UIViewController {
         super.viewDidLoad()
         detailView = DetailView(frame: view.frame)
         self.view = detailView
-        navigationController?.navigationBar.isHidden = false
+        navigationController?.navigationBar.isHidden = false        
         setupNavigationBar()
         bind()
     }
