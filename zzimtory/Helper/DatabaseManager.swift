@@ -117,6 +117,7 @@ final class DatabaseManager {
                 let pocket = Pocket(title: title, items: items)
                 pockets.append(pocket)
             }
+            pockets.sort { $0.title < $1.title }
             print("✅ 최종 Pocket 데이터: \(pockets)")
             completion(pockets)
         }
