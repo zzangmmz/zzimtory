@@ -11,18 +11,20 @@ import FirebaseAuth
 import GoogleSignIn
 
 final class LoginViewModel {
+    private let appleAuthManager: AppleAuthManager
     private let googleAuthManager: GoogleAuthManager
     private let kakaoAuthManager: KakaoAuthManager
     private let naverAuthManager: NaverAuthManager
     
     init() {
+        self.appleAuthManager = AppleAuthManager()
         self.googleAuthManager = GoogleAuthManager()
         self.kakaoAuthManager = KakaoAuthManager()
         self.naverAuthManager = NaverAuthManager()
     }
     
     func signInWithApple(on viewContorller: UIViewController) {
-        
+        appleAuthManager.startSignInWithAppleFlow()
     }
     
     func signInWithGoogle(on viewContorller: UIViewController) {
