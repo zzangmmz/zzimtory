@@ -16,8 +16,50 @@ class PocketCell: UICollectionViewCell {
     private let previewImageView2 = UIImageView()
     private let previewImageView3 = UIImageView()
     private let previewImageView4 = UIImageView()
-    private let titleLabel = UILabel()
-    private let countLabel = UILabel()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.textColor = .black900Zt
+        label.textAlignment = .left
+        label.snp.makeConstraints { make in
+            make.height.equalTo(18)
+        }
+        return label
+    }()
+    
+    private let countLabelOnTitle: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.textColor = .gray500Zt
+        label.textAlignment = .left
+        label.snp.makeConstraints { make in
+            make.height.equalTo(16)
+        }
+        return label
+    }()
+    
+    private lazy var titleStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, countLabelOnTitle])
+        stackView.axis = .vertical
+        stackView.spacing = 4
+        return stackView
+    }()
+    
+    private let countLabelOnImage: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.textColor = .black900Zt
+        label.backgroundColor = .white100Zt
+        label.textAlignment = .center
+        label.layer.cornerRadius = 10
+        label.layer.masksToBounds = true
+        label.snp.makeConstraints { make in
+            make.width.equalTo(30)
+            make.height.equalTo(20)
+        }
+        return label
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -52,28 +94,28 @@ class PocketCell: UICollectionViewCell {
         imageStackView.layer.cornerRadius = 15
         imageStackView.layer.masksToBounds = true
         
-        let titleImageStackView = UIStackView(arrangedSubviews: [imageStackView, titleLabel])
+        let titleImageStackView = UIStackView(arrangedSubviews: [imageStackView, titleStackView])
         titleImageStackView.axis = .vertical
-        titleImageStackView.spacing = 8
+        titleImageStackView.spacing = 10
         titleImageStackView.alignment = .fill
-        titleImageStackView.distribution = .fill
+        titleImageStackView.distribution = .fillProportionally
         
         contentView.addSubview(titleImageStackView)
-        contentView.addSubview(countLabel)
+        contentView.addSubview(countLabelOnImage)
         
         titleImageStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(5)
-            make.trailing.equalToSuperview().inset(-5)
-            make.leading.equalToSuperview().inset(5)
-            make.height.equalToSuperview().offset(10)
-            make.bottom.equalToSuperview().inset(-40)
+            make.edges.equalToSuperview()
+        }
+        
+        titleLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(6)
         }
         
         imageStackView.snp.makeConstraints { make in
-            make.height.lessThanOrEqualTo(contentView).multipliedBy(0.9) // 이걸 추가해야만 전체보기가 안짤림
+            make.height.equalTo(contentView).multipliedBy(0.8)
         }
   
-        countLabel.snp.makeConstraints { make in
+        countLabelOnImage.snp.makeConstraints { make in
             make.top.equalTo(contentView).offset(10)
             make.trailing.equalTo(contentView).inset(12)
         }
@@ -87,29 +129,19 @@ class PocketCell: UICollectionViewCell {
             $0.clipsToBounds = true
             $0.isHidden = true
         }
-        
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
-        titleLabel.textAlignment = .center
-        titleLabel.textColor = .black900Zt
-        
-        countLabel.font = .systemFont(ofSize: 15, weight: .medium)
-        countLabel.textColor = .black900Zt
-        countLabel.backgroundColor = .white100Zt
-        countLabel.textAlignment = .center
-        countLabel.layer.cornerRadius = 6
-        countLabel.layer.masksToBounds = true
     }
     
-    func configure(with title: String, images: [UIImage]) {
+    func configure(with title: String, images: [String]) {
         titleLabel.text = title
-        countLabel.text = "\(images.count)개" // 추후 주머니 속 개수로 수정 예정!!
-        countLabel.isHidden = images.isEmpty
+        countLabelOnImage.text = "\(images.count)개" // 추후 주머니 속 개수로 수정 예정!!
+        countLabelOnImage.isHidden = images.isEmpty
+        countLabelOnTitle.text = "\(images.count)개"
         
         let previews = [previewImageView1, previewImageView2, previewImageView3, previewImageView4]
         
         for (index, imageView) in previews.enumerated() {
             if index < images.count {
-                imageView.image = images[index]
+                imageView.image = UIImage(named: images[index])
                 imageView.isHidden = false
             } else {
                 imageView.isHidden = true

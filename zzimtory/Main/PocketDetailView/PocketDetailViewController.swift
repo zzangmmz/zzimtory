@@ -26,6 +26,7 @@ class PocketDetailViewController: UIViewController,
         super.viewDidLoad()
         
         pocketDetailView = PocketDetailView(frame: view.frame)
+        pocketDetailView.backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         view = pocketDetailView
         
         setupCollectionView()
@@ -81,6 +82,10 @@ class PocketDetailViewController: UIViewController,
     @objc private func sortButtonDidTap() {
         print("정렬 버튼 클릭됨")
         // 정렬 로직 추가 예정
+    }
+    
+    @objc func backButtonTapped() {
+        self.navigationController?.popViewController(animated: true)
     }
 
 }
