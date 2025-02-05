@@ -123,54 +123,7 @@ final class DatabaseManager {
             completion(pockets)
         }
     }
-    
-    //    func readPocket(completion: @escaping ([Pocket]) -> Void) {
-    //        guard let uid = self.userUID else { return }
-    //
-    //        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
-    //            guard let pocketData = snapshot.value as? [String: Any] else {
-    //                print("❌ No data found or wrong format")
-    //                completion([])
-    //                return
-    //            }
-    //
-    //            var pockets: [Pocket] = []
-    //            let sortedKeys = pocketData.keys.sorted()
-    //
-    //            for key in sortedKeys {
-    //                guard let pocketInfo = pocketData[key] as? [String: Any],
-    //                      let title = pocketInfo["title"] as? String,
-    //                      let image = pocketInfo["image"] as? String else { continue }
-    //
-    //                var items: [Item] = []
-    //                if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
-    //                    // 숫자 키를 기준으로 정렬
-    //                    let sortedItemKeys = itemsDict.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
-    //
-    //                    for itemKey in sortedItemKeys {
-    //                        if let itemData = itemsDict[itemKey] {
-    //                            do {
-    //                                let itemJsonData = try JSONSerialization.data(withJSONObject: itemData)
-    //                                if let item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
-    //                                    items.append(item)
-    //                                }
-    //                            } catch {
-    //                                print("❌ Item 변환 실패: \(error)")
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //
-    //                let pocket = Pocket(title: title, items: items, image: image)
-    //                pockets.append(pocket)
-    //            }
-    //
-    //            print("✅ 최종 Pocket 데이터: \(pockets)")
-    //            completion(pockets)
-    //        }
-    //    }
-    
-    
+
     /// 유저 프로필(이메일, 닉네임) 읽어오는 메서드
     func readUserProfile(completion: @escaping ((email: String, nickname: String)?) -> Void) {
         guard let uid = self.userUID else { return }
