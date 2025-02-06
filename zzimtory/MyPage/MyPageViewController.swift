@@ -126,6 +126,7 @@ extension MyPageViewController: UITableViewDelegate {
             GoogleAuthManager().logout()
             KakaoAuthManager().logout()
             NaverAuthManager().logout()
+            AppleAuthManager().logout()
         case .deleteAccount: DatabaseManager.shared.deleteUser()
         }
 
