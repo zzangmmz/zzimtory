@@ -87,11 +87,8 @@ final class DetailView: ZTView {
         
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
-        
-        // 추후 적용을 위해 주석처리
-        // let image = UIImage(named: "PocketBlack", in: Bundle.main, with: config)
-        
-        button.setButtonWithCustomImage(imageName: "PocketBlack")
+
+        button.setButtonWithCustomImage(imageName: "PocketIcon")
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         

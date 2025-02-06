@@ -65,7 +65,7 @@ class PocketCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .center
         imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "PocketBlack")
+        imageView.image = UIImage(named: "PocketIcon")
         imageView.layer.cornerRadius = 15
         imageView.layer.masksToBounds = true
         imageView.backgroundColor = .white100Zt
@@ -86,7 +86,7 @@ class PocketCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        emptyPocketImageView.image = UIImage(named: "PocketBlack")
+        emptyPocketImageView.image = UIImage(named: "PocketIcon")
         [singlePocketImageView,
          previewImageView1, previewImageView2, previewImageView3, previewImageView4].forEach {
             $0.image = nil

@@ -88,7 +88,7 @@ final class ItemWebViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
                 let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketBlack"
+                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketIcon"
                 
                 self?.itemWebView.saveButton.setTitle(title, for: .normal)
                 self?.itemWebView.saveButton.setButtonWithCustomImage(imageName: imageName)
