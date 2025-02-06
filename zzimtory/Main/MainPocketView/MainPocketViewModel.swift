@@ -8,8 +8,8 @@
 import UIKit
 
 enum SortOrder {
-    case newest
-    case oldest
+    case reverse
+    case alphabetically
 }
 
 class MainPocketViewModel {
@@ -39,9 +39,9 @@ class MainPocketViewModel {
         var otherPockets = pockets.filter { $0.title != "전체보기" }
         
         switch order {
-        case .newest:
-            otherPockets.sort { $0.title > $1.title } 
-        case .oldest:
+        case .reverse:
+            otherPockets.sort { $0.title > $1.title }
+        case .alphabetically:
             otherPockets.sort { $0.title < $1.title }
         }
         if let fixedPocket = fixedPocket {
@@ -52,6 +52,7 @@ class MainPocketViewModel {
             completion()
         }
     }
+    
     func filterPockets(with searchText: String) {
             if searchText.isEmpty {
                 filterPockets = pockets
