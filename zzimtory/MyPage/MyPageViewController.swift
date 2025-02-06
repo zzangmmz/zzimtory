@@ -26,7 +26,7 @@ final class MyPageViewController: UIViewController {
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
         
-        imageView.image = UIImage(systemName: "app.gift")
+        imageView.image = UIImage(named: "logo")
         
         return imageView
     }()
@@ -75,9 +75,9 @@ final class MyPageViewController: UIViewController {
     
     private func setConstraints() {
         logoImageView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(20)
             make.leading.equalToSuperview().inset(24)
-            make.width.height.equalTo(40)
+            make.height.equalTo(40)
         }
         
         userProfileView.snp.makeConstraints { make in
