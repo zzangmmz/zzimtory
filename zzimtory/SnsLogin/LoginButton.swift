@@ -38,17 +38,16 @@ final class LoginButton: UIButton {
         super.init(frame: .zero)
         var config = UIButton.Configuration.filled()
         
-        // 에셋에 추가한 아이콘들 리사이징 필요
         var finalImage = type.style.icon
         if type != .apple { // 애플은 SF Symbol 사용하므로 제외
-            let size = CGSize(width: 30, height: 30)
+            let size = CGSize(width: 28, height: 28)
             UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
             type.style.icon?.draw(in: CGRect(origin: .zero, size: size))
             finalImage = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
         }
         
-        config.attributedTitle = AttributedString("\(type.style.name)로 시작하기",
+        config.attributedTitle = AttributedString("\(type.style.name)로 로그인",
                                                   attributes: AttributeContainer([
                                                     .font: UIFont.systemFont(ofSize: 16, weight: .semibold)
                                                   ]))

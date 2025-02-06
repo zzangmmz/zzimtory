@@ -7,18 +7,25 @@
 
 import UIKit
 import SnapKit
+import AuthenticationServices
 
 final class LoginView: ZTView {
-    private(set) var appleLoginButton = LoginButton(type: .apple)
+    private(set) var appleLoginButton: ASAuthorizationAppleIDButton = {
+        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
+        return button
+    }()
+    
+    private(set) var appleCustumLoginButton = LoginButton(type: .apple)
     private(set) var googleLoginButton = LoginButton(type: .google)
     private(set) var kakaoLoginButton = LoginButton(type: .kakao)
     private(set) var naverLoginButton = LoginButton(type: .naver)
     
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [appleLoginButton,
-                                                       googleLoginButton,
-                                                       kakaoLoginButton,
-                                                       naverLoginButton])
+        let stackView = UIStackView(arrangedSubviews: [// appleLoginButton,
+            appleCustumLoginButton,
+            googleLoginButton,
+            kakaoLoginButton,
+            naverLoginButton])
         stackView.axis = .vertical
         stackView.spacing = 10
         return stackView
