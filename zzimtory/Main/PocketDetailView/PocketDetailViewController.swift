@@ -111,13 +111,13 @@ class PocketDetailViewController: UIViewController,
         let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
         let sortByOldestAction = UIAlertAction(title: "내림차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortPockets(by: .oldest) { [weak self] in
+            self?.viewModel.sortItems(by: .descending) { [weak self] in
                 self?.pocketDetailView?.itemCollectionView.reloadData()
             }
         }
         
         let sortByNewestAction = UIAlertAction(title: "오름차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortPockets(by: .newest)  { [weak self] in
+            self?.viewModel.sortItems(by: .ascending)  { [weak self] in
                 self?.pocketDetailView?.itemCollectionView.reloadData()
             }
         }
