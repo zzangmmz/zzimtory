@@ -78,6 +78,7 @@ class MainView: ZTView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "pencil"), for: .normal)
         button.tintColor = .black900Zt
+        button.isHidden = true
         button.layer.cornerRadius = 20
         button.backgroundColor = .white100Zt
         return button

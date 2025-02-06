@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+class MainViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UISearchBarDelegate{
     private var mainView: MainView?
     private let viewModel = MainPocketViewModel()
     
@@ -30,6 +30,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         mainView?.addPocketButton.addTarget(self, action: #selector(addPocketButtonDidTap), for: .touchUpInside)
         mainView?.sortButton.addTarget(self, action: #selector(sortButtonDidTap), for: .touchUpInside)
         mainView?.editButton.addTarget(self, action: #selector(editButtonDidTap), for: .touchUpInside)
+        mainView?.searchBar.delegate = self
     }
     
     private func setupCollectionView() {
@@ -97,7 +98,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.pockets.count
+        return viewModel.filterPockets.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -107,21 +108,23 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             fatalError("Unable to dequeue PocketCell")
         }
         
-        let pocket = viewModel.pockets[indexPath.item]
+        let pocket = viewModel.filterPockets[indexPath.item]
         cell.configure(with: pocket)
         return cell
     }
     
-    // UICollectionViewDelegate 메서드 구현
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let pocket = viewModel.pockets[indexPath.item]
+        let pocket = viewModel.filterPockets[indexPath.item]
         print("\(pocket.title) 이 클릭됨")
         
-        // "전체보기" 클릭 시 PocketDetailViewController로 이동
-        let detailViewModel = PocketDetailViewModel(pocket: pocket)  // 새로운 viewModel 생성
-        let detailVC = PocketDetailViewController(viewModel: detailViewModel) // 생성자 호출
+        let detailViewModel = PocketDetailViewModel(pocket: pocket)
+        let detailVC = PocketDetailViewController(viewModel: detailViewModel)
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+            viewModel.filterPockets(with: searchText)
+            mainView?.collectionView.reloadData()
+        }
     
     @objc private func editButtonDidTap() {
         print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정

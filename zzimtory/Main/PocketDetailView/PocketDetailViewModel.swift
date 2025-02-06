@@ -9,6 +9,7 @@ import Foundation
 
 class PocketDetailViewModel {
     var pocket: Pocket
+    var filteredItems: [Item] = []
     
     var itemCount: String {
         return "아이템 개수: \(pocket.items.count)"
@@ -16,6 +17,7 @@ class PocketDetailViewModel {
     
     init(pocket: Pocket) {
         self.pocket = pocket
+        self.filteredItems = pocket.items
         print(self.pocket)
     }
         

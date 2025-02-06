@@ -15,16 +15,18 @@ enum SortOrder {
 class MainPocketViewModel {
     // 주머니 이름과 이미지 배열을 함께 관리
     private(set) var pockets: [Pocket] = []
-    
+    private(set) var filterPockets: [Pocket] = []
+
     func fetchData(completion: @escaping ([Pocket]) -> Void) {
         DatabaseManager.shared.readPocket { pockets in
             self.pockets = pockets
+            self.filterPockets = pockets
             completion(pockets)
         }
     }
     
     func addPocket(title: String, completion: @escaping () -> Void) {
-        // 새 주머니 추가
+        
         let newPocket = Pocket(title: title, items: [Item]())
         self.pockets.append(newPocket)
         DatabaseManager.shared.createPocket(title: newPocket.title) {
@@ -38,9 +40,9 @@ class MainPocketViewModel {
         
         switch order {
         case .newest:
-            otherPockets.sort { $0.title > $1.title } // 최신순 정렬
+            otherPockets.sort { $0.title > $1.title } 
         case .oldest:
-            otherPockets.sort { $0.title < $1.title } // 오래된 순 정렬
+            otherPockets.sort { $0.title < $1.title }
         }
         if let fixedPocket = fixedPocket {
             pockets = [fixedPocket] + otherPockets
@@ -50,4 +52,16 @@ class MainPocketViewModel {
             completion()
         }
     }
-}
+    func filterPockets(with searchText: String) {
+            if searchText.isEmpty {
+                filterPockets = pockets
+            } else {
+                filterPockets = pockets.filter { pocket in
+                    pocket.title.lowercased().contains(searchText.lowercased()) ||
+                    pocket.items.contains { item in
+                        item.title.lowercased().contains(searchText.lowercased())
+                    }
+                }
+            }
+        }
+    }

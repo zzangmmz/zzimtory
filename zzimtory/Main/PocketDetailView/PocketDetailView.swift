@@ -83,7 +83,7 @@ class PocketDetailView: ZTView {
     
     // 버튼들을 묶은 stackView
     private lazy var buttonStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [searchButton, sortButton, deleteButton])
+        let stackView = UIStackView(arrangedSubviews: [searchButton, sortButton])
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
@@ -180,7 +180,7 @@ class PocketDetailView: ZTView {
         }
         
         moveStackView.snp.makeConstraints { make in
-            make.bottom.equalTo(safeAreaLayoutGuide).inset(100)
+            make.bottom.equalTo(safeAreaLayoutGuide).inset(32)
             make.centerX.equalToSuperview()
             make.width.equalTo(240)
 
