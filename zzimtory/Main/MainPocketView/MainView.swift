@@ -78,6 +78,7 @@ class MainView: ZTView {
         let button = UIButton()
         button.setImage(UIImage(systemName: "pencil"), for: .normal)
         button.tintColor = .black900Zt
+        button.isHidden = true
         button.layer.cornerRadius = 20
         button.backgroundColor = .white100Zt
         return button
@@ -139,13 +140,18 @@ class MainView: ZTView {
             make.leading.trailing.equalToSuperview().inset(24)
             make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
         }
-      
+        
         sortButton.snp.makeConstraints { make in
             make.width.height.equalTo(40) // 크기 조정
         }
         
         editButton.snp.makeConstraints { make in
             make.width.height.equalTo(40) // 크기 조정
+        }
+        
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(logoStackView.snp.bottom).inset(16)
+            make.height.equalTo(44)
         }
         
         searchBar.searchTextField.snp.makeConstraints { make in

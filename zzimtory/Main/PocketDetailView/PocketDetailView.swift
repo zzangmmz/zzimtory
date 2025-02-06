@@ -10,9 +10,10 @@ import SnapKit
 
 // PocketDetailView.swift
 class PocketDetailView: ZTView {
-
+    
     var countLabel = UILabel()
     var itemCollectionView = ItemCollectionView()
+    private var viewModel: PocketDetailViewModel?
     
     let overlayView: ZTView = {
         let view = ZTView()
@@ -82,7 +83,7 @@ class PocketDetailView: ZTView {
     
     // 버튼들을 묶은 stackView
     private lazy var buttonStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [searchButton, sortButton, deleteButton])
+        let stackView = UIStackView(arrangedSubviews: [searchButton, sortButton])
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
@@ -110,12 +111,19 @@ class PocketDetailView: ZTView {
     }()
     
     // 서치바
-    var searchBar: UISearchBar = {
+    let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "상품명을 입력하세요"
+        searchBar.searchBarStyle = .default
+        searchBar.layer.cornerRadius = 14
         searchBar.isHidden = true
-        searchBar.backgroundColor = .clear
-        searchBar.searchBarStyle = .minimal
+        searchBar.backgroundImage = UIImage()
+        searchBar.backgroundColor = .white100Zt
+        
+        if let textField = searchBar.value(forKey: "searchField") as? UITextField {
+            textField.backgroundColor = .white100Zt
+            textField.tintColor = .black900Zt
+        }
         return searchBar
     }()
     
@@ -123,7 +131,7 @@ class PocketDetailView: ZTView {
     var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("취소", for: .normal)
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.black900Zt, for: .normal)
         button.layer.cornerRadius = 8
         button.isHidden = true
         return button
@@ -152,12 +160,12 @@ class PocketDetailView: ZTView {
         
         countLabel.font = .systemFont(ofSize: 16)
         countLabel.textColor = .black900Zt
-
+        
         // countLabel과 버튼들을 묶은 stackView 추가
         addSubview(countAndButtonStackView)
         addSubview(searchBar)
         addSubview(cancelButton)
-       
+        
         addSubview(overlayView)
         addSubview(itemCollectionView)
         addSubview(moveStackView)
@@ -165,28 +173,29 @@ class PocketDetailView: ZTView {
         
         // 주머니 비었을 때 플레이스 홀더 추가
         addSubview(emptyPocketLabel)
-
+        
         countAndButtonStackView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(8)
             make.leading.trailing.equalToSuperview().inset(24)
         }
         
         moveStackView.snp.makeConstraints { make in
-            make.bottom.equalTo(safeAreaLayoutGuide).inset(100)
+            make.bottom.equalTo(safeAreaLayoutGuide).inset(32)
             make.centerX.equalToSuperview()
             make.width.equalTo(240)
-
+            
         }
         
         moveCancelButton.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(16)
             make.trailing.equalToSuperview().inset(24)
         }
-       
+        
         searchBar.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(8)
-            make.top.bottom.equalTo(countAndButtonStackView)
-            make.trailing.equalTo(cancelButton.snp.leading).inset(8)
+            make.leading.equalToSuperview().offset(16)
+            make.top.equalTo(countAndButtonStackView)
+            make.height.equalTo(44)
+            make.trailing.equalTo(cancelButton.snp.leading).offset(-4)
             
         }
         
@@ -234,7 +243,7 @@ class PocketDetailView: ZTView {
             make.center.equalToSuperview()
         }
         
-        cancelButton.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)
+        
         searchButton.addTarget(self, action: #selector(searchButtonDidTap), for: .touchUpInside)
         deleteButton.addTarget(self, action: #selector (deleteButtonDidTap), for: .touchUpInside)
         moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
@@ -269,10 +278,7 @@ class PocketDetailView: ZTView {
     }
     
     // 취소 버튼 클릭 시 서치바를 숨기고, 카운트앤버튼스택뷰 다시 보이게
-    @objc private func cancelSearch() {
-        searchBar.text = nil  // 서치바 초기화
-        setHidden()
-    }
+    
     
     @objc private func deleteButtonDidTap() {
         toggleButtonHidden()
@@ -281,13 +287,13 @@ class PocketDetailView: ZTView {
     @objc private func moveCancelButtonDidTap() {
         toggleButtonHidden()
     }
-
+    
     // 주머니 이동 버튼 클릭 시 추후 추가 예정!!
     @objc private func moveButtonDidTap() {
         print("주머니 이동이 클릭됨")
     }
     
-    private func setHidden() {
+    func setHidden() {
         [searchBar, cancelButton, countAndButtonStackView]
             .forEach {
                 $0.isHidden.toggle()

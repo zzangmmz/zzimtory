@@ -134,9 +134,9 @@ class PocketCell: UICollectionViewCell {
         titleImageStackView.distribution = .fillProportionally
         
         contentView.addSubview(titleImageStackView)
-        contentView.addSubview(countLabelOnImage)
         contentView.addSubview(emptyPocketImageView)
         contentView.addSubview(singlePocketImageView)
+        contentView.addSubview(countLabelOnImage)
         
         titleImageStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()

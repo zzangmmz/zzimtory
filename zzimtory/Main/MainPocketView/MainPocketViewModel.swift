@@ -8,23 +8,25 @@
 import UIKit
 
 enum SortOrder {
-    case newest
-    case oldest
+    case descending
+    case ascending
 }
 
 class MainPocketViewModel {
     // 주머니 이름과 이미지 배열을 함께 관리
     private(set) var pockets: [Pocket] = []
+    private(set) var filterPockets: [Pocket] = []
     
     func fetchData(completion: @escaping ([Pocket]) -> Void) {
         DatabaseManager.shared.readPocket { pockets in
             self.pockets = pockets
+            self.filterPockets = pockets
             completion(pockets)
         }
     }
     
     func addPocket(title: String, completion: @escaping () -> Void) {
-        // 새 주머니 추가
+        
         let newPocket = Pocket(title: title, items: [Item]())
         self.pockets.append(newPocket)
         DatabaseManager.shared.createPocket(title: newPocket.title) {
@@ -32,20 +34,36 @@ class MainPocketViewModel {
         }
     }
     
-    func sortPockets(by order: SortOrder) {
-        let fixedPocket = pockets.first { $0.title == "전체보기"}
-        var otherPockets = pockets.filter { $0.title != "전체보기" }
-        
+    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {
+        //        let fixedPocket = pockets.first { $0.title == "전체보기"}
+        //        var otherPockets = pockets.filter { $0.title != "전체보기" }
+        //        
         switch order {
-        case .newest:
-            otherPockets.sort { $0.title > $1.title } // 최신순 정렬
-        case .oldest:
-            otherPockets.sort { $0.title < $1.title } // 오래된 순 정렬
+        case .descending:
+            pockets.sort { $0.title > $1.title }   // 사전 역순 정렬
+        case .ascending:
+            pockets.sort { $0.title < $1.title }   // 사전순 정렬
         }
-        if let fixedPocket = fixedPocket {
-            pockets = [fixedPocket] + otherPockets
+        //        if let fixedPocket = fixedPocket {
+        //            pockets = [fixedPocket] + otherPockets
+        //            completion()
+        //        } else {
+        //            pockets = otherPockets
+        //            completion()
+        //        }
+        completion()
+    }
+    
+    func filterPockets(with searchText: String) {
+        if searchText.isEmpty {
+            filterPockets = pockets
         } else {
-            pockets = otherPockets
+            filterPockets = pockets.filter { pocket in
+                pocket.title.lowercased().contains(searchText.lowercased()) ||
+                pocket.items.contains { item in
+                    item.title.lowercased().contains(searchText.lowercased())
+                }
+            }
         }
     }
 }
