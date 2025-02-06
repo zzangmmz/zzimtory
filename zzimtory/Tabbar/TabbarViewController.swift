@@ -21,13 +21,7 @@ final class TabbarViewController: UITabBarController {
             navigationController?.pushViewController(LoginViewController(), animated: false)
         }
     }
-    
-//    override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        
-//        
-//        
-//    }
+
 }
 
 private extension TabbarViewController {

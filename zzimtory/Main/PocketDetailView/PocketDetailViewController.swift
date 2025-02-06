@@ -43,9 +43,6 @@ class PocketDetailViewController: UIViewController,
     }
     
     private func bind() {
-        //        self.viewModel.fetchData { [weak self] pockets in
-        //            self?.pocketDetailView?.itemCollectionView.reloadData()
-        //        }
         
         self.viewModel.fetchData { [weak self] _ in
             DispatchQueue.main.async {

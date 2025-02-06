@@ -16,18 +16,18 @@ enum MyPageContents: String {
 
 final class MyPageViewController: UIViewController {
     
-    let tableViewContents: [(name: MyPageContents, color: UIColor)] = [
+    private let tableViewContents: [(name: MyPageContents, color: UIColor)] = [
         (.terms, .black900Zt),
         (.logOut, .black900Zt),
         (.deleteAccount, .systemRed)
     ]
     
     // MARK: - UI Components
+    
     private let logoImageView: UIImageView = {
-        let imageView = UIImageView()
-        
-        imageView.image = UIImage(named: "logo")
-        
+        let imageView = UIImageView(image: UIImage(named: "logo"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .black900Zt
         return imageView
     }()
     
@@ -37,17 +37,18 @@ final class MyPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-                
+        
         DatabaseManager.shared.readUserProfile { [weak self] response in
             guard let nickname = response?.nickname,
                   let email = response?.email else { return }
             self?.userProfileView.setGreeting(for: nickname)
             self?.userProfileView.setEmailAddress(to: email)
         }
+        
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
         view = ZTView(frame: view.frame)
         
@@ -140,6 +141,6 @@ extension MyPageViewController: UITableViewDelegate {
             let loginVC = LoginViewController()
             navigationController?.pushViewController(loginVC, animated: false)
         }
-
+        
     }
 }

@@ -41,6 +41,7 @@ final class ItemSearchView: ZTView {
         
         bind(to: itemSearchViewModel)
         itemCardsView.setDelegate(to: self)
+        itemCardsView.bind(to: itemSearchViewModel)
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -54,7 +55,6 @@ final class ItemSearchView: ZTView {
 
         searchBar.searchTextField.backgroundColor = .white100Zt
         searchBar.searchBarStyle = .minimal
-//        searchBar.setSearchFieldBackgroundImage(UIImage(), for: .normal)
         
         addSubview(searchBar)
     }
@@ -92,7 +92,7 @@ extension ItemSearchView: SearchViewModelBindable {
         viewModel.searchResult.observe(on: MainScheduler.instance)
             .subscribe(
                 onNext: { [weak self] result in
-                    self?.items.append(contentsOf: result)
+                    self?.items = result
                     self?.itemCollectionView.reloadData()
                 },
                 onError: { error in
@@ -115,7 +115,7 @@ extension ItemSearchView: SwipeCardStackDelegate {
     
     func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
         switch direction {
-        case .right: DummyModel.shared.defaultPocket.items.append(items[index])
+        case .right: break
         case .left: break
         case .up:
             self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
@@ -146,7 +146,6 @@ extension ItemSearchView: UISearchBarDelegate {
         itemSearchViewModel.search()
         layer.addSublayer(dimLayer)
         addSubview(itemCardsView)
-        itemCardsView.bind(to: itemSearchViewModel)
         itemCardsView.frame = self.frame
         itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
     }
@@ -155,7 +154,6 @@ extension ItemSearchView: UISearchBarDelegate {
         print("ItemCardsView Tapped")
         itemCardsView.removeFromSuperview()
         dimLayer.removeFromSuperlayer()
-        items = []
     }
 }
 
@@ -179,15 +177,6 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
-        // 린트 경고 때문에 수정
-        //        if kind == UICollectionView.elementKindSectionHeader {
-        //            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-        //                                                                         withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
-        //                                                                         for: indexPath) as! ItemCollectionViewHeader
-        //            return header
-        //        }
-        //        return UICollectionReusableView()
-        
         
         if kind == UICollectionView.elementKindSectionHeader {
             let reusableView = collectionView.dequeueReusableSupplementaryView(

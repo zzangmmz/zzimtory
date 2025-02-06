@@ -20,13 +20,13 @@ class PocketDetailViewModel {
         self.pocket = pocket
         self.filteredItems = pocket.items
         self.displayItems = pocket.items
-        print(self.pocket)
     }
     
     func fetchData(completion: @escaping (Pocket) -> Void) {
         DatabaseManager.shared.readPocket { [weak self] pockets in
             if let updatedPocket = pockets.first(where: { $0.title == self?.pocket.title }) {
                 self?.pocket = updatedPocket
+                self?.displayItems = updatedPocket.items
                 completion(updatedPocket)
             } else {
                 completion(self?.pocket ?? Pocket(title: "", items: []))

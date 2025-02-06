@@ -12,7 +12,7 @@ import AuthenticationServices
 final class LoginView: ZTView {
         
     private let logoImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "logo"))
+        let imageView = UIImageView(image: UIImage(named: "LogoIcon"))
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .black900Zt
         return imageView
@@ -23,14 +23,14 @@ final class LoginView: ZTView {
         return button
     }()
     
-    private(set) var appleCustumLoginButton = LoginButton(type: .apple)
+    private(set) var appleCustomLoginButton = LoginButton(type: .apple)
     private(set) var googleLoginButton = LoginButton(type: .google)
     private(set) var kakaoLoginButton = LoginButton(type: .kakao)
     private(set) var naverLoginButton = LoginButton(type: .naver)
     
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [// appleLoginButton,
-            appleCustumLoginButton,
+        let stackView = UIStackView(arrangedSubviews: [
+            appleCustomLoginButton,
             googleLoginButton,
             kakaoLoginButton,
             naverLoginButton])
@@ -55,8 +55,8 @@ final class LoginView: ZTView {
         logoImageView.snp.makeConstraints {make in
             make.centerX.equalToSuperview()
             make.bottom.equalTo(stackView.snp.top)
-            make.height.equalToSuperview().multipliedBy(0.1)
-            make.width.equalToSuperview().multipliedBy(0.7)
+            make.height.equalToSuperview().multipliedBy(0.2)
+            make.width.equalToSuperview().multipliedBy(1.0)
         }
         
         stackView.arrangedSubviews.forEach {

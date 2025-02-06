@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UISearchBarDelegate{
+class MainViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UISearchBarDelegate {
     private var mainView: MainView?
     private let viewModel = MainPocketViewModel()
     
@@ -121,6 +121,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         let detailVC = PocketDetailViewController(viewModel: detailViewModel)
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         viewModel.filterPockets(with: searchText)
         mainView?.collectionView.reloadData()

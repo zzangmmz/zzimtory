@@ -68,21 +68,14 @@ final class DetailViewModel {
         } else {
             searchQuery = cleanTitle
         }
-        
-        // print("검색어: \(searchQuery)")
     }
     
     // 유사 상품 검색
     private func fetchSimilarItems() {
-        // 임시로 더미 데이터 사용
-        // let dummyItems = DetailDummyItems.dummyItems.filter { $0.productID != currentItem.productID }
-        // similarItems.onNext(dummyItems)
-        
         shoppingRepository.fetchSearchData(query: searchQuery)
             .subscribe(onSuccess: { [weak self] response in
                 let filteredItems = response.items.filter { $0.productID != self?.currentItem.productID }
                 self?.similarItems.onNext(filteredItems)
-                // print(filteredItems)
             }, onFailure: { error in
                 print("유사 상품 검색 실패: \(error)")
             })
