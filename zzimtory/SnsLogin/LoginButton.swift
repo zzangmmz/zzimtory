@@ -22,13 +22,13 @@ enum SnsType {
     var style: SnsStyle {
         switch self {
         case .apple:
-            return SnsStyle(name: "애플", color: UIColor(named: "appleColor"), icon: UIImage(systemName: "apple.logo"))
+            return SnsStyle(name: "Apple", color: UIColor(named: "appleColor"), icon: UIImage(named: "appleIcon"))
         case .google:
-            return SnsStyle(name: "구글", color: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
+            return SnsStyle(name: "Google", color: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
         case .kakao:
-            return SnsStyle(name: "카카오", color: UIColor(named: "kakaoColor"), icon: UIImage(named: "kakaoIcon"))
+            return SnsStyle(name: "Kakao", color: UIColor(named: "kakaoColor"), icon: UIImage(named: "kakaoIcon"))
         case .naver:
-            return SnsStyle(name: "네이버", color: UIColor(named: "naverColor"), icon: UIImage(named: "naverIcon"))
+            return SnsStyle(name: "Naver", color: UIColor(named: "naverColor"), icon: UIImage(named: "naverIcon"))
         }
     }
 }
@@ -43,13 +43,22 @@ final class LoginButton: UIButton {
             let size = CGSize(width: 28, height: 28)
             UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
             type.style.icon?.draw(in: CGRect(origin: .zero, size: size))
-            finalImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
+        } else {
+            let width = 28.0
+            let image = UIImage(named: "appleIcon")
+            let aspectRatio = (image?.size.height ?? 1.0) / (image?.size.width ?? 1.0)
+            let height = width * aspectRatio
+            
+            UIGraphicsBeginImageContextWithOptions(CGSize(width: width, height: height), false, 0.0)
+            image?.draw(in: CGRect(origin: .zero, size: CGSize(width: width, height: height)))
         }
+        
+        finalImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
         
         config.attributedTitle = AttributedString("\(type.style.name)로 로그인",
                                                   attributes: AttributeContainer([
-                                                    .font: UIFont.systemFont(ofSize: 16, weight: .semibold)
+                                                    .font: UIFont.systemFont(ofSize: 19, weight: .semibold)
                                                   ]))
         config.image = finalImage
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 20)

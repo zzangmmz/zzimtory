@@ -63,9 +63,15 @@ final class LoginViewController: UIViewController {
     }
     
     private func bind() {
-        loginView?.appleLoginButton.addTarget(self,
-                                              action: #selector(appleLoginButtonTapped),
-                                              for: .touchUpInside)
+//        loginView?.appleLoginButton.addTarget(self,
+//                                              action: #selector(appleLoginButtonTapped),
+//                                              for: .touchUpInside)
+        loginView?.appleCustumLoginButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.viewModel.signInWithApple(on: self!)
+            })
+            .disposed(by: disposeBag)
+        
         loginView?.googleLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.signInWithGoogle(on: self!)

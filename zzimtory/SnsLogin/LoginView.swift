@@ -10,6 +10,14 @@ import SnapKit
 import AuthenticationServices
 
 final class LoginView: ZTView {
+        
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "logo"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .black900Zt
+        return imageView
+    }()
+    
     private(set) var appleLoginButton: ASAuthorizationAppleIDButton = {
         let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
         return button
@@ -41,7 +49,15 @@ final class LoginView: ZTView {
     }
     
     private func setupView() {
+        self.addSubview(logoImageView)
         self.addSubview(stackView)
+        
+        logoImageView.snp.makeConstraints {make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(stackView.snp.top)
+            make.height.equalToSuperview().multipliedBy(0.1)
+            make.width.equalToSuperview().multipliedBy(0.7)
+        }
         
         stackView.arrangedSubviews.forEach {
             $0.snp.makeConstraints {
