@@ -9,8 +9,8 @@ import UIKit
 class PocketDetailViewController: UIViewController,
                                     UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate {
     
-    private var pocketDetailView: PocketDetailView!
-    private var viewModel: PocketDetailViewModel!
+    private var pocketDetailView: PocketDetailView?
+    private var viewModel: PocketDetailViewModel
     
     // viewModel을 전달받는 생성자
     init(viewModel: PocketDetailViewModel) {
@@ -39,7 +39,7 @@ class PocketDetailViewController: UIViewController,
         setupCollectionView()
         setupActions()
         
-        pocketDetailView.configure(with: viewModel.pocket)
+        pocketDetailView?.configure(with: viewModel.pocket)
         bind()
     }
     
@@ -51,21 +51,21 @@ class PocketDetailViewController: UIViewController,
         self.viewModel.fetchData { [weak self] _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                self.pocketDetailView.configure(with: self.viewModel.pocket)
-                self.pocketDetailView.itemCollectionView.reloadData()
+                self.pocketDetailView?.configure(with: self.viewModel.pocket)
+                self.pocketDetailView?.itemCollectionView.reloadData()
             }
         }
     }
     
     private func setupActions() {
         // 정렬 버튼
-        pocketDetailView.sortButton.addTarget(self, action: #selector(sortButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.sortButton.addTarget(self, action: #selector(sortButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
-        pocketDetailView.itemCollectionView.delegate = self
-        pocketDetailView.itemCollectionView.dataSource = self
-        pocketDetailView.itemCollectionView.register(ItemCollectionViewCell.self,
+        pocketDetailView?.itemCollectionView.delegate = self
+        pocketDetailView?.itemCollectionView.dataSource = self
+        pocketDetailView?.itemCollectionView.register(ItemCollectionViewCell.self,
                                                      forCellWithReuseIdentifier: ItemCollectionViewCell.id)
     }
     
@@ -99,12 +99,30 @@ class PocketDetailViewController: UIViewController,
                 item.title.lowercased().contains(searchText.lowercased()) // 제목에 검색어가 포함되면 필터링
             }
         }
-        pocketDetailView.itemCollectionView.reloadData() // 필터링된 데이터로 CollectionView 업데이트
+        pocketDetailView?.itemCollectionView.reloadData() // 필터링된 데이터로 CollectionView 업데이트
     }
     
     @objc private func sortButtonDidTap() {
-        print("정렬 버튼 클릭됨")
-        // 정렬 로직 추가 예정
+        let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
+        
+        let sortByOldestAction = UIAlertAction(title: "내림차순", style: .default) { [weak self] _ in
+            self?.viewModel.sortPockets(by: .oldest) { [weak self] in
+                self?.pocketDetailView?.itemCollectionView.reloadData()
+            }
+        }
+        
+        let sortByNewestAction = UIAlertAction(title: "오름차순", style: .default) { [weak self] _ in
+            self?.viewModel.sortPockets(by: .newest)  { [weak self] in
+                self?.pocketDetailView?.itemCollectionView.reloadData()
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+        alert.addAction(sortByOldestAction)
+        alert.addAction(sortByNewestAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true, completion: nil)
     }
 }
 extension PocketDetailViewController: UICollectionViewDelegateFlowLayout {

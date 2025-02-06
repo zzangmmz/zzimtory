@@ -29,4 +29,23 @@ class PocketDetailViewModel {
             }
         }
     }
+    
+    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {
+        let fixedPocket = pocket.items.first { $0.title == "전체보기"}
+        var otherPockets = pocket.items.filter { $0.title != "전체보기" }
+        
+        switch order {
+        case .newest:
+            otherPockets.sort { $0.title > $1.title } // 최신순 정렬
+        case .oldest:
+            otherPockets.sort { $0.title < $1.title } // 오래된 순 정렬
+        }
+        if let fixedPocket = fixedPocket {
+            pocket.items = [fixedPocket] + otherPockets
+            completion()
+        } else {
+            pocket.items = otherPockets
+            completion()
+        }
+    }
 }

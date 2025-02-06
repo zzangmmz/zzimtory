@@ -32,7 +32,7 @@ class MainPocketViewModel {
         }
     }
     
-    func sortPockets(by order: SortOrder) {
+    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {
         let fixedPocket = pockets.first { $0.title == "전체보기"}
         var otherPockets = pockets.filter { $0.title != "전체보기" }
         
@@ -44,8 +44,10 @@ class MainPocketViewModel {
         }
         if let fixedPocket = fixedPocket {
             pockets = [fixedPocket] + otherPockets
+            completion()
         } else {
             pockets = otherPockets
+            completion()
         }
     }
 }

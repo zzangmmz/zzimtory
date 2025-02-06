@@ -13,6 +13,7 @@ class PocketDetailView: ZTView {
 
     var countLabel = UILabel()
     var itemCollectionView = ItemCollectionView()
+    private let viewModel = MainPocketViewModel()
     
     let overlayView: ZTView = {
         let view = ZTView()
@@ -125,7 +126,6 @@ class PocketDetailView: ZTView {
         }
         return searchBar
     }()
-    
     
     // 취소 버튼
     var cancelButton: UIButton = {

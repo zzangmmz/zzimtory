@@ -76,11 +76,15 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
         let sortByOldestAction = UIAlertAction(title: "내림차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortPockets(by: .oldest)
+            self?.viewModel.sortPockets(by: .oldest) { [weak self] in
+                self?.mainView?.collectionView.reloadData()
+            }
         }
         
         let sortByNewestAction = UIAlertAction(title: "오름차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortPockets(by: .newest)
+            self?.viewModel.sortPockets(by: .newest) { [weak self] in
+                self?.mainView?.collectionView.reloadData()
+            }
         }
         
         let cancelAction = UIAlertAction(title: "취소", style: .cancel)
