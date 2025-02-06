@@ -34,6 +34,11 @@ final class MyPageViewController: UIViewController {
     private let userProfileView = UserProfileView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
                 
