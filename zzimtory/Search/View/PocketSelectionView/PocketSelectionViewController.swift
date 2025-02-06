@@ -60,10 +60,12 @@ final class PocketSelectionViewController: UIViewController {
         
         view.backgroundColor = .white100Zt
 
-        // 아래 코드의 Array에 두번째 항목으로 .medium()을 추가하면 모달을 당겨 화면 절반을 채우도록 할 수 있음.
-        // 추후 기능 추가에 참고할것?
+        // 화면 높이가 작은 기기(SE 등)인 경우 더 큰 detent 값 사용
+        let screenHeight = UIScreen.main.bounds.height
+        let modalHeight = screenHeight < 700 ? 0.3 : 0.2
+        
         sheetPresentationController?.detents = [.custom { context in
-            0.24 * context.maximumDetentValue
+            modalHeight * context.maximumDetentValue
         }]
         
         addNewPocketButton.addTarget(self, action: #selector(onTap), for: .touchUpInside)
