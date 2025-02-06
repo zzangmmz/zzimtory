@@ -16,7 +16,7 @@ enum MyPageContents: String {
 
 final class MyPageViewController: UIViewController {
     
-    let tableViewContents: [(name: MyPageContents, color: UIColor)] = [
+    private let tableViewContents: [(name: MyPageContents, color: UIColor)] = [
         (.terms, .black900Zt),
         (.logOut, .black900Zt),
         (.deleteAccount, .systemRed)

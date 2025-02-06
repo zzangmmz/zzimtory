@@ -55,7 +55,6 @@ final class ItemSearchView: ZTView {
 
         searchBar.searchTextField.backgroundColor = .white100Zt
         searchBar.searchBarStyle = .minimal
-//        searchBar.setSearchFieldBackgroundImage(UIImage(), for: .normal)
         
         addSubview(searchBar)
     }
@@ -116,7 +115,7 @@ extension ItemSearchView: SwipeCardStackDelegate {
     
     func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
         switch direction {
-        case .right: DummyModel.shared.defaultPocket.items.append(items[index])
+        case .right: break
         case .left: break
         case .up:
             self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
@@ -178,15 +177,6 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
-        // 린트 경고 때문에 수정
-        //        if kind == UICollectionView.elementKindSectionHeader {
-        //            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
-        //                                                                         withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
-        //                                                                         for: indexPath) as! ItemCollectionViewHeader
-        //            return header
-        //        }
-        //        return UICollectionReusableView()
-        
         
         if kind == UICollectionView.elementKindSectionHeader {
             let reusableView = collectionView.dequeueReusableSupplementaryView(

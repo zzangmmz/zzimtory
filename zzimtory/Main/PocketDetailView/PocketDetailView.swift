@@ -242,8 +242,7 @@ class PocketDetailView: ZTView {
         emptyPocketLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
-        
-        
+               
         searchButton.addTarget(self, action: #selector(searchButtonDidTap), for: .touchUpInside)
         deleteButton.addTarget(self, action: #selector (deleteButtonDidTap), for: .touchUpInside)
         moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
@@ -277,9 +276,7 @@ class PocketDetailView: ZTView {
         setHidden()
     }
     
-    // 취소 버튼 클릭 시 서치바를 숨기고, 카운트앤버튼스택뷰 다시 보이게
-    
-    
+    // 취소 버튼 클릭 시 서치바를 숨기고, 카운트앤버튼스택뷰 다시 보이게 
     @objc private func deleteButtonDidTap() {
         toggleButtonHidden()
     }

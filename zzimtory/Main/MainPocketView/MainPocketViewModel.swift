@@ -34,23 +34,14 @@ class MainPocketViewModel {
         }
     }
     
-    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {
-        //        let fixedPocket = pockets.first { $0.title == "전체보기"}
-        //        var otherPockets = pockets.filter { $0.title != "전체보기" }
-        //        
+    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {  
         switch order {
         case .descending:
             pockets.sort { $0.title > $1.title }   // 사전 역순 정렬
         case .ascending:
             pockets.sort { $0.title < $1.title }   // 사전순 정렬
         }
-        //        if let fixedPocket = fixedPocket {
-        //            pockets = [fixedPocket] + otherPockets
-        //            completion()
-        //        } else {
-        //            pockets = otherPockets
-        //            completion()
-        //        }
+
         completion()
     }
     
