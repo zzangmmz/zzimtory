@@ -44,6 +44,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     
     private func bind() {
         self.viewModel.fetchData { [weak self] pockets in
+            guard let pockets = pockets else { return }
             self?.mainView?.pocketCountLabel.text = "주머니 \(pockets.count)개"
             self?.mainView?.collectionView.reloadData()
         }
@@ -98,7 +99,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.pockets.count
+        return viewModel.filterPockets.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -108,7 +109,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             fatalError("Unable to dequeue PocketCell")
         }
         
-        let pocket = viewModel.pockets[indexPath.item]
+        let pocket = viewModel.filterPockets[indexPath.item]
         cell.configure(with: pocket)
         return cell
     }

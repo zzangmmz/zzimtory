@@ -17,18 +17,18 @@ class MainPocketViewModel {
     private(set) var pockets: [Pocket] = []
     private(set) var filterPockets: [Pocket] = []
     
-    func fetchData(completion: @escaping ([Pocket]) -> Void) {
-        DatabaseManager.shared.readPocket { pockets in
-            self.pockets = pockets
-            self.filterPockets = pockets
-            completion(pockets)
+    func fetchData(completion: @escaping ([Pocket]?) -> Void) {
+        DatabaseManager.shared.readPocket { [weak self] pockets in
+            self?.pockets = pockets
+            self?.filterPockets = pockets
+            completion(self?.filterPockets)
         }
     }
     
     func addPocket(title: String, completion: @escaping () -> Void) {
         
         let newPocket = Pocket(title: title, items: [Item]())
-        self.pockets.append(newPocket)
+        self.filterPockets.append(newPocket)
         DatabaseManager.shared.createPocket(title: newPocket.title) {
             completion()
         }
@@ -37,9 +37,9 @@ class MainPocketViewModel {
     func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {  
         switch order {
         case .descending:
-            pockets.sort { $0.title > $1.title }   // 사전 역순 정렬
+            filterPockets.sort { $0.title > $1.title }   // 사전 역순 정렬
         case .ascending:
-            pockets.sort { $0.title < $1.title }   // 사전순 정렬
+            filterPockets.sort { $0.title < $1.title }   // 사전순 정렬
         }
 
         completion()
