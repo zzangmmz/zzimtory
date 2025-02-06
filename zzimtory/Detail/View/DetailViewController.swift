@@ -56,7 +56,7 @@ final class DetailViewController: UIViewController {
         viewModel.itemImageUrl
             .subscribe(onNext: { [weak self] urlString in
                 if let url = URL(string: urlString) {
-                    self?.detailView.itemImageView.loadImage(from: url)
+                    self?.detailView.itemImageView.kf.setImage(with: url)
                 }
             })
             .disposed(by: disposeBag)
