@@ -8,16 +8,26 @@
 import FirebaseCore
 import FirebaseDatabase
 import FirebaseAuth
+import RxSwift
 
 final class DatabaseManager {
     static let shared = DatabaseManager()
     private var ref: DatabaseReference!
     private var userUID: String?
+    let completedLogin = PublishSubject<Bool>()
     
     private init() {
         // 파이어베이스 참조 설정
         ref = Database.database(url: "https://zzimtory-default-rtdb.asia-southeast1.firebasedatabase.app").reference()
         getUserUID()
+    }
+    
+    func hasUserLoggedIn() -> Bool {
+        guard let currentUser = Auth.auth().currentUser else {
+            print("현재 인증된 유저가 없습니다.")
+            return false
+        }
+        return true
     }
     
     private func getUserUID() {
@@ -48,10 +58,12 @@ final class DatabaseManager {
                         print("유저 등록 실패: \(error.localizedDescription)")
                     } else {
                         print("유저 등록 성공")
+                        self.completedLogin.onNext(true)
                     }
                 }
             } else {
                 print("이미 등록된 유저")
+                self.completedLogin.onNext(true)
             }
         }
     }

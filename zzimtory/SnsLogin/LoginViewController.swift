@@ -23,6 +23,7 @@ final class LoginViewController: UIViewController {
         loginView = LoginView(frame: view.frame)
         bind()
         view = loginView
+        navigationController?.isNavigationBarHidden = true
     }
     
     private func bind() {
@@ -37,14 +38,24 @@ final class LoginViewController: UIViewController {
                 self?.viewModel.signInWithGoogle(on: self!)
             })
             .disposed(by: disposeBag)
+        
         loginView?.kakaoLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.signInWithKakao()
             })
             .disposed(by: disposeBag)
+        
         loginView?.naverLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.signInWithNaver()
+            })
+            .disposed(by: disposeBag)
+        
+        DatabaseManager.shared.completedLogin.observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] bool in
+                if bool {
+                    self?.navigationController?.popToRootViewController(animated: true)
+                }
             })
             .disposed(by: disposeBag)
     }
