@@ -8,6 +8,10 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import CryptoKit
+import AuthenticationServices
+
+fileprivate var currentNonce: String?
 
 final class LoginViewController: UIViewController {
     private var loginView: LoginView?
@@ -44,5 +48,4 @@ final class LoginViewController: UIViewController {
             })
             .disposed(by: disposeBag)
     }
-    
 }
