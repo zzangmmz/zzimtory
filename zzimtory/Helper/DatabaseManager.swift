@@ -31,7 +31,8 @@ final class DatabaseManager {
     // MARK: - Data Create Method
     /// 유저 등록하는 메서드
     func createUser(user: User) {
-        guard let uid = self.userUID else { return }
+        let uid = user.uid
+        self.userUID = uid
         
         let userData: [String: Any] = [
             "email": user.email,
