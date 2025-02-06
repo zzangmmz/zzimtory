@@ -41,6 +41,7 @@ final class ItemSearchView: ZTView {
         
         bind(to: itemSearchViewModel)
         itemCardsView.setDelegate(to: self)
+        itemCardsView.bind(to: itemSearchViewModel)
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -92,7 +93,7 @@ extension ItemSearchView: SearchViewModelBindable {
         viewModel.searchResult.observe(on: MainScheduler.instance)
             .subscribe(
                 onNext: { [weak self] result in
-                    self?.items.append(contentsOf: result)
+                    self?.items = result
                     self?.itemCollectionView.reloadData()
                 },
                 onError: { error in
@@ -146,7 +147,6 @@ extension ItemSearchView: UISearchBarDelegate {
         itemSearchViewModel.search()
         layer.addSublayer(dimLayer)
         addSubview(itemCardsView)
-        itemCardsView.bind(to: itemSearchViewModel)
         itemCardsView.frame = self.frame
         itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
     }
@@ -155,7 +155,6 @@ extension ItemSearchView: UISearchBarDelegate {
         print("ItemCardsView Tapped")
         itemCardsView.removeFromSuperview()
         dimLayer.removeFromSuperlayer()
-        items = []
     }
 }
 

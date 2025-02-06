@@ -71,7 +71,7 @@ extension ItemCardsView: SearchViewModelBindable {
         viewModel.searchResult.observe(on: MainScheduler.instance)
             .subscribe(
                 onNext: { [weak self] result in
-                    self?.items.append(contentsOf: result)
+                    self?.items = result
                     self?.cardStack.reloadData()
                 },
                 onError: { error in
