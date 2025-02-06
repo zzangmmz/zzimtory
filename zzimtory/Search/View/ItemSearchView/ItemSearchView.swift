@@ -155,6 +155,7 @@ extension ItemSearchView: UISearchBarDelegate {
         print("ItemCardsView Tapped")
         itemCardsView.removeFromSuperview()
         dimLayer.removeFromSuperlayer()
+        items = []
     }
 }
 
