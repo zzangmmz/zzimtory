@@ -157,6 +157,16 @@ class PocketDetailView: ZTView {
         return button
     }()
     
+    private let emptyPocketLabel: UILabel = {
+        let label = UILabel()
+        label.text = "주머니가 비어있습니다."
+        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.textColor = .gray500Zt
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -183,6 +193,9 @@ class PocketDetailView: ZTView {
         addSubview(itemCollectionView)
         addSubview(moveStackView)
         addSubview(moveCancelButton)
+        
+        // 주머니 비었을 때 플레이스 홀더 추가
+        addSubview(emptyPocketLabel)
        
         
         titleStackView.snp.makeConstraints { make in
@@ -223,24 +236,15 @@ class PocketDetailView: ZTView {
         
         itemCollectionView.snp.makeConstraints { make in
             make.top.equalTo(countAndButtonStackView.snp.bottom).offset(20)
-            make.bottom.equalToSuperview().inset(16)
+            make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
             make.leading.trailing.equalToSuperview().inset(24)
         }
         
         overlayView.snp.makeConstraints { make in
             make.top.leading.trailing.bottom.equalToSuperview()  // 배경을 화면 전체로 채움
         }
-
-//        let layout = UICollectionViewFlowLayout()
-//        layout.scrollDirection = .vertical
-//        layout.minimumLineSpacing = 20
-//        layout.minimumInteritemSpacing = 10
-//        layout.itemSize = CGSize(width: 150, height: 190) // 두 개씩 배치
-//        
-//        itemCollectionView.collectionViewLayout = layout
-//        
-        // 버튼 사이즈 조정
         
+        // 버튼 사이즈 조정
         seedMoveButton.snp.makeConstraints { make in
             make.size.equalTo(50)
         }
@@ -264,19 +268,38 @@ class PocketDetailView: ZTView {
             make.size.equalTo(40) // 크기 조정
         }
         
+        emptyPocketLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        
         cancelButton.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)
         searchButton.addTarget(self, action: #selector(searchButtonDidTap), for: .touchUpInside)
         deleteButton.addTarget(self, action: #selector (deleteButtonDidTap), for: .touchUpInside)
         moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
     }
     
-    func configure(with title: String, itemCount: Int) {
-        titleLabel.text = title
-        countLabel.text = "씨앗 \(itemCount)개"
+    func configure(with pocket: Pocket) {
+        titleLabel.text = pocket.title
+        countLabel.text = "씨앗 \(pocket.items.count)개"
+        
+        if pocket.items.isEmpty {
+            itemCollectionView.isHidden = true
+            emptyPocketLabel.isHidden = false
+        } else {
+            itemCollectionView.isHidden = false
+            emptyPocketLabel.isHidden = true
+        }
     }
     
     func configureCollectionView(items: [Item]) {
         itemCollectionView.reloadData() // ItemCollectionView 데이터 업데이트
+    }
+    
+    private func toggleButtonHidden() {
+        [seedDeleteButton,
+         seedMoveButton,
+         moveCancelButton,
+         overlayView].forEach { $0.isHidden.toggle() }
     }
     
     // 서치버튼 클릭 시 서치바가 보이고, 카운트앤버튼스택뷰 숨기기
@@ -291,17 +314,11 @@ class PocketDetailView: ZTView {
     }
     
     @objc private func deleteButtonDidTap() {
-        seedDeleteButton.isHidden = false
-        seedMoveButton.isHidden = false
-        moveCancelButton.isHidden = false
-        overlayView.isHidden = false
+        toggleButtonHidden()
     }
     
     @objc private func moveCancelButtonDidTap() {
-        seedDeleteButton.isHidden = true
-        seedMoveButton.isHidden = true
-        moveCancelButton.isHidden = true
-        overlayView.isHidden = true
+        toggleButtonHidden()
     }
 
     // 주머니 이동 버튼 클릭 시 추후 추가 예정!!
@@ -316,4 +333,3 @@ class PocketDetailView: ZTView {
             }
     }
 }
-

@@ -28,7 +28,7 @@ class MainView: ZTView {
     let addPocketButton: UIButton = {
         let button = UIButton()
         var config = UIButton.Configuration.filled()
-        config.image = UIImage(named: "PocketBlack")!
+        config.image = UIImage(named: "PocketIcon")!
         config.baseBackgroundColor = .white100Zt
         config.baseForegroundColor = .black900Zt
         config.imagePadding = 6
@@ -44,8 +44,17 @@ class MainView: ZTView {
     let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "Search.."
-        searchBar.searchBarStyle = .minimal
-        searchBar.searchTextField.backgroundColor = .systemBackground
+        searchBar.searchBarStyle = .default
+        searchBar.layer.cornerRadius = 14
+        
+        searchBar.backgroundImage = UIImage()
+        searchBar.backgroundColor = .white100Zt
+        
+        if let textField = searchBar.value(forKey: "searchField") as? UITextField {
+            textField.backgroundColor = .white100Zt
+            textField.tintColor = .black900Zt
+        }
+        
         return searchBar
     }()
     
@@ -126,7 +135,7 @@ class MainView: ZTView {
         addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.bottom.equalTo(safeAreaLayoutGuide).offset(20)
+            make.top.equalTo(safeAreaLayoutGuide).offset(20)
             make.leading.trailing.equalToSuperview().inset(24)
             make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
         }

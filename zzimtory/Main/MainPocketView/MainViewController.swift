@@ -104,7 +104,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         }
         
         let pocket = viewModel.pockets[indexPath.item]
-        cell.configure(with: pocket.title, images: [pocket.image ?? "exampleImage", pocket.image ?? "exampleImage"])
+        cell.configure(with: pocket)
         return cell
     }
     
@@ -114,11 +114,11 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         print("\(pocket.title) 이 클릭됨")
         
         // "전체보기" 클릭 시 PocketDetailViewController로 이동
-        let detailViewModel = PocketDetailViewModel(pocketTitle: pocket.title,
-                                                    items: DummyModel.items)  // 새로운 viewModel 생성
+        let detailViewModel = PocketDetailViewModel(pocket: pocket)  // 새로운 viewModel 생성
         let detailVC = PocketDetailViewController(viewModel: detailViewModel) // 생성자 호출
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    
     @objc private func editButtonDidTap() {
         print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
         DatabaseManager.shared.deletePocket(title: "12")

@@ -63,10 +63,10 @@ final class DatabaseManager {
             let newPocket: [String: Any] = [
                 "title": title,
                 "items": [:],
-                "image": "exampleImage"
+                "image": ""
             ]
             
-            self.ref.child("users").child(uid).child("pockets").child(title).setValue(newPocket) { error, _ in
+            self.ref.child("users").child(uid).child("pockets").child("pocket\(title)").setValue(newPocket) { error, _ in
                 if let error = error {
                     print("주머니 생성 실패: \(error.localizedDescription)")
                 } else {
@@ -89,19 +89,17 @@ final class DatabaseManager {
                 return
             }
             
+            print(pocketData)
+            
             var pockets: [Pocket] = []
             
-            let sortedKeys = pocketData.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
-            
-            for key in sortedKeys {
+            for key in pocketData.keys {
                 guard let pocketInfo = pocketData[key],
                       let title = pocketInfo["title"] as? String else { continue }
                 
                 var items: [Item] = []
                 if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
-                    // items도 숫자 키로 정렬하여 처리합니다
-                    let sortedItemKeys = itemsDict.keys.sorted { Int($0) ?? 0 < Int($1) ?? 0 }
-                    for itemKey in sortedItemKeys {
+                    for itemKey in itemsDict.keys {
                         if let itemData = itemsDict[itemKey] {
                             do {
                                 let itemJsonData = try JSONSerialization.data(withJSONObject: itemData)
@@ -114,11 +112,13 @@ final class DatabaseManager {
                             }
                         }
                     }
+                    items.sort { $0.title < $1.title }
                 }
                 
-                let pocket = Pocket(title: title, items: items, image: nil)
+                let pocket = Pocket(title: title, items: items)
                 pockets.append(pocket)
             }
+            pockets.sort { $0.title < $1.title }
             print("✅ 최종 Pocket 데이터: \(pockets)")
             completion(pockets)
         }
@@ -146,7 +146,7 @@ final class DatabaseManager {
     func updatePocketItem(newItem: Item, pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        let itemsRef = ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items")
+        let itemsRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items")
         
         itemsRef.observeSingleEvent(of: .value) { snapshot in
             let newIndex = String("zzimtory\(newItem.productID)")
@@ -186,7 +186,7 @@ final class DatabaseManager {
     func deletePocket(title: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").child(title).removeValue { error, _ in
+        ref.child("users").child(uid).child("pockets").child("pocket\(title)").removeValue { error, _ in
             if let error = error {
                 print("주머니 삭제 실패: \(error.localizedDescription)")
             } else {
@@ -199,7 +199,7 @@ final class DatabaseManager {
     func deleteItem(productID: String, from pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").child(pocketTitle).observeSingleEvent(of: .value) { snapshot in
+        ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").observeSingleEvent(of: .value) { snapshot in
             guard let pocket = snapshot.value as? [String: Any],
                   let items = pocket["items"] as? [String: Any] else {
                 print("주머니 탐색 실패")
@@ -211,7 +211,7 @@ final class DatabaseManager {
             
             // 해당 키가 items에 존재하는지 확인
             if items[itemKey] != nil {
-                self.ref.child("users").child(uid).child("pockets").child(pocketTitle).child("items").child(itemKey).removeValue { error, _ in
+                self.ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items").child(itemKey).removeValue { error, _ in
                     if let error = error {
                         print("아이템 삭제 실패: \(error.localizedDescription)")
                     } else {
