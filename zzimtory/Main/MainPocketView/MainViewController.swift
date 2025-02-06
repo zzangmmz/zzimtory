@@ -122,9 +122,9 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         navigationController?.pushViewController(detailVC, animated: true)
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-            viewModel.filterPockets(with: searchText)
-            mainView?.collectionView.reloadData()
-        }
+        viewModel.filterPockets(with: searchText)
+        mainView?.collectionView.reloadData()
+    }
     
     @objc private func editButtonDidTap() {
         print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
@@ -134,21 +134,21 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
 
 extension MainViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
-                       layout collectionViewLayout: UICollectionViewLayout,
-                       sizeForItemAt indexPath: IndexPath) -> CGSize {
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
         let numberOfCellsInRow: CGFloat = 2
         let spacing: CGFloat = 20
         let totalSpacing = spacing * (numberOfCellsInRow - 1)
-
+        
         let availableWidth = collectionView.bounds.width - totalSpacing
         let cellWidth = availableWidth / numberOfCellsInRow
-
+        
         return CGSize(width: cellWidth, height: cellWidth * 1.4)
     }
     
     func collectionView(_ collectionView: UICollectionView,
-                       layout collectionViewLayout: UICollectionViewLayout,
-                       minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 20
     }
     

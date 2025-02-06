@@ -38,7 +38,6 @@ class PocketDetailViewController: UIViewController,
         setupNavigationBar()
         setupCollectionView()
         setupActions()
-        
         pocketDetailView?.configure(with: viewModel.pocket)
         bind()
     }
@@ -61,7 +60,7 @@ class PocketDetailViewController: UIViewController,
         // 정렬 버튼
         pocketDetailView?.sortButton.addTarget(self, action: #selector(sortButtonDidTap), for: .touchUpInside)
         pocketDetailView?.searchBar.delegate = self
-        
+        pocketDetailView?.cancelButton.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)
         
     }
     
@@ -73,7 +72,7 @@ class PocketDetailViewController: UIViewController,
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.pocket.items.count
+        return viewModel.displayItems.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -83,13 +82,13 @@ class PocketDetailViewController: UIViewController,
             fatalError("Unable to dequeue ItemCollectionViewCell")
         }
         
-        let item = viewModel.pocket.items[indexPath.item]
+        let item = viewModel.displayItems[indexPath.item]
         cell.setCell(with: item)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedItem = viewModel.pocket.items[indexPath.item]
+        let selectedItem = viewModel.displayItems[indexPath.item]
         let detailVC = DetailViewController(item: selectedItem)
         detailVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(detailVC, animated: true)
@@ -98,13 +97,20 @@ class PocketDetailViewController: UIViewController,
     // 서치바 텍스트 변경 시 필터링된 결과를 업데이트
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
-            viewModel.pocket.items = viewModel.filteredItems // 원본 데이터로 복원
+            viewModel.displayItems = viewModel.filteredItems // 원본 데이터로 복원
         } else {
-            viewModel.pocket.items = viewModel.filteredItems.filter { item in
+            viewModel.displayItems = viewModel.filteredItems.filter { item in
                 item.title.lowercased().contains(searchText.lowercased())
             }
         }
         pocketDetailView?.itemCollectionView.reloadData()
+    }
+    
+    @objc private func cancelSearch() {
+        self.pocketDetailView?.searchBar.searchTextField.text = ""  // 서치바 초기화
+        self.pocketDetailView?.setHidden()
+        viewModel.displayItems = viewModel.pocket.items
+        self.pocketDetailView?.itemCollectionView.reloadData()
     }
     
     @objc private func sortButtonDidTap() {

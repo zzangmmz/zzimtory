@@ -140,7 +140,7 @@ class MainView: ZTView {
             make.leading.trailing.equalToSuperview().inset(24)
             make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
         }
-      
+        
         sortButton.snp.makeConstraints { make in
             make.width.height.equalTo(40) // 크기 조정
         }
