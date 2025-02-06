@@ -20,10 +20,12 @@
 		0FD052C32D3E6F8B00D6A3F1 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0FD052C22D3E6F8B00D6A3F1 /* RxSwift */; };
 		0FED11E72D4369BC00B70A6F /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 0FED11E62D4369BC00B70A6F /* Moya */; };
 		0FED11EE2D4378CA00B70A6F /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 0FED11ED2D4378CA00B70A6F /* RxMoya */; };
+		B31C72992D54E2A600F78B3E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B31C71CE2D54E2A600F78B3E /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0FBBB8A12D3E5B7F007AD449 /* zzimtory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = zzimtory.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B31C71CD2D54E2A600F78B3E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -77,6 +79,7 @@
 				0FBBB8A32D3E5B7F007AD449 /* zzimtory */,
 				0FED11EC2D4378CA00B70A6F /* Frameworks */,
 				0FBBB8A22D3E5B7F007AD449 /* Products */,
+				B31C71CE2D54E2A600F78B3E /* LaunchScreen.storyboard */,
 			);
 			sourceTree = "<group>";
 		};
@@ -183,6 +186,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B31C72992D54E2A600F78B3E /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +223,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		B31C71CE2D54E2A600F78B3E /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B31C71CD2D54E2A600F78B3E /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		0FBBB8B52D3E5B80007AD449 /* Debug */ = {
