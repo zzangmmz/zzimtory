@@ -37,17 +37,18 @@ final class MyPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-                
+        
         DatabaseManager.shared.readUserProfile { [weak self] response in
             guard let nickname = response?.nickname,
                   let email = response?.email else { return }
             self?.userProfileView.setGreeting(for: nickname)
             self?.userProfileView.setEmailAddress(to: email)
         }
+        
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
         view = ZTView(frame: view.frame)
         
