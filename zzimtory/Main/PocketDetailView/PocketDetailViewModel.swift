@@ -10,6 +10,7 @@ import Foundation
 class PocketDetailViewModel {
     var pocket: Pocket
     var filteredItems: [Item] = []
+//    var sortedItems: [Item] = []    // 정렬 데이터 따로 관리
     
     var itemCount: String {
         return "아이템 개수: \(pocket.items.count)"
@@ -32,22 +33,13 @@ class PocketDetailViewModel {
         }
     }
     
-    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {
-        let fixedPocket = pocket.items.first { $0.title == "전체보기"}
-        var otherPockets = pocket.items.filter { $0.title != "전체보기" }
-        
+    func sortItems(by order: SortOrder, completion: @escaping () -> Void) {
         switch order {
-        case .newest:
-            otherPockets.sort { $0.title > $1.title } // 최신순 정렬
-        case .oldest:
-            otherPockets.sort { $0.title < $1.title } // 오래된 순 정렬
+        case .descending:
+            pocket.items.sort { $0.title > $1.title } // 사전 역순 정렬
+        case .ascending:
+            pocket.items.sort { $0.title < $1.title } // 사전순 정렬
         }
-        if let fixedPocket = fixedPocket {
-            pocket.items = [fixedPocket] + otherPockets
-            completion()
-        } else {
-            pocket.items = otherPockets
-            completion()
-        }
+        completion()
     }
 }
