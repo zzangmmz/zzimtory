@@ -7,12 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F1F8BEC2D4BAB2800942140 /* NaverThirdPartyLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 0F1F8BEB2D4BAB2800942140 /* NaverThirdPartyLogin */; };
+		0F3E21BF2D475BE700CE20C1 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 0F3E21BE2D475BE700CE20C1 /* GoogleSignIn */; };
+		0F44BD1D2D4B6FC000778ED3 /* RxKakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0F44BD1C2D4B6FC000778ED3 /* RxKakaoSDKAuth */; };
+		0F44BD1F2D4B6FC000778ED3 /* RxKakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 0F44BD1E2D4B6FC000778ED3 /* RxKakaoSDKCommon */; };
+		0F44BD212D4B6FC000778ED3 /* RxKakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = 0F44BD202D4B6FC000778ED3 /* RxKakaoSDKUser */; };
+		0F88C6E42D4C60EA0067982E /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 0F88C6E32D4C60EA0067982E /* Kingfisher */; };
 		0FBBB8BC2D3E5CE6007AD449 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0FBBB8BB2D3E5CE6007AD449 /* SnapKit */; };
 		0FBBB8BF2D3E5E0F007AD449 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0FBBB8BE2D3E5E0F007AD449 /* FirebaseAuth */; };
 		0FBBB8C12D3E5E0F007AD449 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 0FBBB8C02D3E5E0F007AD449 /* FirebaseDatabase */; };
-		0FBBB8C32D3E5E0F007AD449 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 0FBBB8C22D3E5E0F007AD449 /* FirebaseFirestore */; };
 		0FD052C12D3E6F8B00D6A3F1 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 0FD052C02D3E6F8B00D6A3F1 /* RxCocoa */; };
 		0FD052C32D3E6F8B00D6A3F1 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0FD052C22D3E6F8B00D6A3F1 /* RxSwift */; };
+		0FED11E72D4369BC00B70A6F /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 0FED11E62D4369BC00B70A6F /* Moya */; };
+		0FED11EE2D4378CA00B70A6F /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 0FED11ED2D4378CA00B70A6F /* RxMoya */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,10 +53,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				0FD052C32D3E6F8B00D6A3F1 /* RxSwift in Frameworks */,
+				0F44BD212D4B6FC000778ED3 /* RxKakaoSDKUser in Frameworks */,
+				0F3E21BF2D475BE700CE20C1 /* GoogleSignIn in Frameworks */,
 				0FBBB8C12D3E5E0F007AD449 /* FirebaseDatabase in Frameworks */,
-				0FBBB8C32D3E5E0F007AD449 /* FirebaseFirestore in Frameworks */,
+				0F1F8BEC2D4BAB2800942140 /* NaverThirdPartyLogin in Frameworks */,
 				0FD052C12D3E6F8B00D6A3F1 /* RxCocoa in Frameworks */,
 				0FBBB8BC2D3E5CE6007AD449 /* SnapKit in Frameworks */,
+				0FED11E72D4369BC00B70A6F /* Moya in Frameworks */,
+				0F88C6E42D4C60EA0067982E /* Kingfisher in Frameworks */,
+				0F44BD1F2D4B6FC000778ED3 /* RxKakaoSDKCommon in Frameworks */,
+				0F44BD1D2D4B6FC000778ED3 /* RxKakaoSDKAuth in Frameworks */,
+				0FED11EE2D4378CA00B70A6F /* RxMoya in Frameworks */,
 				0FBBB8BF2D3E5E0F007AD449 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -61,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				0FBBB8A32D3E5B7F007AD449 /* zzimtory */,
+				0FED11EC2D4378CA00B70A6F /* Frameworks */,
 				0FBBB8A22D3E5B7F007AD449 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,6 +86,13 @@
 				0FBBB8A12D3E5B7F007AD449 /* zzimtory.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0FED11EC2D4378CA00B70A6F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -97,9 +119,16 @@
 				0FBBB8BB2D3E5CE6007AD449 /* SnapKit */,
 				0FBBB8BE2D3E5E0F007AD449 /* FirebaseAuth */,
 				0FBBB8C02D3E5E0F007AD449 /* FirebaseDatabase */,
-				0FBBB8C22D3E5E0F007AD449 /* FirebaseFirestore */,
 				0FD052C02D3E6F8B00D6A3F1 /* RxCocoa */,
 				0FD052C22D3E6F8B00D6A3F1 /* RxSwift */,
+				0FED11E62D4369BC00B70A6F /* Moya */,
+				0FED11ED2D4378CA00B70A6F /* RxMoya */,
+				0F3E21BE2D475BE700CE20C1 /* GoogleSignIn */,
+				0F44BD1C2D4B6FC000778ED3 /* RxKakaoSDKAuth */,
+				0F44BD1E2D4B6FC000778ED3 /* RxKakaoSDKCommon */,
+				0F44BD202D4B6FC000778ED3 /* RxKakaoSDKUser */,
+				0F1F8BEB2D4BAB2800942140 /* NaverThirdPartyLogin */,
+				0F88C6E32D4C60EA0067982E /* Kingfisher */,
 			);
 			productName = zzimtory;
 			productReference = 0FBBB8A12D3E5B7F007AD449 /* zzimtory.app */;
@@ -133,6 +162,11 @@
 				0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				0FBBB8BD2D3E5E0F007AD449 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				0FD052BF2D3E6F8B00D6A3F1 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				0FED11E52D4369BC00B70A6F /* XCRemoteSwiftPackageReference "Moya" */,
+				0F3E21BD2D475BE700CE20C1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				0F44BD1B2D4B6FC000778ED3 /* XCRemoteSwiftPackageReference "kakao-ios-sdk-rx" */,
+				0F1F8BEA2D4BAB2800942140 /* XCRemoteSwiftPackageReference "naveridlogin-sdk-ios" */,
+				0F88C6E22D4C60EA0067982E /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0FBBB8A22D3E5B7F007AD449 /* Products */;
@@ -192,9 +226,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = zzimtory/zzimtory.entitlements;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YBKAN7VADJ;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = zzimtory/App/Info.plist;
@@ -209,8 +244,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.myungjilee.zzimtory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zzimtory.zzimtory;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -226,9 +262,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = zzimtory/zzimtory.entitlements;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YBKAN7VADJ;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = zzimtory/App/Info.plist;
@@ -243,8 +280,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.myungjilee.zzimtory;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zzimtory.zzimtory;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -257,6 +295,8 @@
 		};
 		0FBBB8B72D3E5B80007AD449 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 0FBBB8A32D3E5B7F007AD449 /* zzimtory */;
+			baseConfigurationReferenceRelativePath = Network/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -321,6 +361,8 @@
 		};
 		0FBBB8B82D3E5B80007AD449 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 0FBBB8A32D3E5B7F007AD449 /* zzimtory */;
+			baseConfigurationReferenceRelativePath = Network/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -400,6 +442,38 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0F1F8BEA2D4BAB2800942140 /* XCRemoteSwiftPackageReference "naveridlogin-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/naver/naveridlogin-sdk-ios.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		0F3E21BD2D475BE700CE20C1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		0F44BD1B2D4B6FC000778ED3 /* XCRemoteSwiftPackageReference "kakao-ios-sdk-rx" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk-rx";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.23.0;
+			};
+		};
+		0F88C6E22D4C60EA0067982E /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.1.4;
+			};
+		};
 		0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -424,9 +498,47 @@
 				minimumVersion = 6.8.0;
 			};
 		};
+		0FED11E52D4369BC00B70A6F /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0F1F8BEB2D4BAB2800942140 /* NaverThirdPartyLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F1F8BEA2D4BAB2800942140 /* XCRemoteSwiftPackageReference "naveridlogin-sdk-ios" */;
+			productName = NaverThirdPartyLogin;
+		};
+		0F3E21BE2D475BE700CE20C1 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F3E21BD2D475BE700CE20C1 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		0F44BD1C2D4B6FC000778ED3 /* RxKakaoSDKAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F44BD1B2D4B6FC000778ED3 /* XCRemoteSwiftPackageReference "kakao-ios-sdk-rx" */;
+			productName = RxKakaoSDKAuth;
+		};
+		0F44BD1E2D4B6FC000778ED3 /* RxKakaoSDKCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F44BD1B2D4B6FC000778ED3 /* XCRemoteSwiftPackageReference "kakao-ios-sdk-rx" */;
+			productName = RxKakaoSDKCommon;
+		};
+		0F44BD202D4B6FC000778ED3 /* RxKakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F44BD1B2D4B6FC000778ED3 /* XCRemoteSwiftPackageReference "kakao-ios-sdk-rx" */;
+			productName = RxKakaoSDKUser;
+		};
+		0F88C6E32D4C60EA0067982E /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0F88C6E22D4C60EA0067982E /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		0FBBB8BB2D3E5CE6007AD449 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0FBBB8BA2D3E5CE6007AD449 /* XCRemoteSwiftPackageReference "SnapKit" */;
@@ -442,11 +554,6 @@
 			package = 0FBBB8BD2D3E5E0F007AD449 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseDatabase;
 		};
-		0FBBB8C22D3E5E0F007AD449 /* FirebaseFirestore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0FBBB8BD2D3E5E0F007AD449 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestore;
-		};
 		0FD052C02D3E6F8B00D6A3F1 /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0FD052BF2D3E6F8B00D6A3F1 /* XCRemoteSwiftPackageReference "RxSwift" */;
@@ -456,6 +563,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0FD052BF2D3E6F8B00D6A3F1 /* XCRemoteSwiftPackageReference "RxSwift" */;
 			productName = RxSwift;
+		};
+		0FED11E62D4369BC00B70A6F /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0FED11E52D4369BC00B70A6F /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		0FED11ED2D4378CA00B70A6F /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0FED11E52D4369BC00B70A6F /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = RxMoya;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

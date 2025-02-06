@@ -10,7 +10,6 @@ disabled_rules: # Disable specific rules
 
 opt_in_rules: # Enable additional rules that are opt-in
   - empty_count
-  - explicit_self
 
 # Customize specific rules
 line_length:
@@ -30,3 +29,6 @@ excluded: # Exclude specific files or directories from linting
 included: # Explicitly include specific files or directories
   - Model
   - App
+  
+analyzer_rules:
+  - explicit_self
