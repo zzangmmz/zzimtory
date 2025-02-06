@@ -95,9 +95,6 @@ final class PocketSelectionViewController: UIViewController {
                     }
                     
                     self.pocketColletionView.reloadData()
-                    // self.informLabel.userDidPutItem(in: newPocket,
-                                               //onComplete: { self.dismiss(animated: true) })
-                    
                     self.informLabel.userDidPutItem(in: newPocket) { [weak self] in
                         self?.onComplete?()  // 완료 콜백 호출
                         self?.dismiss(animated: true)
@@ -178,9 +175,6 @@ extension PocketSelectionViewController: UICollectionViewDataSource, UICollectio
             self?.onComplete?()  // 완료 콜백 호출
             self?.dismiss(animated: true)
         }
-        
-//        informLabel.userDidPutItem(in: pockets[indexPath.item],
-//                                   onComplete: { self.dismiss(animated: true) })
     }
 }
 
