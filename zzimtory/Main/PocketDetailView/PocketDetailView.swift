@@ -10,35 +10,7 @@ import SnapKit
 
 // PocketDetailView.swift
 class PocketDetailView: ZTView {
-    let backButton: UIButton = {
-        let button = UIButton()
-        var config = UIButton.Configuration.filled()
-        config.image = UIImage(systemName: "chevron.left")
-        config.baseBackgroundColor = .clear
-        config.baseForegroundColor = .black900Zt
-        button.configuration = config
-        button.snp.makeConstraints { make in
-            make.width.equalTo(30)
-        }
-        return button
-    }()
-    
-    var titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .bold)
-        label.textColor = .black900Zt
-        return label
-    }()
-    
-    private lazy var titleStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [backButton, titleLabel])
-        stackView.axis = .horizontal
-        stackView.spacing = 6
-        stackView.alignment = .fill
-        stackView.distribution = .fill
-        return stackView
-    }()
-    
+
     var countLabel = UILabel()
     var itemCollectionView = ItemCollectionView()
     
@@ -84,7 +56,7 @@ class PocketDetailView: ZTView {
     let searchButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
-        button.tintColor = .black
+        button.tintColor = .black900Zt
         button.layer.cornerRadius = 20
         button.backgroundColor = .white100Zt
         return button
@@ -112,7 +84,7 @@ class PocketDetailView: ZTView {
     private lazy var buttonStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [searchButton, sortButton, deleteButton])
         stackView.axis = .horizontal
-        stackView.spacing = 1
+        stackView.spacing = 8
         stackView.alignment = .center
         stackView.distribution = .fillEqually
         return stackView
@@ -188,10 +160,7 @@ class PocketDetailView: ZTView {
         
         countLabel.font = .systemFont(ofSize: 16)
         countLabel.textColor = .black900Zt
-        
-        // titleLabel 추가
-        addSubview(titleStackView)
-        
+
         // countLabel과 버튼들을 묶은 stackView 추가
         addSubview(countAndButtonStackView)
         addSubview(searchBar)
@@ -204,14 +173,9 @@ class PocketDetailView: ZTView {
         
         // 주머니 비었을 때 플레이스 홀더 추가
         addSubview(emptyPocketLabel)
-       
-        titleStackView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(20)
-            make.leading.trailing.equalToSuperview().inset(24)
-        }
-        
+
         countAndButtonStackView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.top.equalTo(safeAreaLayoutGuide).offset(8)
             make.leading.trailing.equalToSuperview().inset(24)
         }
         
@@ -223,9 +187,8 @@ class PocketDetailView: ZTView {
         }
         
         moveCancelButton.snp.makeConstraints { make in
-            make.bottom.equalTo(titleLabel.snp.bottom)
-            make.top.equalTo(safeAreaLayoutGuide).offset(20)
-            make.trailing.equalToSuperview().inset(30)
+            make.top.equalTo(safeAreaLayoutGuide).offset(16)
+            make.trailing.equalToSuperview().inset(24)
         }
        
         searchBar.snp.makeConstraints { make in
@@ -287,7 +250,6 @@ class PocketDetailView: ZTView {
     }
     
     func configure(with pocket: Pocket) {
-        titleLabel.text = pocket.title
         countLabel.text = "씨앗 \(pocket.items.count)개"
         
         if pocket.items.isEmpty {

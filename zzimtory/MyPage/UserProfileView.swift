@@ -32,13 +32,8 @@ final class UserProfileView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        DatabaseManager.shared.readUserProfile { response in
-            guard let nickname = response?.nickname,
-                  let email = response?.email else { return }
-            
-            self.greetingLabel.text = "\(nickname)님 안녕하세요!"
-            self.emailAdressLabel.text = "\(email)"
-        }
+        backgroundColor = .white100Zt
+        layer.cornerRadius = 15
         
         addComponents()
         setConstraints()
@@ -49,6 +44,19 @@ final class UserProfileView: UIView {
     }
     
     // MARK: - UI functions
+    func setGreeting(for userName: String) {
+        guard userName != "" else {
+            greetingLabel.text = "찜토리 사용자님 안녕하세요!"
+            return
+        }
+        
+        greetingLabel.text = "\(userName)님 안녕하세요!"
+    }
+    
+    func setEmailAddress(to address: String) {
+        emailAdressLabel.text = "\(address)"
+    }
+    
     private func addComponents() {
         addSubview(greetingLabel)
         addSubview(emailAdressLabel)
@@ -56,7 +64,15 @@ final class UserProfileView: UIView {
     
     private func setConstraints() {
         greetingLabel.snp.makeConstraints { make in
-            make.snp.bottom.
+            make.bottom.equalTo(snp.centerY)
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.height.equalTo(20)
+        }
+        
+        emailAdressLabel.snp.makeConstraints { make in
+            make.top.equalTo(snp.centerY)
+            make.horizontalEdges.equalToSuperview().inset(20)
+            make.height.equalTo(20)
         }
     }
 }
