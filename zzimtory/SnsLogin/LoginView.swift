@@ -7,18 +7,33 @@
 
 import UIKit
 import SnapKit
+import AuthenticationServices
 
 final class LoginView: ZTView {
-    private(set) var appleLoginButton = LoginButton(type: .apple)
+        
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "logo"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .black900Zt
+        return imageView
+    }()
+    
+    private(set) var appleLoginButton: ASAuthorizationAppleIDButton = {
+        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
+        return button
+    }()
+    
+    private(set) var appleCustumLoginButton = LoginButton(type: .apple)
     private(set) var googleLoginButton = LoginButton(type: .google)
     private(set) var kakaoLoginButton = LoginButton(type: .kakao)
     private(set) var naverLoginButton = LoginButton(type: .naver)
     
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [appleLoginButton,
-                                                       googleLoginButton,
-                                                       kakaoLoginButton,
-                                                       naverLoginButton])
+        let stackView = UIStackView(arrangedSubviews: [// appleLoginButton,
+            appleCustumLoginButton,
+            googleLoginButton,
+            kakaoLoginButton,
+            naverLoginButton])
         stackView.axis = .vertical
         stackView.spacing = 10
         return stackView
@@ -34,7 +49,15 @@ final class LoginView: ZTView {
     }
     
     private func setupView() {
+        self.addSubview(logoImageView)
         self.addSubview(stackView)
+        
+        logoImageView.snp.makeConstraints {make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(stackView.snp.top)
+            make.height.equalToSuperview().multipliedBy(0.1)
+            make.width.equalToSuperview().multipliedBy(0.7)
+        }
         
         stackView.arrangedSubviews.forEach {
             $0.snp.makeConstraints {

@@ -56,7 +56,7 @@ final class DetailViewController: UIViewController {
         viewModel.itemImageUrl
             .subscribe(onNext: { [weak self] urlString in
                 if let url = URL(string: urlString) {
-                    self?.detailView.itemImageView.loadImage(from: url)
+                    self?.detailView.itemImageView.kf.setImage(with: url)
                 }
             })
             .disposed(by: disposeBag)
@@ -118,7 +118,7 @@ final class DetailViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
                 let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketBlack"
+                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketIcon"
                 
                 self?.detailView.saveButton.setTitle(title, for: .normal)
                 self?.detailView.saveButton.setButtonWithCustomImage(imageName: imageName)

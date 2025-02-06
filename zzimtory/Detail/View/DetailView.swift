@@ -87,11 +87,8 @@ final class DetailView: ZTView {
         
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
-        
-        // 추후 적용을 위해 주석처리
-        // let image = UIImage(named: "PocketBlack", in: Bundle.main, with: config)
-        
-        button.setButtonWithCustomImage(imageName: "PocketBlack")
+
+        button.setButtonWithCustomImage(imageName: "PocketIcon")
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -234,7 +231,8 @@ final class DetailView: ZTView {
         }
         
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalTo(scrollView)
+            make.top.horizontalEdges.equalTo(scrollView)
+            make.bottom.equalTo(scrollView).inset(16)
             make.width.equalTo(scrollView)
         }
     }
@@ -265,7 +263,7 @@ final class DetailView: ZTView {
     // [하단 스택] 웹사이트 버튼 및 주머니 넣기 버튼 스택, 구분선, 유사상품 레이블, 유사 상품 컬렌션 뷰
     private func setupBottomStackView() {
         bottomStackView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview().inset(16)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         
         // 화면 내의 비율로 버튼 설정

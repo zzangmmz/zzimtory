@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "kakaotalk_sharing_btn_small.png",
+      "filename" : "SNSIcon_kakao.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "SNSIcon_kakao@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "SNSIcon_kakao@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

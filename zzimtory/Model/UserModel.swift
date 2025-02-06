@@ -17,7 +17,7 @@ struct Pocket: Codable {
     var items: [Item]
     var image: String? {
         if items.isEmpty {
-            return "PocketBlack"
+            return "PocketIcon"
         } else {
             return items[0].image
         }
