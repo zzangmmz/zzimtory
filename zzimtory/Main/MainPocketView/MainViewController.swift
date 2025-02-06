@@ -73,13 +73,13 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     @objc private func sortButtonDidTap() {
-        let alert = UIAlertController(title: "정렬", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
-        let sortByOldestAction = UIAlertAction(title: "오래된 순", style: .default) { [weak self] _ in
+        let sortByOldestAction = UIAlertAction(title: "내림차순", style: .default) { [weak self] _ in
             self?.viewModel.sortPockets(by: .oldest)
         }
         
-        let sortByNewestAction = UIAlertAction(title: "최신 순", style: .default) { [weak self] _ in
+        let sortByNewestAction = UIAlertAction(title: "오름차순", style: .default) { [weak self] _ in
             self?.viewModel.sortPockets(by: .newest)
         }
         

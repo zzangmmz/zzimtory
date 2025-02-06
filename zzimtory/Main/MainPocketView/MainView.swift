@@ -148,6 +148,11 @@ class MainView: ZTView {
             make.width.height.equalTo(40) // 크기 조정
         }
         
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(logoStackView.snp.bottom).inset(16)
+            make.height.equalTo(44)
+        }
+        
         searchBar.searchTextField.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
             make.top.bottom.equalToSuperview().inset(6)

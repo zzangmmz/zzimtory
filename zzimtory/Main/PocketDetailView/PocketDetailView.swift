@@ -138,20 +138,28 @@ class PocketDetailView: ZTView {
     }()
     
     // 서치바
-    var searchBar: UISearchBar = {
+    let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = "상품명을 입력하세요"
+        searchBar.searchBarStyle = .default
+        searchBar.layer.cornerRadius = 14
         searchBar.isHidden = true
-        searchBar.backgroundColor = .clear
-        searchBar.searchBarStyle = .minimal
+        searchBar.backgroundImage = UIImage()
+        searchBar.backgroundColor = .white100Zt
+        
+        if let textField = searchBar.value(forKey: "searchField") as? UITextField {
+            textField.backgroundColor = .white100Zt
+            textField.tintColor = .black900Zt
+        }
         return searchBar
     }()
+    
     
     // 취소 버튼
     var cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle("취소", for: .normal)
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.black900Zt, for: .normal)
         button.layer.cornerRadius = 8
         button.isHidden = true
         return button
@@ -197,7 +205,6 @@ class PocketDetailView: ZTView {
         // 주머니 비었을 때 플레이스 홀더 추가
         addSubview(emptyPocketLabel)
        
-        
         titleStackView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(20)
             make.leading.trailing.equalToSuperview().inset(24)
@@ -222,9 +229,10 @@ class PocketDetailView: ZTView {
         }
        
         searchBar.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(8)
-            make.top.bottom.equalTo(countAndButtonStackView)
-            make.trailing.equalTo(cancelButton.snp.leading).inset(8)
+            make.leading.equalToSuperview().offset(16)
+            make.top.equalTo(countAndButtonStackView)
+            make.height.equalTo(44)
+            make.trailing.equalTo(cancelButton.snp.leading).offset(-4)
             
         }
         
