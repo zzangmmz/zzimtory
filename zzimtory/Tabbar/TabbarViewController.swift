@@ -16,11 +16,18 @@ final class TabbarViewController: UITabBarController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+               
         if !DatabaseManager.shared.hasUserLoggedIn() {
             navigationController?.pushViewController(LoginViewController(), animated: false)
         }
     }
+    
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        
+//        
+//        
+//    }
 }
 
 private extension TabbarViewController {

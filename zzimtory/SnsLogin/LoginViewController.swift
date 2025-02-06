@@ -24,6 +24,13 @@ final class LoginViewController: UIViewController {
         bind()
         view = loginView
         navigationController?.isNavigationBarHidden = true
+        navigationController?.tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        navigationController?.tabBarController?.tabBar.isHidden = false
     }
     
     private func bind() {
