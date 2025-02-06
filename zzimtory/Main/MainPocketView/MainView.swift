@@ -10,10 +10,11 @@ import SnapKit
 
 class MainView: ZTView {
     
-    let logoImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "logo")!
+    
+    private let logoImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "logo"))
         imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .black900Zt
         return imageView
     }()
     

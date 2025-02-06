@@ -12,7 +12,7 @@ import AuthenticationServices
 final class LoginView: ZTView {
         
     private let logoImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "logo"))
+        let imageView = UIImageView(image: UIImage(named: "LogoIcon"))
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .black900Zt
         return imageView
@@ -55,8 +55,8 @@ final class LoginView: ZTView {
         logoImageView.snp.makeConstraints {make in
             make.centerX.equalToSuperview()
             make.bottom.equalTo(stackView.snp.top)
-            make.height.equalToSuperview().multipliedBy(0.1)
-            make.width.equalToSuperview().multipliedBy(0.7)
+            make.height.equalToSuperview().multipliedBy(0.2)
+            make.width.equalToSuperview().multipliedBy(1.0)
         }
         
         stackView.arrangedSubviews.forEach {

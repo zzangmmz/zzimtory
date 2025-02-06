@@ -23,11 +23,11 @@ final class MyPageViewController: UIViewController {
     ]
     
     // MARK: - UI Components
+    
     private let logoImageView: UIImageView = {
-        let imageView = UIImageView()
-        
-        imageView.image = UIImage(named: "logo")
-        
+        let imageView = UIImageView(image: UIImage(named: "logo"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .black900Zt
         return imageView
     }()
     
@@ -141,6 +141,6 @@ extension MyPageViewController: UITableViewDelegate {
             let loginVC = LoginViewController()
             navigationController?.pushViewController(loginVC, animated: false)
         }
-
+        
     }
 }
