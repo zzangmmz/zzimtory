@@ -98,7 +98,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.filterPockets.count
+        return viewModel.pockets.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -108,7 +108,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             fatalError("Unable to dequeue PocketCell")
         }
         
-        let pocket = viewModel.filterPockets[indexPath.item]
+        let pocket = viewModel.pockets[indexPath.item]
         cell.configure(with: pocket)
         return cell
     }
