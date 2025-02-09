@@ -56,10 +56,14 @@ final class LoginViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        DatabaseManager.shared.completedLogin.observe(on: MainScheduler.instance)
+        DatabaseManager.shared.completedLogin
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] bool in
                 if bool {
-                    self?.navigationController?.popToRootViewController(animated: true)
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first {
+                        window.rootViewController = TabbarViewController()
+                    }
                 }
             })
             .disposed(by: disposeBag)
