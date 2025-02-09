@@ -137,8 +137,8 @@ extension MyPageViewController: UITableViewDelegate {
             KakaoAuthManager().logout()
             NaverAuthManager().logout()
             AppleAuthManager().logout()
-            DatabaseManager.shared.logout()
             DatabaseManager.shared.deleteUser()
+            DatabaseManager.shared.logout()
             
             let loginVC = LoginViewController()
             navigationController?.pushViewController(loginVC, animated: false)
