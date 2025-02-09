@@ -132,6 +132,11 @@ class PocketDetailViewController: UIViewController,
         
         present(alert, animated: true, completion: nil)
     }
+    
+    // 검색어 입력 중 Return 키를 눌렀을 때
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder() // 키보드 내리기
+    }
 }
 extension PocketDetailViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
@@ -184,8 +189,4 @@ extension PocketDetailViewController {
     @objc private func backButtonTapped() {
         navigationController?.popViewController(animated: true)
     }
-    
-    
 }
-
-
