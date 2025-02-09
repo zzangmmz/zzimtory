@@ -128,6 +128,11 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         mainView?.collectionView.reloadData()
     }
     
+    // 검색어 입력 중 Return 키를 눌렀을 때
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder() // 키보드 내리기
+    }
+    
     @objc private func editButtonDidTap() {
         print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
         DatabaseManager.shared.deletePocket(title: "12")
