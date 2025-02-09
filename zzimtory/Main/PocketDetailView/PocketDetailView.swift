@@ -150,6 +150,7 @@ class PocketDetailView: ZTView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupSearchBarTapGesture()
     }
     
     required init?(coder: NSCoder) {
@@ -295,5 +296,26 @@ class PocketDetailView: ZTView {
             .forEach {
                 $0.isHidden.toggle()
             }
+    }
+    
+    // 외부 탭 하면 키보드 사라지게 함
+    private func setupSearchBarTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        tapGesture.delegate = self
+        self.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func handleTap() {
+        searchBar.resignFirstResponder()
+    }
+}
+
+extension PocketDetailView: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        // 터치된 뷰가 컬렉션뷰나 버튼이면 제스처를 무시
+        if touch.view?.isDescendant(of: itemCollectionView) == true {
+            return false
+        }
+        return true
     }
 }

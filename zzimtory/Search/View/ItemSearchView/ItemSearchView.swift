@@ -38,6 +38,7 @@ final class ItemSearchView: ZTView {
         setSearchBar()
         setColletionView()
         setConstraints()
+        setupSearchBarTapGesture()
         
         bind(to: itemSearchViewModel)
         itemCardsView.setDelegate(to: self)
@@ -143,17 +144,40 @@ extension ItemSearchView: UISearchBarDelegate {
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder() // 키보드 내리기
+        
         itemSearchViewModel.search()
         layer.addSublayer(dimLayer)
         addSubview(itemCardsView)
         itemCardsView.frame = self.frame
         itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
+        
+        // TabBar 숨기기
+        if let viewController = self.next as? UIViewController {
+            viewController.tabBarController?.tabBar.isHidden = true
+        }
+    }
+    
+    // 외부 탭 하면 키보드 사라지게 함
+    private func setupSearchBarTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        tapGesture.delegate = self
+        self.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func handleTap() {
+        searchBar.resignFirstResponder()
     }
     
     @objc func onTap() {
         print("ItemCardsView Tapped")
         itemCardsView.removeFromSuperview()
         dimLayer.removeFromSuperlayer()
+        
+        // TabBar 다시 보이기
+        if let viewController = self.next as? UIViewController {
+            viewController.tabBarController?.tabBar.isHidden = false
+        }
     }
 }
 
@@ -227,4 +251,14 @@ extension ItemSearchView: UICollectionViewDelegateFlowLayout {
         return CGSize(width: collectionView.frame.width, height: 50)
     }
     
+}
+
+extension ItemSearchView: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        // 터치된 뷰가 컬렉션뷰나 버튼이면 제스처를 무시
+        if touch.view?.isDescendant(of: itemCollectionView) == true {
+            return false
+        }
+        return true
+    }
 }
