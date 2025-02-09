@@ -86,7 +86,7 @@ extension NaverAuthManager: ThirdPartyAuthProtocol {
     }
     
     func logout() {
-        instance?.resetToken()
+        instance?.requestDeleteToken()
     }
     
     func disconnect() {
