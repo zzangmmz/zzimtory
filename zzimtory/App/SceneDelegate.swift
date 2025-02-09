@@ -20,7 +20,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = TabbarViewController()
+        
+        // 로그인 상태에 따라 초기 화면 결정
+        if DatabaseManager.shared.hasUserLoggedIn() {
+            window.rootViewController = TabbarViewController()
+        } else {
+            window.rootViewController = UINavigationController(rootViewController: LoginViewController())
+        }
         window.makeKeyAndVisible()
         
         self.window = window
