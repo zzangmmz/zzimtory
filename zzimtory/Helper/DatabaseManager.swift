@@ -30,6 +30,15 @@ final class DatabaseManager {
         return true
     }
     
+    func logout() {
+        do {
+            try Auth.auth().signOut()
+            self.userUID = nil
+        } catch let error as NSError {
+            print("파이어베이스 로그아웃 실패: \(error.localizedDescription)")
+        }
+    }
+    
     private func getUserUID() {
         guard let currentUser = Auth.auth().currentUser else {
             print("현재 인증된 유저가 없습니다.")
