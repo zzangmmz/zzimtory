@@ -66,18 +66,18 @@ final class ItemCardsView: UIView {
 
 // ItemCardsView를 ViewModel에 바인딩해주기 위한 프로토콜 적용입니다.
 // ItemSearchView에서 사용되며, 자세한 설명은 SearchViewModel+Bindable 참고 바랍니다.
-extension ItemCardsView: SearchViewModelBindable {
-    func bind(to viewModel: some SearchViewModel) {
-        viewModel.searchResult.observe(on: MainScheduler.instance)
-            .subscribe(
-                onNext: { [weak self] result in
-                    self?.items = result
-                    self?.cardStack.reloadData()
-                },
-                onError: { error in
-                    print("error: \(error)")
-                }
-            ).disposed(by: disposeBag)
+extension ItemCardsView: ViewModelBindable {
+    func bind() {
+//        viewModel.searchResult.observe(on: MainScheduler.instance)
+//            .subscribe(
+//                onNext: { [weak self] result in
+//                    self?.items = result
+//                    self?.cardStack.reloadData()
+//                },
+//                onError: { error in
+//                    print("error: \(error)")
+//                }
+//            ).disposed(by: disposeBag)
     }
 }
 
