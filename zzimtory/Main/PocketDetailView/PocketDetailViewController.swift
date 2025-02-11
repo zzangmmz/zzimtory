@@ -24,7 +24,8 @@ class PocketDetailViewController: UIViewController,
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+
         bind()
     }
     
@@ -33,7 +34,6 @@ class PocketDetailViewController: UIViewController,
         
         pocketDetailView = PocketDetailView(frame: view.frame)
         view = pocketDetailView
-        navigationController?.navigationBar.isHidden = false
         
         setupNavigationBar()
         setupCollectionView()
