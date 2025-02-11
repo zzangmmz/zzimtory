@@ -21,7 +21,7 @@ final class LoginViewController: UIViewController {
         loginView = LoginView(frame: view.frame)
         bind()
         view = loginView
-        navigationController?.isNavigationBarHidden = true
+        // navigationController?.isNavigationBarHidden = true
         navigationController?.tabBarController?.tabBar.isHidden = true
     }
     
