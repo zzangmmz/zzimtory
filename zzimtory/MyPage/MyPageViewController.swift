@@ -160,9 +160,6 @@ extension MyPageViewController: UITableViewDelegate {
             NaverAuthManager().logout()
             AppleAuthManager().logout()
             DatabaseManager.shared.logout()
-            
-            let loginVC = LoginViewController()
-            navigationController?.pushViewController(loginVC, animated: false)
         case .deleteAccount:
             GoogleAuthManager().logout()
             KakaoAuthManager().logout()
@@ -170,9 +167,6 @@ extension MyPageViewController: UITableViewDelegate {
             AppleAuthManager().logout()
             DatabaseManager.shared.deleteUser()
             DatabaseManager.shared.logout()
-            
-            let loginVC = LoginViewController()
-            navigationController?.pushViewController(loginVC, animated: false)
         }
     }
 }
