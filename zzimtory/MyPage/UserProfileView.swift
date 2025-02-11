@@ -64,6 +64,14 @@ final class UserProfileView: UIView {
     // MARK: - UI functions
     func setGreeting(for userName: String) {
         arrowImageView.isHidden = true  // 회원일 때는 화살표 숨기기
+        
+        greetingLabel.snp.remakeConstraints { make in
+            make.bottom.equalTo(snp.centerY)
+            make.leading.equalToSuperview().inset(20)
+            make.trailing.equalTo(arrowImageView.snp.leading).offset(-10)
+            make.height.equalTo(20)
+        }
+        
         guard userName != "" else {
             greetingLabel.text = "찜토리 사용자님 안녕하세요!"
             return
