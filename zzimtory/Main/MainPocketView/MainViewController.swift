@@ -51,6 +51,12 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     @objc private func addPocketButtonDidTap() {
+        guard DatabaseManager.shared.hasUserLoggedIn() else {
+            let loginVC = LoginViewController()
+            self.navigationController?.pushViewController(loginVC, animated: true)
+            return
+        }
+        
         let alert = UIAlertController(title: "주머니 만들기", message: "새 주머니를 입력하세요.", preferredStyle: .alert)
         alert.addTextField { textField in
             textField.placeholder = "새 주머니 이름"
