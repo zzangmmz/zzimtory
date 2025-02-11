@@ -44,7 +44,7 @@ final class ItemCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private let cellOverlayView: ZTView = {
+    let cellOverlayView: ZTView = {
         let view = ZTView()
         view.backgroundColor = UIColor.black900Zt.withAlphaComponent(0.5)
         view.isHidden = true
@@ -107,7 +107,11 @@ final class ItemCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func toggleCellOverlayView() {
-        cellOverlayView.isHidden.toggle()
+    func setEditModeCell(with editMode: Bool) {
+        if editMode {
+            self.cellOverlayView.isHidden = false
+        } else {
+            self.cellOverlayView.isHidden = true
+        }
     }
 }
