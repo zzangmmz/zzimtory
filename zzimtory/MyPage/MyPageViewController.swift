@@ -52,17 +52,7 @@ final class MyPageViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         
-        if isLoggedIn {
-            DatabaseManager.shared.readUserProfile { [weak self] response in
-                guard let nickname = response?.nickname,
-                      let email = response?.email else { return }
-                self?.userProfileView.setGreeting(for: nickname)
-                self?.userProfileView.setEmailAddress(to: email)
-            }
-        } else {
-            userProfileView.setForGuest()
-        }
-        
+        checkUserState()
         tableView.reloadData()
     }
     
@@ -152,14 +142,15 @@ extension MyPageViewController: UITableViewDelegate {
         switch selectedContent.name {
         case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
         case .login:
-            let loginVC = LoginViewController()
-            navigationController?.pushViewController(loginVC, animated: true)
+            pushToLoginView()
         case .logOut:
             GoogleAuthManager().logout()
             KakaoAuthManager().logout()
             NaverAuthManager().logout()
             AppleAuthManager().logout()
             DatabaseManager.shared.logout()
+            
+            pushToLoginView()
         case .deleteAccount:
             GoogleAuthManager().logout()
             KakaoAuthManager().logout()
@@ -167,7 +158,31 @@ extension MyPageViewController: UITableViewDelegate {
             AppleAuthManager().logout()
             DatabaseManager.shared.deleteUser()
             DatabaseManager.shared.logout()
+            
+            pushToLoginView()
         }
+    }
+}
+
+extension MyPageViewController {
+    // 유저 상태에 따른 UserProfileView 설정
+    private func checkUserState() {
+        if isLoggedIn {
+            DatabaseManager.shared.readUserProfile { [weak self] response in
+                guard let nickname = response?.nickname,
+                      let email = response?.email else { return }
+                self?.userProfileView.setGreeting(for: nickname)
+                self?.userProfileView.setEmailAddress(to: email)
+            }
+        } else {
+            userProfileView.setForGuest()
+        }
+    }
+    
+    // 로그인뷰로 이동
+    private func pushToLoginView() {
+        let loginVC = LoginViewController()
+        navigationController?.pushViewController(loginVC, animated: true)
     }
 }
 
