@@ -72,11 +72,13 @@ class PocketDetailViewController: UIViewController,
         pocketDetailView?.cancelButton.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)
         pocketDetailView?.editButton.addTarget(self, action: #selector (editButtonDidTap), for: .touchUpInside)
         pocketDetailView?.moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.seedDeleteButton.addTarget(self, action: #selector(seedDeleteButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
         pocketDetailView?.itemCollectionView.delegate = self
         pocketDetailView?.itemCollectionView.dataSource = self
+        pocketDetailView?.itemCollectionView.allowsMultipleSelection = true
         pocketDetailView?.itemCollectionView.register(ItemCollectionViewCell.self,
                                                       forCellWithReuseIdentifier: ItemCollectionViewCell.id)
     }
@@ -104,7 +106,6 @@ class PocketDetailViewController: UIViewController,
             // 편집모드인 경우
             if let selectedCell = collectionView.cellForItem(at: indexPath) as? ItemCollectionViewCell {
                 selectedCell.toggleCellOverlayView() // cell 색상 변경
-                // 셀 선택 동작
             }
             return
         }
@@ -134,6 +135,21 @@ class PocketDetailViewController: UIViewController,
     
     @objc func moveCancelButtonDidTap() {
         isEditButtonTapped.toggle()
+        pocketDetailView?.toggleButtonHidden()
+    }
+    
+    @objc func seedDeleteButtonDidTap() {
+        guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
+        
+        let selectedItems = selectedIndexPaths.compactMap { viewModel.displayItems[$0.item] }
+        
+        selectedItems.forEach { item in
+            DatabaseManager.shared.deleteItem(productID: item.productID, from: viewModel.pocket.title)
+        }
+        
+        bind()
+        
+        isEditButtonTapped = false
         pocketDetailView?.toggleButtonHidden()
     }
     
