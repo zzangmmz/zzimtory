@@ -87,11 +87,7 @@ final class ItemWebViewController: UIViewController {
         viewModel.isInPocket
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
-                let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage
-                
-                self?.itemWebView.saveButton.setTitle(title, for: .normal)
-                self?.itemWebView.saveButton.setButtonWithCustomImage(imageName: imageName)
+                self?.itemWebView.setSaveButton(isInPocket)
             })
             .disposed(by: disposeBag)
         

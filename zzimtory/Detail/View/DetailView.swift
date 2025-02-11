@@ -297,3 +297,13 @@ final class DetailView: ZTView {
         }
     }
 }
+
+extension DetailView {
+    func setSaveButton(_ isInPocket: Bool) {
+        let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
+        let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage
+        
+        saveButton.setTitle(title, for: .normal)
+        saveButton.setButtonWithCustomImage(imageName: imageName)
+    }
+}
