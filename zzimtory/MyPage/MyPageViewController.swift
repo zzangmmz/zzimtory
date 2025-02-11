@@ -50,7 +50,7 @@ final class MyPageViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // navigationController?.setNavigationBarHidden(true, animated: animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
         
         if isLoggedIn {
             DatabaseManager.shared.readUserProfile { [weak self] response in
