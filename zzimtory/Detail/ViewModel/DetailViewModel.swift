@@ -13,9 +13,6 @@ final class DetailViewModel {
     private let disposeBag = DisposeBag()
     private let shoppingRepository = ShoppingRepository()
     
-    // 임시 로그인 상태 변수
-    // static var isLoggedIn: Bool = true
-    
     // Input
     let currentItem: Item // 현재 보여줄 아이템
     private var searchQuery: String = ""

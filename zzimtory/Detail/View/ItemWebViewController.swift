@@ -129,9 +129,6 @@ final class ItemWebViewController: UIViewController {
     }
     
     @objc private func backButtonTapped() {
-        // 모달 닫기
-        // dismiss(animated: true)
-        
         // 화면 전환
         guard let navigationController = self.navigationController else { return }
         navigationController.popViewController(animated: true)

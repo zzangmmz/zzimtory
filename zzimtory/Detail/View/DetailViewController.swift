@@ -86,7 +86,6 @@ final class DetailViewController: UIViewController {
                 guard let self = self,
                       let url = URL(string: self.viewModel.currentItem.link) else { return }
                 
-                // let webVC = ItemWebViewController(urlString: url.absoluteString, item: self.viewModel.currentItem)
                 let webVC = ItemWebViewController(urlString: url.absoluteString, viewModel: self.viewModel)
                 self.navigationController?.pushViewController(webVC, animated: true)
             })
