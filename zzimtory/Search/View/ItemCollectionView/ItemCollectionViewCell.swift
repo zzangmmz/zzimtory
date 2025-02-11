@@ -44,6 +44,14 @@ final class ItemCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private let cellOverlayView: ZTView = {
+        let view = ZTView()
+        view.backgroundColor = UIColor.black900Zt.withAlphaComponent(0.5)
+        view.isHidden = true
+        view.layer.cornerRadius = 15
+        return view
+    }()
+    
     // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -69,7 +77,9 @@ final class ItemCollectionViewCell: UICollectionViewCell {
         
         [imageView,
          priceLabel,
-         titleLabel].forEach {
+         titleLabel,
+         cellOverlayView
+        ].forEach {
             contentView.addSubview($0)
         }
         
@@ -92,6 +102,12 @@ final class ItemCollectionViewCell: UICollectionViewCell {
             make.bottom.equalToSuperview().inset(12)
         }
         
+        cellOverlayView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
+    func toggleCellOverlayView() {
+        cellOverlayView.isHidden.toggle()
+    }
 }
