@@ -100,7 +100,7 @@ final class ItemWebViewController: UIViewController {
                 guard let self = self else { return }
                 
                 // 로그인 상태 확인
-                guard Auth.auth().currentUser != nil else {
+                guard DatabaseManager.shared.hasUserLoggedIn() else {
                     self.presentLoginView()
                     return
                 }
@@ -125,9 +125,7 @@ final class ItemWebViewController: UIViewController {
     
     private func presentLoginView() {
         let loginVC = LoginViewController()
-        let nav = UINavigationController(rootViewController: loginVC)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
+        navigationController?.pushViewController(loginVC, animated: true)
     }
     
     @objc private func backButtonTapped() {

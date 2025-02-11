@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import Kingfisher
 
 class PocketCell: UICollectionViewCell {
     
@@ -176,7 +177,7 @@ class PocketCell: UICollectionViewCell {
     
     func configure(with pocket: Pocket) {
         titleLabel.text = pocket.title
-        countLabelOnImage.text = "\(pocket.items.count)개" // 추후 주머니 속 개수로 수정 예정!!
+        countLabelOnImage.text = "\(pocket.items.count)개" 
         countLabelOnTitle.text = "\(pocket.items.count)개"
         
         let previews = [previewImageView1, previewImageView2, previewImageView3, previewImageView4]
@@ -189,13 +190,13 @@ class PocketCell: UICollectionViewCell {
             if pocket.items.count == 1 {
                 emptyPocketImageView.isHidden = true
                 singlePocketImageView.isHidden = false
-                singlePocketImageView.loadImage(from: URL(string: pocket.image!)!)
+                singlePocketImageView.kf.setImage(with: URL(string: pocket.image!))
             } else {
                 emptyPocketImageView.isHidden = true
                 // 아이템 개수에 따라 이미지 설정
                 for (index, imageView) in previews.enumerated() {
                     if index < pocket.items.count {
-                        imageView.loadImage(from: URL(string: pocket.image!)!)
+                        imageView.kf.setImage(with: URL(string: pocket.image!))
                         imageView.isHidden = false
                     } else {
                         imageView.isHidden = true
