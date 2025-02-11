@@ -14,6 +14,9 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.isHidden = true
+        if !DatabaseManager.shared.hasUserLoggedIn() {
+            self.mainView?.sortButton.isEnabled = false
+        }
         bind()
     }
     
