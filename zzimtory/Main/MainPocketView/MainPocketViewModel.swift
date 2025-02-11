@@ -7,10 +7,6 @@
 
 import UIKit
 
-enum SortOrder {
-    case descending
-    case ascending
-}
 
 class MainPocketViewModel {
     // 주머니 이름과 이미지 배열을 함께 관리
