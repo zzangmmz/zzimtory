@@ -26,7 +26,7 @@ final class ItemWebView: UIView {
     private let websiteBackButton: UIButton = {
         let button = UIButton()
         
-        button.setButtonWithSystemImage(imageName: "chevron.left")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.backButtonImage)
         
         return button
     }()
@@ -35,7 +35,7 @@ final class ItemWebView: UIView {
     private let websiteForwardButton: UIButton = {
         let button = UIButton()
         
-        button.setButtonWithSystemImage(imageName: "chevron.right")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.frontButtonImage)
         
         return button
     }()
@@ -44,7 +44,7 @@ final class ItemWebView: UIView {
     let shareButton: UIButton = {
         let button = UIButton()
         
-        button.setButtonWithSystemImage(imageName: "square.and.arrow.up")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.shareButtonImage)
         
         return button
     }()
@@ -60,7 +60,7 @@ final class ItemWebView: UIView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
-        button.setButtonWithSystemImage(imageName: "tray.fill")
+        button.setButtonWithCustomImage(imageName: ButtonImageConstants.PocketButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
