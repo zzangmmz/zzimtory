@@ -60,7 +60,13 @@ final class LoginViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] bool in
                 if bool {
-                    self?.dismiss(animated: true)
+                    let tabbarVC = TabbarViewController()
+                    
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first {
+                        window.rootViewController = tabbarVC
+                        window.makeKeyAndVisible()
+                    }
                 }
             })
             .disposed(by: disposeBag)
