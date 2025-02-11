@@ -121,6 +121,13 @@ extension ItemSearchView: ViewModelBindable {
 //        case .right: break
 //        case .left: break
 //        case .up:
+//            guard DatabaseManager.shared.hasUserLoggedIn() else {
+//                self.window?.rootViewController?.present(LoginViewController(), animated: true) {
+//                    
+//                }
+//                return
+//            }
+//            
 //            self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
 //                                                     animated: true)
 //  
@@ -212,40 +219,6 @@ extension ItemSearchView: UICollectionViewDelegate {
 //        }
 //    }
 }
-
-//extension ItemSearchView: SwipeCardStackDelegate {
-//    func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
-//        let selectedItem = items[index]
-//        let detailVC = DetailViewController(item: selectedItem)
-//        detailVC.hidesBottomBarWhenPushed = true
-//
-//        if let viewController = self.next as? UIViewController {
-//            viewController.navigationController?.pushViewController(detailVC, animated: true)
-//        }
-//    }
-//    
-//    func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
-//        switch direction {
-//        case .right: break
-//        case .left: break
-//        case .up:
-//            self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
-//                                                     animated: true)
-//  
-//        default: print("Undefined swipe action")
-//        }
-//    }
-//    
-//    func cardStack(_ cardStack: SwipeCardStack, didUndoCardAt index: Int, from direction: SwipeDirection) {
-//        
-//    }
-//    
-//    func didSwipeAllCards(_ cardStack: SwipeCardStack) {
-//        itemCardsView.removeFromSuperview()
-//        dimLayer.removeFromSuperlayer()
-//    }
-//    
-//}
 
 extension ItemSearchView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
