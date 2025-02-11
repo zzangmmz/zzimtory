@@ -117,7 +117,7 @@ final class DetailViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
                 let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? ButtonImage.EmptyPocketButtonImage : ButtonImage.PocketButtonImage
+                let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage
                 
                 self?.detailView.saveButton.setTitle(title, for: .normal)
                 self?.detailView.saveButton.setButtonWithCustomImage(imageName: imageName)

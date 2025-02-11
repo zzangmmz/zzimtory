@@ -54,7 +54,7 @@ final class DetailView: ZTView {
         let button = UIButton()
 
         button.setAsIconButton()
-        button.setButtonWithSystemImage(imageName: ButtonImage.shareButtonImage)
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.shareButtonImage)
         
         return button
     }()
@@ -70,7 +70,7 @@ final class DetailView: ZTView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
-        button.setButtonWithSystemImage(imageName: ButtonImage.websiteButtonImage)
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.websiteButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -88,7 +88,7 @@ final class DetailView: ZTView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
 
-        button.setButtonWithCustomImage(imageName: ButtonImage.PocketButtonImage)
+        button.setButtonWithCustomImage(imageName: ButtonImageConstants.PocketButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
