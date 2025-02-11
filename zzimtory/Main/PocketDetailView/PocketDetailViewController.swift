@@ -12,12 +12,11 @@ class PocketDetailViewController: UIViewController,
     private var pocketDetailView: PocketDetailView?
     private var viewModel: PocketDetailViewModel
     
-    private var isEditButtonTapped: Bool = false {
+    private var editMode: Bool = false {
         didSet {
             pocketDetailView?.itemCollectionView.visibleCells.forEach { cell in
                 if let itemCell = cell as? ItemCollectionViewCell {
-                    print(isEditButtonTapped)
-                    itemCell.toggleCellOverlayView()
+                    itemCell.setEditModeCell(with: editMode)
                 }
             }
             
@@ -100,19 +99,28 @@ class PocketDetailViewController: UIViewController,
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedItem = viewModel.displayItems[indexPath.item]
-        
-        guard !isEditButtonTapped else {
-            // 편집모드인 경우
-            if let selectedCell = collectionView.cellForItem(at: indexPath) as? ItemCollectionViewCell {
-                selectedCell.toggleCellOverlayView() // cell 색상 변경
-            }
+        guard editMode else {
+            let selectedItem = viewModel.displayItems[indexPath.item]
+            let detailVC = DetailViewController(item: selectedItem)
+            detailVC.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(detailVC, animated: true)
             return
         }
         
-        let detailVC = DetailViewController(item: selectedItem)
-        detailVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(detailVC, animated: true)
+        // 편집모드인 경우
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as? ItemCollectionViewCell {
+            selectedCell.cellOverlayView.isHidden = true
+            selectedCell.isSelected = true
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        guard editMode else { return }
+        
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as? ItemCollectionViewCell {
+            selectedCell.cellOverlayView.isHidden = false
+            selectedCell.isSelected = false
+        }
     }
     
     // 서치바 텍스트 변경 시 필터링된 결과를 업데이트
@@ -129,19 +137,19 @@ class PocketDetailViewController: UIViewController,
     
     // 취소 버튼 클릭 시 서치바를 숨기고, 카운트앤버튼스택뷰 다시 보이게
     @objc func editButtonDidTap() {
-        isEditButtonTapped.toggle()
+        editMode.toggle()
         pocketDetailView?.toggleButtonHidden()
     }
     
     @objc func moveCancelButtonDidTap() {
-        isEditButtonTapped.toggle()
+        editMode.toggle()
         pocketDetailView?.toggleButtonHidden()
     }
     
     @objc func seedDeleteButtonDidTap() {
         guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
         
-        let selectedItems = selectedIndexPaths.compactMap { viewModel.displayItems[$0.item] }
+        let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
         
         selectedItems.forEach { item in
             DatabaseManager.shared.deleteItem(productID: item.productID, from: viewModel.pocket.title)
@@ -149,7 +157,7 @@ class PocketDetailViewController: UIViewController,
         
         bind()
         
-        isEditButtonTapped = false
+        editMode = false
         pocketDetailView?.toggleButtonHidden()
     }
     
