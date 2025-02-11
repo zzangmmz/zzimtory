@@ -12,6 +12,18 @@ class PocketDetailViewController: UIViewController,
     private var pocketDetailView: PocketDetailView?
     private var viewModel: PocketDetailViewModel
     
+    private var isEditButtonTapped: Bool = false {
+        didSet {
+            pocketDetailView?.itemCollectionView.visibleCells.forEach { cell in
+                if let itemCell = cell as? ItemCollectionViewCell {
+                    print(isEditButtonTapped)
+                    itemCell.toggleCellOverlayView()
+                }
+            }
+            
+        }
+    }
+    
     // viewModel을 전달받는 생성자
     init(viewModel: PocketDetailViewModel) {
         self.viewModel = viewModel
@@ -58,7 +70,8 @@ class PocketDetailViewController: UIViewController,
         pocketDetailView?.sortButton.addTarget(self, action: #selector(sortButtonDidTap), for: .touchUpInside)
         pocketDetailView?.searchBar.delegate = self
         pocketDetailView?.cancelButton.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)
-        
+        pocketDetailView?.editButton.addTarget(self, action: #selector (editButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
@@ -86,6 +99,16 @@ class PocketDetailViewController: UIViewController,
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedItem = viewModel.displayItems[indexPath.item]
+        
+        guard !isEditButtonTapped else {
+            // 편집모드인 경우
+            if let selectedCell = collectionView.cellForItem(at: indexPath) as? ItemCollectionViewCell {
+                selectedCell.toggleCellOverlayView() // cell 색상 변경
+                // 셀 선택 동작
+            }
+            return
+        }
+        
         let detailVC = DetailViewController(item: selectedItem)
         detailVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(detailVC, animated: true)
@@ -101,6 +124,17 @@ class PocketDetailViewController: UIViewController,
             }
         }
         pocketDetailView?.itemCollectionView.reloadData()
+    }
+    
+    // 취소 버튼 클릭 시 서치바를 숨기고, 카운트앤버튼스택뷰 다시 보이게
+    @objc func editButtonDidTap() {
+        isEditButtonTapped.toggle()
+        pocketDetailView?.toggleButtonHidden()
+    }
+    
+    @objc func moveCancelButtonDidTap() {
+        isEditButtonTapped.toggle()
+        pocketDetailView?.toggleButtonHidden()
     }
     
     @objc private func cancelSearch() {
