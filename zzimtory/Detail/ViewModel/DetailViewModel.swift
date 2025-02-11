@@ -22,6 +22,7 @@ final class DetailViewModel {
     let itemBrand = BehaviorSubject<String>(value: "")
     let itemPrice = BehaviorSubject<String>(value: "")
     let itemImageUrl = BehaviorSubject<String>(value: "")
+    let itemUrl = BehaviorSubject<String>(value: "")
     let similarItems = BehaviorSubject<[Item]>(value: [])
     
     let isInPocket = BehaviorSubject<Bool>(value: false)
@@ -51,6 +52,8 @@ final class DetailViewModel {
         
         // 이미지 URL 설정
         itemImageUrl.onNext(currentItem.image)
+        
+        itemUrl.onNext(currentItem.link)
     }
     
     // 검색어 설정 메서드
