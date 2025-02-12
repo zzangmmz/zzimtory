@@ -14,7 +14,7 @@ final class ItemSearchView: ZTView {
     private let searchBar = UISearchBar()
     private let itemCollectionView = ItemCollectionView()
     
-//    private let itemCardsView = ItemCardsView()
+    private lazy var itemCardsView = ItemCardsView(with: items)
     
     private let itemSearchViewModel = ItemSearchViewModel()
     private let disposeBag = DisposeBag()

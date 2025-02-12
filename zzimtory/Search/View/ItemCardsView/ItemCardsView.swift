@@ -11,13 +11,14 @@ import RxSwift
 
 final class ItemCardsView: UIView {
     
-    private var items: [Item] = []
+    var items: [Item] = []
     private let cardStack = SwipeCardStack()
     private let disposeBag = DisposeBag()
     
     // MARK: - Initializers
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(with items: [Item]) {
+        self.items = items
+        super.init(frame: .zero)
         
         backgroundColor = .clear
         
@@ -59,26 +60,6 @@ final class ItemCardsView: UIView {
         return card
     }
     
-    func setDelegate(to target: SwipeCardStackDelegate) {
-        cardStack.delegate = target
-    }
-}
-
-// ItemCardsView를 ViewModel에 바인딩해주기 위한 프로토콜 적용입니다.
-// ItemSearchView에서 사용되며, 자세한 설명은 SearchViewModel+Bindable 참고 바랍니다.
-extension ItemCardsView: ViewModelBindable {
-    func bind() {
-//        viewModel.searchResult.observe(on: MainScheduler.instance)
-//            .subscribe(
-//                onNext: { [weak self] result in
-//                    self?.items = result
-//                    self?.cardStack.reloadData()
-//                },
-//                onError: { error in
-//                    print("error: \(error)")
-//                }
-//            ).disposed(by: disposeBag)
-    }
 }
 
 // SwipeCardStack의 DataSource를 지정해주기 위한 프로토콜입니다.
