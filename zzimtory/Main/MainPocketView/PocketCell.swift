@@ -61,18 +61,6 @@ class PocketCell: UICollectionViewCell {
         return label
     }()
     
-    private let emptyPocketImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .center
-        imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "PocketIcon")
-        imageView.layer.cornerRadius = 15
-        imageView.layer.masksToBounds = true
-        imageView.backgroundColor = .white100Zt
-        imageView.isHidden = true
-        return imageView
-    }()
-    
     private let singlePocketImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -86,7 +74,6 @@ class PocketCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        emptyPocketImageView.image = UIImage(named: "PocketIcon")
         [singlePocketImageView,
          previewImageView1, previewImageView2, previewImageView3, previewImageView4].forEach {
             $0.image = nil
@@ -134,7 +121,6 @@ class PocketCell: UICollectionViewCell {
         titleImageStackView.distribution = .fillProportionally
         
         contentView.addSubview(titleImageStackView)
-        contentView.addSubview(emptyPocketImageView)
         contentView.addSubview(singlePocketImageView)
         contentView.addSubview(countLabelOnImage)
         
@@ -148,10 +134,6 @@ class PocketCell: UICollectionViewCell {
         
         imageStackView.snp.makeConstraints { make in
             make.height.equalTo(contentView).multipliedBy(0.8)
-        }
-        
-        emptyPocketImageView.snp.makeConstraints { make in
-            make.edges.equalTo(imageStackView)
         }
         
         singlePocketImageView.snp.makeConstraints { make in
@@ -181,25 +163,34 @@ class PocketCell: UICollectionViewCell {
         
         let previews = [previewImageView1, previewImageView2, previewImageView3, previewImageView4]
         
-        if pocket.items.isEmpty {
-            // 주머니 빈 경우 기본 이미지 설정
-            emptyPocketImageView.isHidden = false
+        if pocket.items.count <= 1 {
+            // 주머니 빈 경우
+            // 혹은 아이템 1개 들어있는 경우
+            singlePocketImageView.isHidden = false
             previews.forEach { $0.isHidden = true }
-        } else {
-            if pocket.items.count == 1 {
-                emptyPocketImageView.isHidden = true
-                singlePocketImageView.isHidden = false
-                singlePocketImageView.loadImage(from: URL(string: pocket.image!)!)
+            
+            if pocket.images.isEmpty {
+                singlePocketImageView.image = UIImage(named: "EmptyPocketIcon")
+                singlePocketImageView.contentMode = .center
+                singlePocketImageView.tintColor = .gray400Zt
+                singlePocketImageView.backgroundColor = .white100Zt
             } else {
-                emptyPocketImageView.isHidden = true
-                // 아이템 개수에 따라 이미지 설정
-                for (index, imageView) in previews.enumerated() {
-                    if index < pocket.items.count {
-                        imageView.loadImage(from: URL(string: pocket.image!)!)
+                if let imageUrl = URL(string: pocket.images[0]) {
+                    singlePocketImageView.loadImage(from: imageUrl)
+                }
+            }
+            
+        } else {
+            singlePocketImageView.isHidden = true
+            // 아이템 개수에 따라 이미지 설정
+            for (index, imageView) in previews.enumerated() {
+                if index < pocket.items.count {
+                    if let imageUrl = URL(string: pocket.images[index]) {
+                        imageView.loadImage(from: imageUrl)
                         imageView.isHidden = false
-                    } else {
-                        imageView.isHidden = true
                     }
+                } else {
+                    imageView.isHidden = true
                 }
             }
         }
