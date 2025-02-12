@@ -30,16 +30,31 @@ class MainPocketViewModel {
         }
     }
     
-    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {  
+    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {
         switch order {
         case .dictionary:
-            filterPockets.sort { $0.title < $1.title }   // 사전순 정렬
+            filterPockets.sort { $0.title < $1.title }
+            
         case .newest:
-            filterPockets.sort { $0.saveDate > $1.saveDate }
+            filterPockets.sort { pocket1, pocket2 in
+                switch (pocket1.saveDate, pocket2.saveDate) {
+                case (nil, nil): return false
+                case (nil, _): return false
+                case (_, nil): return true
+                case (let date1?, let date2?): return date1 > date2
+                }
+            }
+            
         case .oldest:
-            filterPockets.sort { $0.saveDate < $1.saveDate }
+            filterPockets.sort { pocket1, pocket2 in
+                switch (pocket1.saveDate, pocket2.saveDate) {
+                case (nil, nil): return false
+                case (nil, _): return false
+                case (_, nil): return true
+                case (let date1?, let date2?): return date1 < date2
+                }
+            }
         }
-
         completion()
     }
     
