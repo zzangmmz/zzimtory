@@ -23,10 +23,10 @@ final class LoginView: ZTView {
         return button
     }()
     
-    private(set) var appleCustomLoginButton = LoginButton(type: .apple)
-    private(set) var googleLoginButton = LoginButton(type: .google)
-    private(set) var kakaoLoginButton = LoginButton(type: .kakao)
-    private(set) var naverLoginButton = LoginButton(type: .naver)
+    private(set) var appleCustomLoginButton = LoginButton(sns: .apple)
+    private(set) var googleLoginButton = LoginButton(sns: .google)
+    private(set) var kakaoLoginButton = LoginButton(sns: .kakao)
+    private(set) var naverLoginButton = LoginButton(sns: .naver)
     
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
