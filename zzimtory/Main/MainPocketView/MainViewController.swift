@@ -87,20 +87,27 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     @objc private func sortButtonDidTap() {
         let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
-        let sortByOldestAction = UIAlertAction(title: "내림차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortPockets(by: .descending) { [weak self] in
+        let sortByDictionary = UIAlertAction(title: "가나다순", style: .default) { [weak self] _ in
+            self?.viewModel.sortPockets(by: .dictionary) { [weak self] in
                 self?.mainView?.collectionView.reloadData()
             }
         }
         
-        let sortByNewestAction = UIAlertAction(title: "오름차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortPockets(by: .ascending) { [weak self] in
+        let sortByNewestAction = UIAlertAction(title: "최신순", style: .default) { [weak self] _ in
+            self?.viewModel.sortPockets(by: .newest) { [weak self] in
+                self?.mainView?.collectionView.reloadData()
+            }
+        }
+        
+        let sortByOldestAction = UIAlertAction(title: "오래된순", style: .default) { [weak self] _ in
+            self?.viewModel.sortPockets(by: .oldest) { [weak self] in
                 self?.mainView?.collectionView.reloadData()
             }
         }
         
         let cancelAction = UIAlertAction(title: "취소", style: .cancel)
         
+        alert.addAction(sortByDictionary)
         alert.addAction(sortByOldestAction)
         alert.addAction(sortByNewestAction)
         alert.addAction(cancelAction)
