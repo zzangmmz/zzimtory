@@ -15,11 +15,11 @@ struct User: Codable {
 struct Pocket: Codable {
     var title: String
     var items: [Item]
-    var image: String? {
+    var images: [String] {
         if items.isEmpty {
-            return "PocketIcon"
+            return []
         } else {
-            return items[0].image
+            return items.suffix(4).map { $0.image }
         }
     }
     
