@@ -113,7 +113,7 @@ class PocketDetailViewController: UIViewController,
     @objc private func sortButtonDidTap() {
         let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
-        let sortByDictionary = UIAlertAction(title: "가다나순", style: .default) { [weak self] _ in
+        let sortByDictionary = UIAlertAction(title: "사전순", style: .default) { [weak self] _ in
             self?.viewModel.sortItems(by: .dictionary) { [weak self] in
                 self?.pocketDetailView?.itemCollectionView.reloadData()
             }
