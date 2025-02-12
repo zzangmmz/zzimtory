@@ -8,8 +8,6 @@
 import UIKit
 import RxSwift
 import RxCocoa
-import CryptoKit
-import AuthenticationServices
 
 final class LoginViewController: UIViewController {
     private var loginView: LoginView?
