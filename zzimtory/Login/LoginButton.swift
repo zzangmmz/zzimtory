@@ -7,13 +7,6 @@
 
 import UIKit
 
-struct ButtonStyle {
-    let title: String
-    let backgroundColor: UIColor?
-    let foregroundColor: UIColor?
-    let icon: UIImage?
-}
-
 enum SNS: String {
     case apple
     case google
@@ -42,25 +35,19 @@ enum SNS: String {
         guard let icon = UIImage(named: "\(rawValue)Icon") else { return nil }
         return icon
     }
-    
-    var style: ButtonStyle {
-        ButtonStyle(title: self.title,
-                    backgroundColor: self.backgroundColor,
-                    foregroundColor: self.foregroundColor,
-                    icon: self.icon)
-    }
 }
 
 final class LoginButton: UIButton {
-    init(type: SNS) {
+    init(sns: SNS) {
         super.init(frame: .zero)
+        
         var config = UIButton.Configuration.filled()
         
-        var finalImage = type.style.icon
-        if type != .apple { // 애플은 SF Symbol 사용하므로 제외
+        var finalImage = sns.icon
+        if sns != .apple { // 애플은 SF Symbol 사용하므로 제외
             let size = CGSize(width: 28, height: 28)
             UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
-            type.style.icon?.draw(in: CGRect(origin: .zero, size: size))
+            sns.icon?.draw(in: CGRect(origin: .zero, size: size))
         } else {
             let width = 28.0
             let image = UIImage(named: "appleIcon")
@@ -74,7 +61,7 @@ final class LoginButton: UIButton {
         finalImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        config.attributedTitle = AttributedString("\(type.style.title)로 로그인",
+        config.attributedTitle = AttributedString(sns.title,
                                                   attributes: AttributeContainer([
                                                     .font: UIFont.systemFont(ofSize: 19, weight: .semibold)
                                                   ]))
@@ -82,8 +69,8 @@ final class LoginButton: UIButton {
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 20)
         config.imagePlacement = .leading
         config.imagePadding = 10
-        config.baseBackgroundColor = type.style.backgroundColor
-        config.baseForegroundColor = (type == .apple || type == .naver) ? .white : .black
+        config.baseBackgroundColor = sns.backgroundColor
+        config.baseForegroundColor = sns.foregroundColor
         config.cornerStyle = .medium
         self.configuration = config
     }
