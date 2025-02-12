@@ -16,7 +16,7 @@ struct User: Codable {
 
 struct Pocket: Codable {
     var title: String
-    var saveDate: Date
+    var saveDate: Date?
     var items: [Item]
     var images: [String] {
         if items.isEmpty {
