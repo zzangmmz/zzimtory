@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import AuthenticationServices
 
 final class LoginView: ZTView {
         
@@ -16,11 +15,6 @@ final class LoginView: ZTView {
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .black900Zt
         return imageView
-    }()
-    
-    private(set) var appleLoginButton: ASAuthorizationAppleIDButton = {
-        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
-        return button
     }()
     
     private(set) var appleCustomLoginButton = LoginButton(sns: .apple)
