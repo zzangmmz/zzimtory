@@ -47,11 +47,17 @@ final class LoginButton: UIButton {
     init(sns: SNS) {
         self.sns = sns
         super.init(frame: .zero)
-        self.configuration = createConfiguration(sns: sns)
+        
+        setupButton()
+        bindButton()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupButton() {
+        self.configuration = createConfiguration(sns: sns)
     }
     
     private func createConfiguration(sns: SNS) -> UIButton.Configuration {
@@ -93,5 +99,15 @@ final class LoginButton: UIButton {
         UIGraphicsEndImageContext()
         
         return resizedIcon
+    }
+    
+    private func bindButton() {
+        rx.tap
+            .withUnretained(self)
+            .map { owner, _ in
+                owner.sns
+            }
+            .bind(to: loginTapped)
+            .disposed(by: disposeBag)
     }
 }
