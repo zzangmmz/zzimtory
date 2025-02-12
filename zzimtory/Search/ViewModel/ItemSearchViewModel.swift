@@ -20,11 +20,20 @@ final class ItemSearchViewModel {
     struct Input {
         var query: Observable<String>
         var didSelectCard: Observable<Int>
+        var didSwipeCard: Observable<(Int, SwipeDirection)>
+        var didSwipeAllCards: Observable<Void>
     }
     
     struct Output {
         let searchResult: Driver<[Item]>
         let selectedCard: Driver<Item>
+        let swipedCard: Driver<SwipedCard>
+        let swipedAllCards: Driver<Void>
+    }
+    
+    struct SwipedCard {
+        let item: Item
+        let direction: SwipeDirection
     }
     
     func transform(input: Input) -> Output {
@@ -44,6 +53,27 @@ final class ItemSearchViewModel {
             }
             .asDriver(onErrorDriveWith: .empty())
         
-        return Output(searchResult: searchResult, selectedCard: selectedCard)
+        let swipedCard = input.didSwipeCard
+            .withUnretained(self)
+            .flatMap { vm, didSwipeCardAt -> Observable<SwipedCard> in
+                let observableItem = vm.currentItems.compactMap { $0[didSwipeCardAt.0] }
+                
+                let swipedCard = observableItem
+                    .map { SwipedCard(item: $0, direction: didSwipeCardAt.1)}
+                
+                return swipedCard
+            }
+            .asDriver(onErrorDriveWith: .empty())
+        
+        let swipedAllCards = input.didSwipeAllCards
+            .asDriver(onErrorJustReturn: ())
+        
+        let output = Output(searchResult: searchResult,
+                            selectedCard: selectedCard,
+                            swipedCard: swipedCard,
+                            swipedAllCards: swipedAllCards
+        )
+        
+        return output
     }
 }

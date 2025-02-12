@@ -54,7 +54,7 @@ extension Reactive where Base: SwipeCardStack {
             .map { args in
                 return (
                     index: args[1] as? Int ?? 0,
-                    direction: args[2] as! SwipeDirection
+                    direction: SwipeDirection(rawValue: args[2] as? Int ?? 3) ?? .down
                 )
             }
     }
