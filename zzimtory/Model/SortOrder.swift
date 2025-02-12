@@ -8,6 +8,7 @@
 import Foundation
 
 enum SortOrder {
-    case descending
-    case ascending
+    case dictionary
+    case oldest
+    case newest
 }
