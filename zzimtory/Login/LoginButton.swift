@@ -9,7 +9,8 @@ import UIKit
 
 struct ButtonStyle {
     let title: String
-    let color: UIColor?
+    let backgroundColor: UIColor?
+    let foregroundColor: UIColor?
     let icon: UIImage?
 }
 
@@ -22,13 +23,13 @@ enum SNS {
     var style: ButtonStyle {
         switch self {
         case .apple:
-            return ButtonStyle(title: "Apple", color: UIColor(named: "appleColor"), icon: UIImage(named: "appleIcon"))
+            return ButtonStyle(title: "Apple", backgroundColor: UIColor(named: "appleColor"), icon: UIImage(named: "appleIcon"))
         case .google:
-            return ButtonStyle(title: "Google", color: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
+            return ButtonStyle(title: "Google", backgroundColor: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
         case .kakao:
-            return ButtonStyle(title: "Kakao", color: UIColor(named: "kakaoColor"), icon: UIImage(named: "kakaoIcon"))
+            return ButtonStyle(title: "Kakao", backgroundColor: UIColor(named: "kakaoColor"), icon: UIImage(named: "kakaoIcon"))
         case .naver:
-            return ButtonStyle(title: "Naver", color: UIColor(named: "naverColor"), icon: UIImage(named: "naverIcon"))
+            return ButtonStyle(title: "Naver", backgroundColor: UIColor(named: "naverColor"), icon: UIImage(named: "naverIcon"))
         }
     }
 }
@@ -64,7 +65,7 @@ final class LoginButton: UIButton {
         config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 20)
         config.imagePlacement = .leading
         config.imagePadding = 10
-        config.baseBackgroundColor = type.style.color
+        config.baseBackgroundColor = type.style.backgroundColor
         config.baseForegroundColor = (type == .apple || type == .naver) ? .white : .black
         config.cornerStyle = .medium
         self.configuration = config
