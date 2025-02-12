@@ -36,10 +36,12 @@ class PocketDetailViewModel {
     
     func sortItems(by order: SortOrder, completion: @escaping () -> Void) {
         switch order {
-        case .descending:
-            displayItems.sort { $0.title > $1.title } // 사전 역순 정렬
-        case .ascending:
+        case .dictionary:
             displayItems.sort { $0.title < $1.title } // 사전순 정렬
+        case .newest:
+            displayItems.sort { $0.saveDate > $1.saveDate }
+        case .oldest:
+            displayItems.sort { $0.saveDate < $1.saveDate }
         }
         completion()
     }
