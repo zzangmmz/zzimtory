@@ -14,23 +14,40 @@ struct ButtonStyle {
     let icon: UIImage?
 }
 
-enum SNS {
+enum SNS: String {
     case apple
     case google
     case kakao
     case naver
     
-    var style: ButtonStyle {
+    var title: String {
+        "\(rawValue.capitalized)로 로그인"
+    }
+    
+    var backgroundColor: UIColor? {
+        guard let color = UIColor(named: "\(rawValue)Color") else { return nil }
+        return color
+    }
+    
+    var foregroundColor: UIColor {
         switch self {
-        case .apple:
-            return ButtonStyle(title: "Apple", backgroundColor: UIColor(named: "appleColor"), icon: UIImage(named: "appleIcon"))
-        case .google:
-            return ButtonStyle(title: "Google", backgroundColor: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
-        case .kakao:
-            return ButtonStyle(title: "Kakao", backgroundColor: UIColor(named: "kakaoColor"), icon: UIImage(named: "kakaoIcon"))
-        case .naver:
-            return ButtonStyle(title: "Naver", backgroundColor: UIColor(named: "naverColor"), icon: UIImage(named: "naverIcon"))
+        case .apple, .naver:
+            return .white
+        default:
+            return .black
         }
+    }
+    
+    var icon: UIImage? {
+        guard let icon = UIImage(named: "\(rawValue)Icon") else { return nil }
+        return icon
+    }
+    
+    var style: ButtonStyle {
+        ButtonStyle(title: self.title,
+                    backgroundColor: self.backgroundColor,
+                    foregroundColor: self.foregroundColor,
+                    icon: self.icon)
     }
 }
 
