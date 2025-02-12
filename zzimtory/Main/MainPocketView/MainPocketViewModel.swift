@@ -7,16 +7,17 @@
 
 import UIKit
 
-
 class MainPocketViewModel {
     // 주머니 이름과 이미지 배열을 함께 관리
     private(set) var pockets: [Pocket] = []
     private(set) var filterPockets: [Pocket] = []
+    var displayPockets: [Pocket] = []
     
     func fetchData(completion: @escaping ([Pocket]?) -> Void) {
         DatabaseManager.shared.readPocket { [weak self] pockets in
             self?.pockets = pockets
             self?.filterPockets = pockets
+            self?.displayPockets = pockets
             completion(self?.filterPockets)
         }
     }

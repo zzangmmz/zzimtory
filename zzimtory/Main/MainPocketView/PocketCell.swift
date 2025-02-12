@@ -84,6 +84,14 @@ class PocketCell: UICollectionViewCell {
         return imageView
     }()
     
+    let pocketOverlayView: ZTView = {
+        let view = ZTView()
+        view.backgroundColor = UIColor.black900Zt.withAlphaComponent(0.5)
+        view.isHidden = true
+        view.layer.cornerRadius = 15
+        return view
+    }()
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         
@@ -97,7 +105,6 @@ class PocketCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .clear
         setupUI()
     }
     
@@ -106,7 +113,8 @@ class PocketCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        contentView.backgroundColor = .clear
+        contentView.backgroundColor = .white100Zt
+        contentView.layer.cornerRadius = 16
         
         let leftImageStackView = UIStackView(arrangedSubviews: [previewImageView1, previewImageView3])
         leftImageStackView.axis = .horizontal
@@ -134,10 +142,12 @@ class PocketCell: UICollectionViewCell {
         titleImageStackView.alignment = .fill
         titleImageStackView.distribution = .fillProportionally
         
+        
         contentView.addSubview(titleImageStackView)
         contentView.addSubview(emptyPocketImageView)
         contentView.addSubview(singlePocketImageView)
         contentView.addSubview(countLabelOnImage)
+        contentView.addSubview(pocketOverlayView)
         
         titleImageStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -157,6 +167,10 @@ class PocketCell: UICollectionViewCell {
         
         singlePocketImageView.snp.makeConstraints { make in
             make.edges.equalTo(imageStackView)
+        }
+        
+        pocketOverlayView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
         countLabelOnImage.snp.makeConstraints { make in
@@ -205,4 +219,12 @@ class PocketCell: UICollectionViewCell {
             }
         }
     }
+    func setEditModePocket(with editMode: Bool) {
+        if editMode {
+            self.pocketOverlayView.isHidden = false
+        } else {
+            self.pocketOverlayView.isHidden = true
+        }
+    }
+    
 }
