@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 enum SNS: String {
     case apple
@@ -38,7 +40,12 @@ enum SNS: String {
 }
 
 final class LoginButton: UIButton {
+    private var disposeBag = DisposeBag()
+    let loginTapped = PublishRelay<SNS>()
+    private let sns: SNS
+    
     init(sns: SNS) {
+        self.sns = sns
         super.init(frame: .zero)
         self.configuration = createConfiguration(sns: sns)
     }
