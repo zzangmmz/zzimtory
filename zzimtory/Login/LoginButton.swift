@@ -7,8 +7,8 @@
 
 import UIKit
 
-struct SnsStyle {
-    let name: String
+struct ButtonStyle {
+    let title: String
     let color: UIColor?
     let icon: UIImage?
 }
@@ -19,16 +19,16 @@ enum SnsType {
     case kakao
     case naver
     
-    var style: SnsStyle {
+    var style: ButtonStyle {
         switch self {
         case .apple:
-            return SnsStyle(name: "Apple", color: UIColor(named: "appleColor"), icon: UIImage(named: "appleIcon"))
+            return ButtonStyle(title: "Apple", color: UIColor(named: "appleColor"), icon: UIImage(named: "appleIcon"))
         case .google:
-            return SnsStyle(name: "Google", color: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
+            return ButtonStyle(title: "Google", color: UIColor(named: "googleColor"), icon: UIImage(named: "googleIcon"))
         case .kakao:
-            return SnsStyle(name: "Kakao", color: UIColor(named: "kakaoColor"), icon: UIImage(named: "kakaoIcon"))
+            return ButtonStyle(title: "Kakao", color: UIColor(named: "kakaoColor"), icon: UIImage(named: "kakaoIcon"))
         case .naver:
-            return SnsStyle(name: "Naver", color: UIColor(named: "naverColor"), icon: UIImage(named: "naverIcon"))
+            return ButtonStyle(title: "Naver", color: UIColor(named: "naverColor"), icon: UIImage(named: "naverIcon"))
         }
     }
 }
@@ -56,7 +56,7 @@ final class LoginButton: UIButton {
         finalImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        config.attributedTitle = AttributedString("\(type.style.name)로 로그인",
+        config.attributedTitle = AttributedString("\(type.style.title)로 로그인",
                                                   attributes: AttributeContainer([
                                                     .font: UIFont.systemFont(ofSize: 19, weight: .semibold)
                                                   ]))
