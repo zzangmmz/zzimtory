@@ -72,6 +72,7 @@ class PocketDetailViewController: UIViewController,
         pocketDetailView?.editButton.addTarget(self, action: #selector (editButtonDidTap), for: .touchUpInside)
         pocketDetailView?.moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
         pocketDetailView?.seedDeleteButton.addTarget(self, action: #selector(seedDeleteButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.seedMoveButton.addTarget(self, action: #selector(seedMoveButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
@@ -159,6 +160,27 @@ class PocketDetailViewController: UIViewController,
         
         editMode = false
         pocketDetailView?.toggleButtonHidden()
+    }
+    
+    @objc func seedMoveButtonDidTap() {
+        guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
+        
+        let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
+        
+        // 주머니에 없으면 모달 띄우기
+        let pocketVC = PocketSelectionViewController(selectedItems: selectedItems)
+        self.present(pocketVC, animated: true)
+        
+        // 모달에서 주머니 추가 완료 시 ViewModel 업데이트
+        pocketVC.onComplete = { [weak self] in
+            guard let self = self else { return }
+            selectedItems.forEach { item in
+                DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+            }
+            self.bind()
+            editMode = false
+            pocketDetailView?.toggleButtonHidden()
+        }
     }
     
     @objc private func cancelSearch() {
