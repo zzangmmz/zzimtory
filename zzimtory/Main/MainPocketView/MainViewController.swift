@@ -87,7 +87,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     @objc private func sortButtonDidTap() {
         let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
-        let sortByDictionary = UIAlertAction(title: "샤전순", style: .default) { [weak self] _ in
+        let sortByDictionary = UIAlertAction(title: "가나다순", style: .default) { [weak self] _ in
             self?.viewModel.sortPockets(by: .dictionary) { [weak self] in
                 self?.mainView?.collectionView.reloadData()
             }
