@@ -27,7 +27,7 @@ struct Item: Codable {
     let category2: String
     let category3: String
     let category4: String
-    var saveDate: Date?
+    var saveDate: Date = Date()
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -62,13 +62,9 @@ extension Item {
             "category1": self.category1,
             "category2": self.category2,
             "category3": self.category3,
-            "category4": self.category4
+            "category4": self.category4,
+            "saveDate": Int(self.saveDate.timeIntervalSince1970 * 1000)
         ]
-        
-        // Date를 TimeInterval(timestamp)로 변환
-        if let date = self.saveDate {
-            dict["saveDate"] = Int(date.timeIntervalSince1970 * 1000)
-        }
         
         return dict
     }
