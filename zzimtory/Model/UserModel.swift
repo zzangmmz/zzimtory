@@ -5,6 +5,8 @@
 //  Created by 이명지 on 1/31/25.
 //
 
+import Foundation
+
 struct User: Codable {
     let email: String
     let nickname: String
@@ -14,21 +16,23 @@ struct User: Codable {
 
 struct Pocket: Codable {
     var title: String
+    var saveDate: Date?
     var items: [Item]
-    var image: String? {
+    var images: [String] {
         if items.isEmpty {
-            return "PocketIcon"
+            return []
         } else {
-            return items[0].image
+            return items.suffix(4).map { $0.image }
         }
     }
     
     private enum CodingKeys: String, CodingKey {
-        case title, items
+        case title, items, saveDate
     }
     
     init(title: String, items: [Item]) {
         self.title = title
+        self.saveDate = Date()
         self.items = items
     }
 }

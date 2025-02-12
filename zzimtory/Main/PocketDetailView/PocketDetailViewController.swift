@@ -35,7 +35,8 @@ class PocketDetailViewController: UIViewController,
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+
         bind()
     }
     
@@ -44,7 +45,6 @@ class PocketDetailViewController: UIViewController,
         
         pocketDetailView = PocketDetailView(frame: view.frame)
         view = pocketDetailView
-        navigationController?.navigationBar.isHidden = false
         
         setupNavigationBar()
         setupCollectionView()
@@ -194,21 +194,28 @@ class PocketDetailViewController: UIViewController,
     @objc private func sortButtonDidTap() {
         let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
-        let sortByOldestAction = UIAlertAction(title: "내림차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortItems(by: .descending) { [weak self] in
+        let sortByDictionary = UIAlertAction(title: "가나다순", style: .default) { [weak self] _ in
+            self?.viewModel.sortItems(by: .dictionary) { [weak self] in
                 self?.pocketDetailView?.itemCollectionView.reloadData()
             }
         }
         
-        let sortByNewestAction = UIAlertAction(title: "오름차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortItems(by: .ascending)  { [weak self] in
+        let sortByNewest = UIAlertAction(title: "최신순", style: .default) { [weak self] _ in
+            self?.viewModel.sortItems(by: .newest)  { [weak self] in
+                self?.pocketDetailView?.itemCollectionView.reloadData()
+            }
+        }
+        
+        let sortByOldest = UIAlertAction(title: "오래된순", style: .default) { [weak self] _ in
+            self?.viewModel.sortItems(by: .oldest)  { [weak self] in
                 self?.pocketDetailView?.itemCollectionView.reloadData()
             }
         }
         
         let cancelAction = UIAlertAction(title: "취소", style: .cancel)
-        alert.addAction(sortByOldestAction)
-        alert.addAction(sortByNewestAction)
+        alert.addAction(sortByDictionary)
+        alert.addAction(sortByNewest)
+        alert.addAction(sortByOldest)
         alert.addAction(cancelAction)
         
         present(alert, animated: true, completion: nil)
