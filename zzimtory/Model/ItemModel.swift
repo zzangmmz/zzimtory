@@ -49,7 +49,7 @@ struct Item: Codable {
 
 extension Item {
     func asAny() -> Any {
-        return [
+        var dict: [String: Any] = [
             "title": self.title,
             "link": self.link,
             "image": self.image,
@@ -62,12 +62,17 @@ extension Item {
             "category1": self.category1,
             "category2": self.category2,
             "category3": self.category3,
-            "category4": self.category4,
-            "saveDate": self.saveDate
+            "category4": self.category4
         ]
+        
+        // Date를 TimeInterval(timestamp)로 변환
+        if let date = self.saveDate {
+            dict["saveDate"] = Int(date.timeIntervalSince1970 * 1000)
+        }
+        
+        return dict
     }
 }
-
 
 // MARK: - API Response 참고용 JSON (추후 삭제 요망)
 //{
