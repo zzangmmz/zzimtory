@@ -11,6 +11,16 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     private var mainView: MainView?
     private let viewModel = MainPocketViewModel()
     
+    private var editMode: Bool = false {
+        didSet {
+            mainView?.collectionView.visibleCells.forEach { cell in
+                if let itemCell = cell as? PocketCell {
+                    itemCell.setEditModePocket(with: editMode)
+                }
+            }
+        }
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
@@ -35,11 +45,14 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         mainView?.sortButton.addTarget(self, action: #selector(sortButtonDidTap), for: .touchUpInside)
         mainView?.editButton.addTarget(self, action: #selector(editButtonDidTap), for: .touchUpInside)
         mainView?.searchBar.delegate = self
+        mainView?.moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
+        mainView?.pocketDeleteButton.addTarget(self, action: #selector(pocketDeleteButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
         mainView?.collectionView.dataSource = self
         mainView?.collectionView.delegate = self
+        mainView?.collectionView.allowsMultipleSelection = true
         mainView?.collectionView.register(
             PocketCell.self,
             forCellWithReuseIdentifier: "PocketCell"
@@ -126,18 +139,39 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             fatalError("Unable to dequeue PocketCell")
         }
         
-        let pocket = viewModel.filterPockets[indexPath.item]
+        let pocket = viewModel.displayPockets[indexPath.item]
         cell.configure(with: pocket)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let pocket = viewModel.filterPockets[indexPath.item]
-        print("\(pocket.title) 이 클릭됨")
+        guard editMode else {
+            let pocket = viewModel.displayPockets[indexPath.item]
+            print("\(pocket.title) 이 클릭됨")
+            
+            let detailViewModel = PocketDetailViewModel(pocket: pocket)
+            let detailVC = PocketDetailViewController(viewModel: detailViewModel)
+            navigationController?.pushViewController(detailVC, animated: true)
+            
+            return
+        }
         
-        let detailViewModel = PocketDetailViewModel(pocket: pocket)
-        let detailVC = PocketDetailViewController(viewModel: detailViewModel)
-        navigationController?.pushViewController(detailVC, animated: true)
+        // 편집모드인 경우
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as?
+            PocketCell {
+            selectedCell.pocketOverlayView.isHidden = true
+            selectedCell.isSelected = true
+            
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        guard editMode else { return }
+        
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as? PocketCell {
+            selectedCell.pocketOverlayView.isHidden = false
+            selectedCell.isSelected = false
+        }
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -150,9 +184,41 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         searchBar.resignFirstResponder() // 키보드 내리기
     }
     
-    @objc private func editButtonDidTap() {
-        print("수정/삭제 버튼 눌림") // 수정/삭제 기능 추가 예정
-        DatabaseManager.shared.deletePocket(title: "12")
+    @objc func editButtonDidTap() {
+        editMode.toggle()
+        mainView?.toggleButtonHidden()
+    }
+    
+    @objc func moveCancelButtonDidTap() {
+        editMode.toggle()
+        mainView?.toggleButtonHidden()
+        mainView?.collectionView.reloadData()
+    }
+    
+    @objc func pocketDeleteButtonDidTap() {
+        
+        guard let selectedIndexPaths = mainView?.collectionView.indexPathsForSelectedItems else { return }
+
+        let selectedPockets = selectedIndexPaths.map { viewModel.displayPockets[$0.item] }
+        
+        let alert = UIAlertController(title: "주머니 삭제", message: "주머니를 삭제하시겠습니까?", preferredStyle: .alert)
+
+        let deleteAction = UIAlertAction(title: "네", style: .destructive) { [weak self] _ in
+            selectedPockets.forEach { pocket in
+                DatabaseManager.shared.deletePocket(title: pocket.title)
+            }
+ 
+            self?.bind()
+            self?.editMode = false
+            self?.mainView?.toggleButtonHidden()
+        }
+
+        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+
+        present(alert, animated: true, completion: nil)
     }
 }
 

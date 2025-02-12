@@ -34,16 +34,13 @@ class PocketCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray500Zt
         label.textAlignment = .left
-        label.snp.makeConstraints { make in
-            make.height.equalTo(16)
-        }
         return label
     }()
     
     private lazy var titleStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, countLabelOnTitle])
         stackView.axis = .vertical
-        stackView.spacing = 4
+        stackView.spacing = 2
         return stackView
     }()
     
@@ -72,6 +69,14 @@ class PocketCell: UICollectionViewCell {
         return imageView
     }()
     
+    let pocketOverlayView: ZTView = {
+        let view = ZTView()
+        view.backgroundColor = UIColor.black900Zt.withAlphaComponent(0.5)
+        view.isHidden = true
+        view.layer.cornerRadius = 15
+        return view
+    }()
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         
@@ -84,7 +89,6 @@ class PocketCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .clear
         setupUI()
     }
     
@@ -93,7 +97,8 @@ class PocketCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        contentView.backgroundColor = .clear
+        contentView.backgroundColor = .white100Zt
+        contentView.layer.cornerRadius = 16
         
         let leftImageStackView = UIStackView(arrangedSubviews: [previewImageView1, previewImageView3])
         leftImageStackView.axis = .horizontal
@@ -109,7 +114,7 @@ class PocketCell: UICollectionViewCell {
         
         let imageStackView = UIStackView(arrangedSubviews: [leftImageStackView, rightImageStackView])
         imageStackView.axis = .vertical
-        imageStackView.spacing = 0
+        imageStackView.spacing = 10
         imageStackView.alignment = .fill
         imageStackView.distribution = .fillEqually
         imageStackView.layer.cornerRadius = 15
@@ -121,24 +126,39 @@ class PocketCell: UICollectionViewCell {
         titleImageStackView.alignment = .fill
         titleImageStackView.distribution = .fillProportionally
         
+        
         contentView.addSubview(titleImageStackView)
         contentView.addSubview(singlePocketImageView)
         contentView.addSubview(countLabelOnImage)
+        contentView.addSubview(pocketOverlayView)
         
         titleImageStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(6)
+            make.leading.equalToSuperview().offset(10)
+            make.top.equalTo(imageStackView.snp.bottom).offset(10)
+            make.bottom.equalTo(imageStackView.snp.bottom).offset(20)
+            make.height.equalTo(18)
         }
         
+        countLabelOnTitle.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(16)
+            make.height.equalTo(16)
+            }
+            
         imageStackView.snp.makeConstraints { make in
             make.height.equalTo(contentView).multipliedBy(0.8)
         }
         
         singlePocketImageView.snp.makeConstraints { make in
-            make.edges.equalTo(imageStackView)
+            make.edges.equalTo(imageStackView).inset(10)
+            
+        }
+        
+        pocketOverlayView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
         countLabelOnImage.snp.makeConstraints { make in
@@ -196,4 +216,12 @@ class PocketCell: UICollectionViewCell {
             }
         }
     }
+    func setEditModePocket(with editMode: Bool) {
+        if editMode {
+            self.pocketOverlayView.isHidden = false
+        } else {
+            self.pocketOverlayView.isHidden = true
+        }
+    }
+    
 }

@@ -72,7 +72,7 @@ class PocketDetailView: ZTView {
         return button
     }()
     
-    let deleteButton: UIButton = {
+    let editButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "pencil"), for: .normal)
         button.tintColor = .black900Zt
@@ -83,7 +83,7 @@ class PocketDetailView: ZTView {
     
     // 버튼들을 묶은 stackView
     private lazy var buttonStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [searchButton, sortButton])
+        let stackView = UIStackView(arrangedSubviews: [searchButton, sortButton, editButton])
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
@@ -188,7 +188,7 @@ class PocketDetailView: ZTView {
         }
         
         moveCancelButton.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(16)
+            make.top.equalTo(safeAreaLayoutGuide).offset(8)
             make.trailing.equalToSuperview().inset(24)
         }
         
@@ -236,7 +236,7 @@ class PocketDetailView: ZTView {
             make.size.equalTo(40) // 크기 조정
         }
         
-        deleteButton.snp.makeConstraints { make in
+        editButton.snp.makeConstraints { make in
             make.size.equalTo(40) // 크기 조정
         }
         
@@ -245,8 +245,6 @@ class PocketDetailView: ZTView {
         }
                
         searchButton.addTarget(self, action: #selector(searchButtonDidTap), for: .touchUpInside)
-        deleteButton.addTarget(self, action: #selector (deleteButtonDidTap), for: .touchUpInside)
-        moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
     }
     
     func configure(with pocket: Pocket) {
@@ -265,7 +263,7 @@ class PocketDetailView: ZTView {
         itemCollectionView.reloadData() // ItemCollectionView 데이터 업데이트
     }
     
-    private func toggleButtonHidden() {
+    func toggleButtonHidden() {
         [seedDeleteButton,
          seedMoveButton,
          moveCancelButton,
@@ -275,15 +273,6 @@ class PocketDetailView: ZTView {
     // 서치버튼 클릭 시 서치바가 보이고, 카운트앤버튼스택뷰 숨기기
     @objc private func searchButtonDidTap() {
         setHidden()
-    }
-    
-    // 취소 버튼 클릭 시 서치바를 숨기고, 카운트앤버튼스택뷰 다시 보이게 
-    @objc private func deleteButtonDidTap() {
-        toggleButtonHidden()
-    }
-    
-    @objc private func moveCancelButtonDidTap() {
-        toggleButtonHidden()
     }
     
     // 주머니 이동 버튼 클릭 시 추후 추가 예정!!
