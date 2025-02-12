@@ -85,7 +85,8 @@ final class DatabaseManager {
             let newPocket: [String: Any] = [
                 "title": title,
                 "items": [:],
-                "image": ""
+                "images": [],
+                "saveDate": ServerValue.timestamp()
             ]
             
             self.ref.child("users").child(uid).child("pockets").child("pocket\(title)").setValue(newPocket) { error, _ in
@@ -104,7 +105,7 @@ final class DatabaseManager {
     func readPocket(completion: @escaping ([Pocket]) -> Void) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot, _ in
             guard let pocketData = snapshot.value as? [String: [String: Any]] else {
                 print("❌ No data found or wrong format")
                 completion([])
@@ -117,7 +118,8 @@ final class DatabaseManager {
             
             for key in pocketData.keys {
                 guard let pocketInfo = pocketData[key],
-                      let title = pocketInfo["title"] as? String else { continue }
+                      let title = pocketInfo["title"] as? String,
+                      let saveDateTimestamp = pocketInfo["saveDate"] as? TimeInterval else { continue }
                 
                 var items: [Item] = []
                 if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
@@ -134,13 +136,15 @@ final class DatabaseManager {
                             }
                         }
                     }
-                    items.sort { $0.title < $1.title }
+                    items.sort { $0.saveDate > $1.saveDate }
                 }
                 
-                let pocket = Pocket(title: title, items: items)
+                var pocket = Pocket(title: title, items: items)
+                pocket.saveDate = Date(timeIntervalSince1970: saveDateTimestamp / 1000)
                 pockets.append(pocket)
             }
-            pockets.sort { $0.title < $1.title }
+            
+            pockets.sort { $0.saveDate > $1.saveDate }
             print("✅ 최종 Pocket 데이터: \(pockets)")
             completion(pockets)
         }
@@ -168,24 +172,31 @@ final class DatabaseManager {
     func updatePocketItem(newItem: Item, pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        let itemsRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items")
+        let pocketRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)")
         
-        itemsRef.observeSingleEvent(of: .value) { snapshot in
+        pocketRef.observeSingleEvent(of: .value) { snapshot in
             let newIndex = String("zzimtory\(newItem.productID)")
             
-            do {
-                let data = try JSONEncoder().encode(newItem)
-                let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
-                
-                itemsRef.child(newIndex).setValue(dict) { error, _ in
-                    if let error = error {
-                        print("아이템 추가 실패: \(error.localizedDescription)")
-                    } else {
-                        print("아이템 추가 성공")
-                    }
+            var updatedItem = newItem
+            updatedItem.saveDate = Date()
+            
+            // as? 를 사용하여 안전하게 타입 캐스팅
+            guard let dict = updatedItem.asAny() as? [String: Any] else {
+                print("아이템 데이터 변환 실패")
+                return
+            }
+            
+            let updates: [String: Any] = [
+                "items/\(newIndex)": dict,
+                "saveDate": ServerValue.timestamp()
+            ]
+            
+            pocketRef.updateChildValues(updates) { error, _ in
+                if let error = error {
+                    print("아이템 추가 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 추가 성공")
                 }
-            } catch {
-                print("아이템 변환 실패: \(error)")
             }
         }
     }
