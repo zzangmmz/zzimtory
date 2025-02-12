@@ -136,7 +136,14 @@ final class DatabaseManager {
                             }
                         }
                     }
-                    items.sort { $0.saveDate > $1.saveDate }
+                    items.sort {
+                        switch ($0.saveDate, $1.saveDate) {
+                        case (nil, nil): return false
+                        case (nil, _): return false
+                        case (_, nil): return true
+                        case (let date1?, let date2?): return date1 > date2
+                        }
+                    }
                 }
                 
                 var pocket = Pocket(title: title, items: items)
