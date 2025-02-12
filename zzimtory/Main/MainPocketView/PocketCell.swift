@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import SnapKit
+import Kingfisher
 
 class PocketCell: UICollectionViewCell {
     
@@ -158,7 +159,7 @@ class PocketCell: UICollectionViewCell {
     
     func configure(with pocket: Pocket) {
         titleLabel.text = pocket.title
-        countLabelOnImage.text = "\(pocket.items.count)개" // 추후 주머니 속 개수로 수정 예정!!
+        countLabelOnImage.text = "\(pocket.items.count)개" 
         countLabelOnTitle.text = "\(pocket.items.count)개"
         
         let previews = [previewImageView1, previewImageView2, previewImageView3, previewImageView4]

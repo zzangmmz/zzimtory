@@ -21,7 +21,7 @@ final class LoginViewController: UIViewController {
         loginView = LoginView(frame: view.frame)
         bind()
         view = loginView
-        navigationController?.isNavigationBarHidden = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.tabBarController?.tabBar.isHidden = true
     }
     
@@ -60,9 +60,12 @@ final class LoginViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] bool in
                 if bool {
+                    let tabbarVC = TabbarViewController()
+                    
                     if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                        let window = windowScene.windows.first {
-                        window.rootViewController = TabbarViewController()
+                        window.rootViewController = tabbarVC
+                        window.makeKeyAndVisible()
                     }
                 }
             })

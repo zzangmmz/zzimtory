@@ -119,6 +119,13 @@ extension ItemSearchView: SwipeCardStackDelegate {
         case .right: break
         case .left: break
         case .up:
+            guard DatabaseManager.shared.hasUserLoggedIn() else {
+                self.window?.rootViewController?.present(LoginViewController(), animated: true) {
+                    
+                }
+                return
+            }
+            
             self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
                                                      animated: true)
   
