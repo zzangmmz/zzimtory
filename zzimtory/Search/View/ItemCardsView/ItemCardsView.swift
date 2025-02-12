@@ -12,7 +12,7 @@ import RxSwift
 final class ItemCardsView: UIView {
     
     var items: [Item]
-    private let cardStack = SwipeCardStack()
+    let cardStack = SwipeCardStack()
     private let disposeBag = DisposeBag()
     
     // MARK: - Initializers
@@ -60,6 +60,9 @@ final class ItemCardsView: UIView {
         return card
     }
     
+    func setDelegate(to target: SwipeCardStackDelegate) {
+        cardStack.delegate = target
+    }
 }
 
 // SwipeCardStack의 DataSource를 지정해주기 위한 프로토콜입니다.

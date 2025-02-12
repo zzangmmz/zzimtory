@@ -17,19 +17,29 @@ final class ItemSearchViewModel {
 
     struct Input {
         var query: Observable<String>
+//        var didSelectCard: Observable<Int>
     }
     
     struct Output {
         let searchResult: Driver<[Item]>
+//        let selectedCard: Driver<Item>
     }
     
     func transform(input: Input) -> Output {
         let searchResult = input.query
             .withUnretained(self)
             .flatMap { vm, query -> Observable<[Item]> in
-                return vm.shoppingRepository.fetchForViewModel(with: query)
+                let fetchedItems = vm.shoppingRepository.fetchForViewModel(with: query)
+                return fetchedItems
             }
             .asDriver(onErrorDriveWith: .empty())
+        
+//        let selectedCard = input.didSelectCard
+//            .withUnretained(self)
+//            .flatMap { vm, index -> Observable<Item> in
+//                return vm.currentItems.compactMap { $0[index] }
+//            }
+//            .asDriver(onErrorDriveWith: .empty())
         
         return Output(searchResult: searchResult)
     }

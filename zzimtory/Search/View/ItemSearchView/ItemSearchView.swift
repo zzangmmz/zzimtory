@@ -41,7 +41,7 @@ final class ItemSearchView: ZTView {
 //        setupSearchBarTapGesture()
         
         bind()
-//        itemCardsView.setDelegate(to: self)
+        itemCardsView.setDelegate(to: self)
 //        itemCardsView.bind(to: itemSearchViewModel)
     }
     
@@ -91,6 +91,7 @@ extension ItemSearchView: ViewModelBindable {
         
         let input = ItemSearchViewModel.Input(
             query: searchBar.rx.searchButtonClicked.withLatestFrom(searchBar.rx.text.orEmpty)
+//            didSelectCard: itemCardsView.cardStack.rx.didSelectCardAt
         )
         
         let output = itemSearchViewModel.transform(input: input)
@@ -110,90 +111,104 @@ extension ItemSearchView: ViewModelBindable {
                 self.layer.addSublayer(self.dimLayer)
                 self.addSubview(self.itemCardsView)
                 itemCardsView.frame = self.frame
+                itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
             })
             .disposed(by: disposeBag)
+        
+//        output.selectedCard
+//            .drive(onNext: { cardItem in
+//                print(cardItem)
+//                
+//                let detailVC = DetailViewController(item: cardItem)
+//                detailVC.hidesBottomBarWhenPushed = true
+//                
+//                if let viewController = self.next as? UIViewController {
+//                    viewController.navigationController?.pushViewController(detailVC, animated: true)
+//                }
+//            })
+//            .disposed(by: disposeBag)
     }
 }
 
-//extension ItemSearchView: SwipeCardStackDelegate {
-//    func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
-//        let selectedItem = items[index]
-//        let detailVC = DetailViewController(item: selectedItem)
-//        detailVC.hidesBottomBarWhenPushed = true
-//
-//        if let viewController = self.next as? UIViewController {
-//            viewController.navigationController?.pushViewController(detailVC, animated: true)
-//        }
-//    }
-//    
-//    func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
-//        switch direction {
-//        case .right: break
-//        case .left: break
-//        case .up:
-//            guard DatabaseManager.shared.hasUserLoggedIn() else {
-//                self.window?.rootViewController?.present(LoginViewController(), animated: true) {
-//                    
-//                }
-//                return
-//            }
-//            
-//            self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
-//                                                     animated: true)
-//  
-//        default: print("Undefined swipe action")
-//        }
-//    }
-//    
-//    func cardStack(_ cardStack: SwipeCardStack, didUndoCardAt index: Int, from direction: SwipeDirection) {
-//        
-//    }
-//    
-//    func didSwipeAllCards(_ cardStack: SwipeCardStack) {
-//        itemCardsView.removeFromSuperview()
-//        dimLayer.removeFromSuperlayer()
-//    }
-//    
-//}
+extension ItemSearchView: SwipeCardStackDelegate {
+    func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
+        let selectedItem = items[index]
+        let detailVC = DetailViewController(item: selectedItem)
+        detailVC.hidesBottomBarWhenPushed = true
+
+        if let viewController = self.next as? UIViewController {
+            viewController.navigationController?.pushViewController(detailVC, animated: true)
+        }
+    }
+    
+    func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
+        switch direction {
+        case .right: break
+        case .left: break
+        case .up:
+            guard DatabaseManager.shared.hasUserLoggedIn() else {
+                self.window?.rootViewController?.present(LoginViewController(), animated: true) {
+                    
+                }
+                return
+            }
+            
+            self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
+                                                     animated: true)
+  
+        default: print("Undefined swipe action")
+        }
+    }
+    
+    func cardStack(_ cardStack: SwipeCardStack, didUndoCardAt index: Int, from direction: SwipeDirection) {
+        
+    }
+    
+    func didSwipeAllCards(_ cardStack: SwipeCardStack) {
+        itemCardsView.removeFromSuperview()
+        dimLayer.removeFromSuperlayer()
+    }
+    
+}
 
 extension ItemSearchView: UISearchBarDelegate {
 
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        searchBar.resignFirstResponder() // 키보드 내리기
-//        
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder() // 키보드 내리기
+        
 //        itemSearchViewModel.search()
 //        layer.addSublayer(dimLayer)
 //        addSubview(itemCardsView)
 //        itemCardsView.frame = self.frame
-//        itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
-//        
-//        // TabBar 숨기기
-//        if let viewController = self.next as? UIViewController {
-//            viewController.tabBarController?.tabBar.isHidden = true
-//        }
-//    }
-//    
-//    // 외부 탭 하면 키보드 사라지게 함
-//    private func setupSearchBarTapGesture() {
-//        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-//        tapGesture.delegate = self
-//        self.addGestureRecognizer(tapGesture)
-//    }
-//    
-//    @objc private func handleTap() {
-//        searchBar.resignFirstResponder()
-//    }
-//    
-//    @objc func onTap() {
-//        print("ItemCardsView Tapped")
-//        itemCardsView.removeFromSuperview()
-//        dimLayer.removeFromSuperlayer()
-//        
-//        // TabBar 다시 보이기
-//        if let viewController = self.next as? UIViewController {
-//            viewController.tabBarController?.tabBar.isHidden = false
-//        }
-//    }
+        itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
+        
+        // TabBar 숨기기
+        if let viewController = self.next as? UIViewController {
+            viewController.tabBarController?.tabBar.isHidden = true
+        }
+    }
+    
+    // 외부 탭 하면 키보드 사라지게 함
+    private func setupSearchBarTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        tapGesture.delegate = self
+        self.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func handleTap() {
+        searchBar.resignFirstResponder()
+    }
+    
+    @objc func onTap() {
+        print("ItemCardsView Tapped")
+        itemCardsView.removeFromSuperview()
+        dimLayer.removeFromSuperlayer()
+        
+        // TabBar 다시 보이기
+        if let viewController = self.next as? UIViewController {
+            viewController.tabBarController?.tabBar.isHidden = false
+        }
+    }
 }
 
 extension ItemSearchView: UICollectionViewDelegate {
