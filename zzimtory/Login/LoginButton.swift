@@ -13,7 +13,7 @@ struct ButtonStyle {
     let icon: UIImage?
 }
 
-enum SnsType {
+enum SNS {
     case apple
     case google
     case kakao
@@ -34,7 +34,7 @@ enum SnsType {
 }
 
 final class LoginButton: UIButton {
-    init(type: SnsType) {
+    init(type: SNS) {
         super.init(frame: .zero)
         var config = UIButton.Configuration.filled()
         
