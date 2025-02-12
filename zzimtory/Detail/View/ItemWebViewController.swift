@@ -64,9 +64,10 @@ final class ItemWebViewController: UIViewController {
     private func bind() {
         
         itemWebView.shareButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+            .withLatestFrom(viewModel.itemUrl) // tap 이벤트가 나타날 때마다 viewModel.itemUrl의 가장 최근 값을 방출
+            .subscribe(onNext: { [weak self] urlString in
                 guard let self = self,
-                      let url = URL(string: self.urlString) else { return }
+                      let url = URL(string: urlString) else { return }
                 
                 let shareText = "주머니에서 꺼내왔습니다!!"
                 var shareItems: [Any] = [shareText]
@@ -87,11 +88,7 @@ final class ItemWebViewController: UIViewController {
         viewModel.isInPocket
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
-                let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketIcon"
-                
-                self?.itemWebView.saveButton.setTitle(title, for: .normal)
-                self?.itemWebView.saveButton.setButtonWithCustomImage(imageName: imageName)
+                self?.itemWebView.setSaveButton(isInPocket)
             })
             .disposed(by: disposeBag)
         
@@ -100,7 +97,7 @@ final class ItemWebViewController: UIViewController {
                 guard let self = self else { return }
                 
                 // 로그인 상태 확인
-                guard Auth.auth().currentUser != nil else {
+                guard DatabaseManager.shared.hasUserLoggedIn() else {
                     self.presentLoginView()
                     return
                 }
@@ -125,15 +122,10 @@ final class ItemWebViewController: UIViewController {
     
     private func presentLoginView() {
         let loginVC = LoginViewController()
-        let nav = UINavigationController(rootViewController: loginVC)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
+        navigationController?.pushViewController(loginVC, animated: true)
     }
     
     @objc private func backButtonTapped() {
-        // 모달 닫기
-        // dismiss(animated: true)
-        
         // 화면 전환
         guard let navigationController = self.navigationController else { return }
         navigationController.popViewController(animated: true)

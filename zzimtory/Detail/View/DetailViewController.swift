@@ -82,21 +82,20 @@ final class DetailViewController: UIViewController {
         
         // 웹사이트 버튼 탭 처리
         detailView.websiteButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                guard let self = self,
-                      let url = URL(string: self.viewModel.currentItem.link) else { return }
-                
-                // let webVC = ItemWebViewController(urlString: url.absoluteString, item: self.viewModel.currentItem)
-                let webVC = ItemWebViewController(urlString: url.absoluteString, viewModel: self.viewModel)
+            .withLatestFrom(viewModel.itemUrl) // tap 이벤트가 나타날 때마다 viewModel.itemUrl의 가장 최근 값을 방출
+            .subscribe(onNext: { [weak self] urlString in
+                guard let self = self else { return }
+                let webVC = ItemWebViewController(urlString: urlString, viewModel: self.viewModel)
                 self.navigationController?.pushViewController(webVC, animated: true)
             })
             .disposed(by: disposeBag)
         
         // 공유 버튼 탭 처리
         detailView.shareButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+            .withLatestFrom(viewModel.itemUrl) // tap 이벤트가 나타날 때마다 viewModel.itemUrl의 가장 최근 값을 방출
+            .subscribe(onNext: { [weak self] urlString in
                 guard let self = self,
-                      let url = URL(string: self.viewModel.currentItem.link) else { return }
+                      let url = URL(string: urlString) else { return }
                 
                 let shareText = "주머니에서 꺼내왔습니다!!"
                 var shareItems: [Any] = [shareText]
@@ -117,11 +116,7 @@ final class DetailViewController: UIViewController {
         viewModel.isInPocket
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isInPocket in
-                let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-                let imageName = isInPocket ? "EmptyPocketIcon" : "PocketIcon"
-                
-                self?.detailView.saveButton.setTitle(title, for: .normal)
-                self?.detailView.saveButton.setButtonWithCustomImage(imageName: imageName)
+                self?.detailView.setSaveButton(isInPocket)
             })
             .disposed(by: disposeBag)
 
@@ -130,7 +125,7 @@ final class DetailViewController: UIViewController {
                 guard let self = self else { return }
                 
                 // 로그인 상태 확인
-                guard Auth.auth().currentUser != nil else {
+                guard DatabaseManager.shared.hasUserLoggedIn() else {
                     self.presentLoginView()
                     return
                 }
@@ -155,9 +150,7 @@ final class DetailViewController: UIViewController {
     
     private func presentLoginView() {
         let loginVC = LoginViewController()
-        let nav = UINavigationController(rootViewController: loginVC)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
+        navigationController?.pushViewController(loginVC, animated: true)
     }
 }
 

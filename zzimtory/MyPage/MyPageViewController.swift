@@ -10,17 +10,31 @@ import SnapKit
 
 enum MyPageContents: String {
     case terms = "이용약관"
+    case login = "로그인"
     case logOut = "로그아웃"
     case deleteAccount = "탈퇴하기"
 }
 
 final class MyPageViewController: UIViewController {
+        
+    private var isLoggedIn: Bool {
+        return DatabaseManager.shared.hasUserLoggedIn()
+    }
     
-    private let tableViewContents: [(name: MyPageContents, color: UIColor)] = [
-        (.terms, .black900Zt),
-        (.logOut, .black900Zt),
-        (.deleteAccount, .systemRed)
-    ]
+    private var tableViewContents: [(name: MyPageContents, color: UIColor)] {
+        if isLoggedIn {
+            return [
+                (.terms, .black900Zt),
+                (.logOut, .black900Zt),
+                (.deleteAccount, .systemRed)
+            ]
+        } else {
+            return [
+                (.terms, .black900Zt),
+                (.login, .black900Zt)
+            ]
+        }
+    }
     
     // MARK: - UI Components
     
@@ -38,17 +52,14 @@ final class MyPageViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         
-        DatabaseManager.shared.readUserProfile { [weak self] response in
-            guard let nickname = response?.nickname,
-                  let email = response?.email else { return }
-            self?.userProfileView.setGreeting(for: nickname)
-            self?.userProfileView.setEmailAddress(to: email)
-        }
-        
+        checkUserState()
+        tableView.reloadData()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        userProfileView.delegate = self
         
         view = ZTView(frame: view.frame)
         
@@ -70,8 +81,6 @@ final class MyPageViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.isScrollEnabled = false
-
-        tableView.layer.cornerRadius = 15
     }
     
     private func setConstraints() {
@@ -111,6 +120,15 @@ extension MyPageViewController: UITableViewDataSource {
         cell.textLabel?.textColor = content.color
         cell.backgroundColor = .white100Zt
         
+        // 셀 윗부분 & 아랫부분 radius 처리
+        if indexPath.row == 0 || indexPath.row == tableViewContents.count - 1 {
+            cell.layer.cornerRadius = 15
+            cell.layer.maskedCorners = indexPath.row == 0
+                ? [.layerMinXMinYCorner, .layerMaxXMinYCorner]  // 첫 번째 셀 (왼쪽 위 / 오른쪽 위)
+                : [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]  // 마지막 셀
+            cell.layer.masksToBounds = true
+        }
+        
         return cell
     }
     
@@ -123,6 +141,8 @@ extension MyPageViewController: UITableViewDelegate {
         
         switch selectedContent.name {
         case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
+        case .login:
+            pushToLoginView()
         case .logOut:
             GoogleAuthManager().logout()
             KakaoAuthManager().logout()
@@ -130,8 +150,7 @@ extension MyPageViewController: UITableViewDelegate {
             AppleAuthManager().logout()
             DatabaseManager.shared.logout()
             
-            let loginVC = LoginViewController()
-            navigationController?.pushViewController(loginVC, animated: false)
+            pushToLoginView()
         case .deleteAccount:
             GoogleAuthManager().logout()
             KakaoAuthManager().logout()
@@ -140,9 +159,38 @@ extension MyPageViewController: UITableViewDelegate {
             DatabaseManager.shared.deleteUser()
             DatabaseManager.shared.logout()
             
-            let loginVC = LoginViewController()
-            navigationController?.pushViewController(loginVC, animated: false)
+            pushToLoginView()
         }
-        
+    }
+}
+
+extension MyPageViewController {
+    // 유저 상태에 따른 UserProfileView 설정
+    private func checkUserState() {
+        if isLoggedIn {
+            DatabaseManager.shared.readUserProfile { [weak self] response in
+                guard let nickname = response?.nickname,
+                      let email = response?.email else { return }
+                self?.userProfileView.setGreeting(for: nickname)
+                self?.userProfileView.setEmailAddress(to: email)
+            }
+        } else {
+            userProfileView.setForGuest()
+        }
+    }
+    
+    // 로그인뷰로 이동
+    private func pushToLoginView() {
+        let loginVC = LoginViewController()
+        navigationController?.pushViewController(loginVC, animated: true)
+    }
+}
+
+// MARK: - UserProfileViewDelegate
+extension MyPageViewController: UserProfileViewDelegate {
+    func didTapUserProfile() {
+        guard !isLoggedIn else { return } // 로그인 상태라면 실행 안 함
+        let loginVC = LoginViewController()
+        navigationController?.pushViewController(loginVC, animated: true)
     }
 }
