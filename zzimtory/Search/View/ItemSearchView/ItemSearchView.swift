@@ -21,6 +21,9 @@ final class ItemSearchView: ZTView {
     
     var items: [Item] = []
     
+    private lazy var dimLayerTapRecognizer = UITapGestureRecognizer(target: self,
+                                                               action: #selector(onTap))
+    
     // MARK: - Background layer
     private lazy var dimLayer: CALayer = {
         let layer = CALayer()
@@ -94,7 +97,21 @@ final class ItemSearchView: ZTView {
             make.center.equalToSuperview()
         }
         
+        addGestureRecognizer(dimLayerTapRecognizer)
         
+    }
+    
+    @objc private func onTap() {
+        print("ItemCardsView Tapped")
+        cardStack.removeFromSuperview()
+        dimLayer.removeFromSuperlayer()
+        
+        // TabBar 다시 보이기
+        if let viewController = self.next as? UIViewController {
+            viewController.tabBarController?.tabBar.isHidden = false
+        }
+        
+        removeGestureRecognizer(dimLayerTapRecognizer)
     }
     
 }
@@ -134,8 +151,6 @@ extension ItemSearchView: ViewModelBindable {
                 self.items = items
                 setCardStack()
                 cardStack.reloadData()
-//                itemCardsView.setDelegate(to: self)
-//                itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
             })
             .disposed(by: disposeBag)
         
@@ -193,45 +208,6 @@ extension ItemSearchView: ViewModelBindable {
 //    }
 //    
 //}
-
-extension ItemSearchView: UISearchBarDelegate {
-
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        searchBar.resignFirstResponder() // 키보드 내리기
-//        
-//        layer.addSublayer(dimLayer)
-//        addSubview(itemCardsView)
-//        itemCardsView.frame = self.frame
-//        itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
-//        
-//        // TabBar 숨기기
-//        if let viewController = self.next as? UIViewController {
-//            viewController.tabBarController?.tabBar.isHidden = true
-//        }
-//    }
-    
-    // 외부 탭 하면 키보드 사라지게 함
-    private func setupSearchBarTapGesture() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-        tapGesture.delegate = self
-        self.addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func handleTap() {
-        searchBar.resignFirstResponder()
-    }
-    
-    @objc func onTap() {
-        print("ItemCardsView Tapped")
-//        itemCardsView.removeFromSuperview()
-//        dimLayer.removeFromSuperlayer()
-//        
-        // TabBar 다시 보이기
-        if let viewController = self.next as? UIViewController {
-            viewController.tabBarController?.tabBar.isHidden = false
-        }
-    }
-}
 
 extension ItemSearchView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
