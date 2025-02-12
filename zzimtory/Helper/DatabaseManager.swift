@@ -118,16 +118,19 @@ final class DatabaseManager {
             
             for key in pocketData.keys {
                 guard let pocketInfo = pocketData[key],
-                      let title = pocketInfo["title"] as? String,
-                      let saveDateTimestamp = pocketInfo["saveDate"] as? TimeInterval else { continue }
+                      let title = pocketInfo["title"] as? String else { continue }
                 
                 var items: [Item] = []
+                
                 if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
                     for itemKey in itemsDict.keys {
                         if let itemData = itemsDict[itemKey] {
                             do {
                                 let itemJsonData = try JSONSerialization.data(withJSONObject: itemData)
-                                if let item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
+                                if var item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
+                                    if let saveDate = itemData["saveDate"] as? TimeInterval {
+                                        item.saveDate = Date(timeIntervalSince1970: saveDate / 1000)
+                                    }
                                     items.append(item)
                                 }
                             } catch {
@@ -147,16 +150,29 @@ final class DatabaseManager {
                 }
                 
                 var pocket = Pocket(title: title, items: items)
-                pocket.saveDate = Date(timeIntervalSince1970: saveDateTimestamp / 1000)
+                
+                if let saveDateTimestamp = pocketInfo["saveDate"] as? TimeInterval {
+                    pocket.saveDate = Date(timeIntervalSince1970: saveDateTimestamp / 1000)
+                } else {
+                    pocket.saveDate = nil
+                }
                 pockets.append(pocket)
             }
             
-            pockets.sort { $0.saveDate > $1.saveDate }
+            pockets.sort { pocket1, pocket2 in
+                switch (pocket1.saveDate, pocket2.saveDate) {
+                case (nil, nil): return false
+                case (nil, _): return false
+                case (_, nil): return true
+                case (let date1?, let date2?): return date1 > date2
+                }
+            }
+            
             print("✅ 최종 Pocket 데이터: \(pockets)")
             completion(pockets)
         }
     }
-
+    
     /// 유저 프로필(이메일, 닉네임) 읽어오는 메서드
     func readUserProfile(completion: @escaping ((email: String, nickname: String)?) -> Void) {
         guard let uid = self.userUID else { return }
