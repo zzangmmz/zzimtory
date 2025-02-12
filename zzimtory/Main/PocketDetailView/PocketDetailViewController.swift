@@ -145,6 +145,7 @@ class PocketDetailViewController: UIViewController,
     @objc func moveCancelButtonDidTap() {
         editMode.toggle()
         pocketDetailView?.toggleButtonHidden()
+        pocketDetailView?.itemCollectionView.reloadData()
     }
     
     @objc func seedDeleteButtonDidTap() {

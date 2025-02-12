@@ -34,16 +34,13 @@ class PocketCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray500Zt
         label.textAlignment = .left
-        label.snp.makeConstraints { make in
-            make.height.equalTo(16)
-        }
         return label
     }()
     
     private lazy var titleStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, countLabelOnTitle])
         stackView.axis = .vertical
-        stackView.spacing = 4
+        stackView.spacing = 2
         return stackView
     }()
     
@@ -130,7 +127,7 @@ class PocketCell: UICollectionViewCell {
         
         let imageStackView = UIStackView(arrangedSubviews: [leftImageStackView, rightImageStackView])
         imageStackView.axis = .vertical
-        imageStackView.spacing = 0
+        imageStackView.spacing = 10
         imageStackView.alignment = .fill
         imageStackView.distribution = .fillEqually
         imageStackView.layer.cornerRadius = 15
@@ -154,9 +151,17 @@ class PocketCell: UICollectionViewCell {
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(6)
+            make.leading.equalToSuperview().offset(10)
+            make.top.equalTo(imageStackView.snp.bottom).offset(10)
+            make.bottom.equalTo(imageStackView.snp.bottom).offset(20)
+            make.height.equalTo(18)
         }
         
+        countLabelOnTitle.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(16)
+            make.height.equalTo(16)
+            }
+            
         imageStackView.snp.makeConstraints { make in
             make.height.equalTo(contentView).multipliedBy(0.8)
         }
@@ -166,7 +171,8 @@ class PocketCell: UICollectionViewCell {
         }
         
         singlePocketImageView.snp.makeConstraints { make in
-            make.edges.equalTo(imageStackView)
+            make.edges.equalTo(imageStackView).inset(10)
+            
         }
         
         pocketOverlayView.snp.makeConstraints { make in

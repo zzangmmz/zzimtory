@@ -153,6 +153,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
             PocketCell {
             selectedCell.pocketOverlayView.isHidden = true
             selectedCell.isSelected = true
+            
         }
     }
     
@@ -183,20 +184,33 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     @objc func moveCancelButtonDidTap() {
         editMode.toggle()
         mainView?.toggleButtonHidden()
+        mainView?.collectionView.reloadData()
     }
     
     @objc func pocketDeleteButtonDidTap() {
-        guard let selectedIndexPaths = mainView?.collectionView.indexPathsForSelectedItems else { return }
         
+        guard let selectedIndexPaths = mainView?.collectionView.indexPathsForSelectedItems else { return }
+
         let selectedPockets = selectedIndexPaths.map { viewModel.displayPockets[$0.item] }
         
-        selectedPockets.forEach { pocket in
-            DatabaseManager.shared.deletePocket(title: pocket.title)
+        let alert = UIAlertController(title: "주머니 삭제", message: "주머니를 삭제하시겠습니까?", preferredStyle: .alert)
+
+        let deleteAction = UIAlertAction(title: "네", style: .destructive) { [weak self] _ in
+            selectedPockets.forEach { pocket in
+                DatabaseManager.shared.deletePocket(title: pocket.title)
+            }
+ 
+            self?.bind()
+            self?.editMode = false
+            self?.mainView?.toggleButtonHidden()
         }
-        
-        bind()
-        editMode = false
-        mainView?.toggleButtonHidden()
+
+        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+
+        present(alert, animated: true, completion: nil)
     }
 }
 
