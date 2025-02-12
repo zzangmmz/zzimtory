@@ -11,7 +11,7 @@ import RxSwift
 
 final class ItemCardsView: UIView {
     
-    var items: [Item] = []
+    var items: [Item]
     private let cardStack = SwipeCardStack()
     private let disposeBag = DisposeBag()
     

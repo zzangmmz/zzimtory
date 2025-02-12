@@ -14,7 +14,7 @@ final class ItemSearchView: ZTView {
     private let searchBar = UISearchBar()
     private let itemCollectionView = ItemCollectionView()
     
-    private lazy var itemCardsView = ItemCardsView(with: items)
+    private var itemCardsView = ItemCardsView(with: [])
     
     private let itemSearchViewModel = ItemSearchViewModel()
     private let disposeBag = DisposeBag()
@@ -88,6 +88,7 @@ final class ItemSearchView: ZTView {
 // 자세한 설명은 SearchViewModel+Bindable 참고 바랍니다.
 extension ItemSearchView: ViewModelBindable {
     func bind() {
+        
         let input = ItemSearchViewModel.Input(
             query: searchBar.rx.searchButtonClicked.withLatestFrom(searchBar.rx.text.orEmpty)
         )
@@ -101,6 +102,15 @@ extension ItemSearchView: ViewModelBindable {
             ) { (row, element, cell) in
                 cell.setCell(with: element)
             }
+            .disposed(by: disposeBag)
+        
+        output.searchResult
+            .drive(onNext: { [unowned self] items in
+                self.itemCardsView = ItemCardsView(with: items)
+                self.layer.addSublayer(self.dimLayer)
+                self.addSubview(self.itemCardsView)
+                itemCardsView.frame = self.frame
+            })
             .disposed(by: disposeBag)
     }
 }
