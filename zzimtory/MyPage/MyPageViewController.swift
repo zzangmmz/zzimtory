@@ -9,7 +9,10 @@ import UIKit
 import SnapKit
 
 enum MyPageContents: String {
+    case faq = "자주 묻는 질문"
+    case support = "1:1 문의하기"
     case terms = "이용약관"
+    case versionInfo = "버전 정보"
     case login = "로그인"
     case logOut = "로그아웃"
     case deleteAccount = "탈퇴하기"
