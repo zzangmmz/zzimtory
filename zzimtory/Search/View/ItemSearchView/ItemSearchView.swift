@@ -41,10 +41,8 @@ final class ItemSearchView: ZTView {
         setSearchBar()
         setColletionView()
         setConstraints()
-//        setupSearchBarTapGesture()
         
         bind()
-//        itemCardsView.bind(to: itemSearchViewModel)
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -85,7 +83,6 @@ final class ItemSearchView: ZTView {
     }
     
     private func setCardStack() {
-//        cardStack.dataSource = self
         cardStack.backgroundColor = .clear
         
         layer.addSublayer(dimLayer)
@@ -181,7 +178,9 @@ extension ItemSearchView: ViewModelBindable {
                         return
                     }
                     
-                    self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [swipedCard.item]), animated: true)
+                    let pocketSelectionVC = PocketSelectionViewController(selectedItems: [swipedCard.item])
+                    
+                    self.window?.rootViewController?.present(pocketSelectionVC, animated: true)
                     
                 default: print("Undefined swipe direction")
                 }
@@ -223,38 +222,6 @@ extension ItemSearchView: ViewModelBindable {
             .disposed(by: disposeBag)
     }
 }
-
-//extension ItemSearchView: SwipeCardStackDelegate {
-
-//    func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
-//        switch direction {
-//        case .right: break
-//        case .left: break
-//        case .up:
-//            guard DatabaseManager.shared.hasUserLoggedIn() else {
-//                self.window?.rootViewController?.present(LoginViewController(), animated: true) {
-//                    
-//                }
-//                return
-//            }
-//            
-//            self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
-//                                                     animated: true)
-//  
-//        default: print("Undefined swipe action")
-//        }
-//    }
-//    
-//    func cardStack(_ cardStack: SwipeCardStack, didUndoCardAt index: Int, from direction: SwipeDirection) {
-//        
-//    }
-//    
-//    func didSwipeAllCards(_ cardStack: SwipeCardStack) {
-//        itemCardsView.removeFromSuperview()
-//        dimLayer.removeFromSuperlayer()
-//    }
-//    
-//}
 
 extension ItemSearchView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
@@ -321,35 +288,3 @@ extension ItemSearchView: UIGestureRecognizerDelegate {
         return true
     }
 }
-
-//extension ItemSearchView: SwipeCardStackDataSource {
-//    func makeCard(with item: Item) -> SwipeCard {
-//        let card = SwipeCard()
-//        
-//        card.swipeDirections = [.left, .right, .up]
-//        // TO-DO: card.footer 확인해서 넣을지 결정
-//        card.content = ItemCardContents(item: item)
-//        card.contentMode = .scaleAspectFill
-//        
-//        let leftOverlay = UIView()
-//        leftOverlay.backgroundColor = .clear
-//        
-//        let rightOverlay = UIView()
-//        rightOverlay.backgroundColor = .clear
-//        
-//        let upOverlay = UIView()
-//        upOverlay.backgroundColor = .clear
-//        
-//        card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
-//        
-//        return card
-//    }
-//    
-//    func cardStack(_ cardStack: SwipeCardStack, cardForIndexAt index: Int) -> SwipeCard {
-//        return makeCard(with: items[index])
-//    }
-//    
-//    func numberOfCards(in cardStack: SwipeCardStack) -> Int {
-//        items.count
-//    }
-//}
