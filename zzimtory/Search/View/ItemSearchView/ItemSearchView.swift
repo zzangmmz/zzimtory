@@ -85,7 +85,7 @@ final class ItemSearchView: ZTView {
     }
     
     private func setCardStack() {
-        cardStack.dataSource = self
+//        cardStack.dataSource = self
         cardStack.backgroundColor = .clear
         
         layer.addSublayer(dimLayer)
@@ -194,6 +194,33 @@ extension ItemSearchView: ViewModelBindable {
                 self.dimLayer.removeFromSuperlayer()
             })
             .disposed(by: disposeBag)
+        
+        output.searchResult
+            .do(onNext: { [weak self] _ in
+                self?.setCardStack()
+            })
+            .drive(cardStack.rx.items(with: { item in
+                let card = SwipeCard()
+                
+                card.swipeDirections = [.left, .right, .up]
+                // TO-DO: card.footer 확인해서 넣을지 결정
+                card.content = ItemCardContents(item: item)
+                card.contentMode = .scaleAspectFill
+                
+                let leftOverlay = UIView()
+                leftOverlay.backgroundColor = .clear
+                
+                let rightOverlay = UIView()
+                rightOverlay.backgroundColor = .clear
+                
+                let upOverlay = UIView()
+                upOverlay.backgroundColor = .clear
+                
+                card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
+                
+                return card
+            }))
+            .disposed(by: disposeBag)
     }
 }
 
@@ -295,34 +322,34 @@ extension ItemSearchView: UIGestureRecognizerDelegate {
     }
 }
 
-extension ItemSearchView: SwipeCardStackDataSource {
-    func makeCard(with item: Item) -> SwipeCard {
-        let card = SwipeCard()
-        
-        card.swipeDirections = [.left, .right, .up]
-        // TO-DO: card.footer 확인해서 넣을지 결정
-        card.content = ItemCardContents(item: item)
-        card.contentMode = .scaleAspectFill
-        
-        let leftOverlay = UIView()
-        leftOverlay.backgroundColor = .clear
-        
-        let rightOverlay = UIView()
-        rightOverlay.backgroundColor = .clear
-        
-        let upOverlay = UIView()
-        upOverlay.backgroundColor = .clear
-        
-        card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
-        
-        return card
-    }
-    
-    func cardStack(_ cardStack: SwipeCardStack, cardForIndexAt index: Int) -> SwipeCard {
-        return makeCard(with: items[index])
-    }
-    
-    func numberOfCards(in cardStack: SwipeCardStack) -> Int {
-        items.count
-    }
-}
+//extension ItemSearchView: SwipeCardStackDataSource {
+//    func makeCard(with item: Item) -> SwipeCard {
+//        let card = SwipeCard()
+//        
+//        card.swipeDirections = [.left, .right, .up]
+//        // TO-DO: card.footer 확인해서 넣을지 결정
+//        card.content = ItemCardContents(item: item)
+//        card.contentMode = .scaleAspectFill
+//        
+//        let leftOverlay = UIView()
+//        leftOverlay.backgroundColor = .clear
+//        
+//        let rightOverlay = UIView()
+//        rightOverlay.backgroundColor = .clear
+//        
+//        let upOverlay = UIView()
+//        upOverlay.backgroundColor = .clear
+//        
+//        card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
+//        
+//        return card
+//    }
+//    
+//    func cardStack(_ cardStack: SwipeCardStack, cardForIndexAt index: Int) -> SwipeCard {
+//        return makeCard(with: items[index])
+//    }
+//    
+//    func numberOfCards(in cardStack: SwipeCardStack) -> Int {
+//        items.count
+//    }
+//}
