@@ -1,15 +1,15 @@
 //
-//  DetailView.swift
+//  ItemDetailCollectionViewCell.swift
 //  zzimtory
 //
-//  Created by seohuibaek on 1/24/25.
+//  Created by seohuibaek on 2/12/25.
 //
 
 import UIKit
 import SnapKit
 
-final class DetailView: ZTView {
-    
+final class ItemDetailCollectionViewCell: UICollectionViewCell {
+
     // 유사 상품 데이터 저장 배열
     var similarItems: [Item] = []
     
@@ -54,7 +54,7 @@ final class DetailView: ZTView {
         let button = UIButton()
 
         button.setAsIconButton()
-        button.setButtonWithSystemImage(imageName: ButtonImageConstants.shareButtonImage)
+        button.setButtonWithSystemImage(imageName: "square.and.arrow.up")
         
         return button
     }()
@@ -70,7 +70,7 @@ final class DetailView: ZTView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
-        button.setButtonWithSystemImage(imageName: ButtonImageConstants.websiteButtonImage)
+        button.setButtonWithSystemImage(imageName: "safari")
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -88,7 +88,7 @@ final class DetailView: ZTView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
 
-        button.setButtonWithCustomImage(imageName: ButtonImageConstants.PocketButtonImage)
+        button.setButtonWithCustomImage(imageName: "PocketIcon")
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -198,15 +198,6 @@ final class DetailView: ZTView {
         return stackView
     }()
     
-    // 스크롤뷰
-    private let scrollView: UIScrollView = {
-        let scrollView = UIScrollView()
-        
-        scrollView.showsVerticalScrollIndicator = false
-        
-        return scrollView
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureUI()
@@ -217,23 +208,15 @@ final class DetailView: ZTView {
     }
     
     private func configureUI() {
-        setupScrollView()
         setupTopStackView()
         setupBottomStackView()
     }
     
-    private func setupScrollView() {
-        addSubview(scrollView)
-        scrollView.addSubview(mainStackView)
-        
-        scrollView.snp.makeConstraints { make in
-            make.edges.equalTo(safeAreaLayoutGuide)
-        }
+    private func setupMainStackView() {
+        addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(scrollView)
-            make.bottom.equalTo(scrollView).inset(16)
-            make.width.equalTo(scrollView)
+            make.edges.equalTo(safeAreaLayoutGuide)
         }
     }
     
@@ -295,15 +278,5 @@ final class DetailView: ZTView {
         similarItemCollectionView.snp.makeConstraints { make in
             make.height.equalTo(190)
         }
-    }
-}
-
-extension DetailView {
-    func setSaveButton(_ isInPocket: Bool) {
-        let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
-        let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage
-        
-        saveButton.setTitle(title, for: .normal)
-        saveButton.setButtonWithCustomImage(imageName: imageName)
     }
 }
