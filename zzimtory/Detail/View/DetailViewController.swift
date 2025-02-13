@@ -6,10 +6,8 @@
 //
 
 import UIKit
-import SnapKit
 import RxSwift
 import RxCocoa
-import FirebaseAuth
 
 final class DetailViewController: UIViewController {
     private var detailView = DetailView()
