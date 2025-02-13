@@ -7,8 +7,17 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 final class ItemDetailCollectionViewCell: UICollectionViewCell {
+
+    var disposeBag = DisposeBag()
+
+    // 배경뷰로 사용할 ZTView 프로퍼티 추가
+    private let backgroundZTView: ZTView = {
+        let view = ZTView()
+        return view
+    }()
 
     // 유사 상품 데이터 저장 배열
     var similarItems: [Item] = []
@@ -54,7 +63,7 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         let button = UIButton()
 
         button.setAsIconButton()
-        button.setButtonWithSystemImage(imageName: "square.and.arrow.up")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.shareButtonImage)
         
         return button
     }()
@@ -70,7 +79,7 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
-        button.setButtonWithSystemImage(imageName: "safari")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.websiteButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -87,8 +96,8 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
-
-        button.setButtonWithCustomImage(imageName: "PocketIcon")
+        
+        button.setButtonWithCustomImage(imageName: ButtonImageConstants.PocketButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -200,6 +209,8 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        contentView.backgroundColor = .backgroundGradientBottom
+
         configureUI()
     }
     
@@ -208,12 +219,13 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     }
     
     private func configureUI() {
+        setupMainStackView()
         setupTopStackView()
         setupBottomStackView()
     }
     
     private func setupMainStackView() {
-        addSubview(mainStackView)
+        contentView.addSubview(mainStackView)
         
         mainStackView.snp.makeConstraints { make in
             make.edges.equalTo(safeAreaLayoutGuide)
@@ -278,5 +290,31 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         similarItemCollectionView.snp.makeConstraints { make in
             make.height.equalTo(190)
         }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag() // 이전 구독들을 모두 해제
+    }
+}
+
+extension ItemDetailCollectionViewCell {
+    func setCell(with item: Item) {
+        itemImageView.kf.setImage(with: URL(string: item.image))
+        
+        let brandText = item.brand.isEmpty ? item.mallName : item.brand
+        brandButton.setTitle(brandText, for: .normal)
+        
+        itemNameLabel.text = item.title.removingHTMLTags
+        
+        priceLabel.text = Int(item.price)?.withSeparator
+    }
+    
+    func setSaveButton(_ isInPocket: Bool) {
+        let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
+        let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage
+        
+        saveButton.setTitle(title, for: .normal)
+        saveButton.setButtonWithCustomImage(imageName: imageName)
     }
 }
