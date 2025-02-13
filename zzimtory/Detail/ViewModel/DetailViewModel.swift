@@ -13,9 +13,6 @@ final class DetailViewModel {
     private let disposeBag = DisposeBag()
     private let shoppingRepository = ShoppingRepository()
     
-    // 임시 로그인 상태 변수
-    // static var isLoggedIn: Bool = true
-    
     // Input
     let currentItem: Item // 현재 보여줄 아이템
     private var searchQuery: String = ""
@@ -25,6 +22,7 @@ final class DetailViewModel {
     let itemBrand = BehaviorSubject<String>(value: "")
     let itemPrice = BehaviorSubject<String>(value: "")
     let itemImageUrl = BehaviorSubject<String>(value: "")
+    let itemUrl = BehaviorSubject<String>(value: "")
     let similarItems = BehaviorSubject<[Item]>(value: [])
     
     let isInPocket = BehaviorSubject<Bool>(value: false)
@@ -54,6 +52,8 @@ final class DetailViewModel {
         
         // 이미지 URL 설정
         itemImageUrl.onNext(currentItem.image)
+        
+        itemUrl.onNext(currentItem.link)
     }
     
     // 검색어 설정 메서드
