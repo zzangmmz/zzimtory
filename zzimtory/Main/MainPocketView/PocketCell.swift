@@ -34,6 +34,7 @@ class PocketCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray500Zt
         label.textAlignment = .left
+        label.backgroundColor = .clear
         return label
     }()
     
@@ -41,6 +42,7 @@ class PocketCell: UICollectionViewCell {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, countLabelOnTitle])
         stackView.axis = .vertical
         stackView.spacing = 2
+        stackView.alignment = .fill
         return stackView
     }()
     
@@ -114,7 +116,7 @@ class PocketCell: UICollectionViewCell {
         
         let imageStackView = UIStackView(arrangedSubviews: [leftImageStackView, rightImageStackView])
         imageStackView.axis = .vertical
-        imageStackView.spacing = 10
+        imageStackView.spacing = 0
         imageStackView.alignment = .fill
         imageStackView.distribution = .fillEqually
         imageStackView.layer.cornerRadius = 15
@@ -133,27 +135,16 @@ class PocketCell: UICollectionViewCell {
         contentView.addSubview(pocketOverlayView)
         
         titleImageStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.edges.equalToSuperview().inset(10)
         }
-        
-        titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(10)
-            make.top.equalTo(imageStackView.snp.bottom).offset(10)
-            make.bottom.equalTo(imageStackView.snp.bottom).offset(20)
-            make.height.equalTo(18)
-        }
-        
-        countLabelOnTitle.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(16)
-            make.height.equalTo(16)
-            }
             
         imageStackView.snp.makeConstraints { make in
-            make.height.equalTo(contentView).multipliedBy(0.8)
+            make.height.equalTo(contentView).multipliedBy(0.7)
         }
+
         
         singlePocketImageView.snp.makeConstraints { make in
-            make.edges.equalTo(imageStackView).inset(10)
+            make.edges.equalTo(imageStackView)
             
         }
         
