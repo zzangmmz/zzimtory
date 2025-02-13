@@ -143,7 +143,10 @@ extension MyPageViewController: UITableViewDelegate {
         let selectedContent = tableViewContents[indexPath.item]
         
         switch selectedContent.name {
+        case .faq:
+        case .support:
         case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
+        case .versionInfo:
         case .login:
             pushToLoginView()
         case .logOut:
