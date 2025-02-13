@@ -90,6 +90,11 @@ final class MyPageViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.isScrollEnabled = false
+        tableView.showsVerticalScrollIndicator = false
+        tableView.showsHorizontalScrollIndicator = false
+        tableView.separatorInset = .zero
+        
+        tableView.layoutIfNeeded()
     }
     
     private func setConstraints() {
@@ -108,7 +113,7 @@ final class MyPageViewController: UIViewController {
         tableView.snp.makeConstraints { make in
             make.top.equalTo(userProfileView.snp.bottom).offset(24)
             make.horizontalEdges.equalToSuperview().inset(24)
-            make.bottom.equalTo(userProfileView.snp.bottom).offset(158)
+            make.height.equalTo(tableView.contentSize.height).priority(.low)
         }
         
     }
@@ -128,6 +133,11 @@ extension MyPageViewController: UITableViewDataSource {
         cell.textLabel?.text = content.name.rawValue
         cell.textLabel?.textColor = content.color
         cell.backgroundColor = .white100Zt
+        
+        // 마지막 셀만 separator 없애기
+        if indexPath.row == tableViewContents.count - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        }
         
         // 셀 윗부분 & 아랫부분 radius 처리
         if indexPath.row == 0 || indexPath.row == tableViewContents.count - 1 {
@@ -150,9 +160,12 @@ extension MyPageViewController: UITableViewDelegate {
         
         switch selectedContent.name {
         case .faq:
+            break
         case .support:
+            break
         case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
         case .versionInfo:
+            break
         case .login:
             pushToLoginView()
         case .logOut:
@@ -174,6 +187,15 @@ extension MyPageViewController: UITableViewDelegate {
             pushToLoginView()
         }
     }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 45
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 45
+    }
+
 }
 
 extension MyPageViewController {
