@@ -27,13 +27,19 @@ final class MyPageViewController: UIViewController {
     private var tableViewContents: [(name: MyPageContents, color: UIColor)] {
         if isLoggedIn {
             return [
+                (.faq, .black900Zt),
+                (.support, .black900Zt),
                 (.terms, .black900Zt),
+                (.versionInfo, .black900Zt),
                 (.logOut, .black900Zt),
                 (.deleteAccount, .systemRed)
             ]
         } else {
             return [
+                (.faq, .black900Zt),
+                (.support, .black900Zt),
                 (.terms, .black900Zt),
+                (.versionInfo, .black900Zt),
                 (.login, .black900Zt)
             ]
         }
