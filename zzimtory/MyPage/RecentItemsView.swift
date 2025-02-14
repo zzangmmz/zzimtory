@@ -30,16 +30,18 @@ final class RecentItemsView: UIView {
         return collectionView
     }()
     
-    private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, collectionView])
-        stackView.axis = .vertical
-        stackView.spacing = 10
-        return stackView
+    private let placeHolder: UILabel = {
+        let label = UILabel()
+        label.text = "최근 본 상품이 없습니다."
+        label.textColor = .gray300Zt
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         setupUI()
     }
     
@@ -51,10 +53,33 @@ final class RecentItemsView: UIView {
         self.layer.cornerRadius = 15
         self.backgroundColor = .white100Zt
         
-        self.addSubview(stackView)
+        [
+            titleLabel,
+            collectionView,
+            placeHolder
+        ].forEach { self.addSubview($0) }
         
-        stackView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(20)
+        titleLabel.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.top.equalToSuperview().inset(20)
+            $0.height.equalTo(24)
         }
+        
+        collectionView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(10)
+            $0.bottom.equalToSuperview().inset(20)
+        }
+        
+        placeHolder.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(10)
+            $0.bottom.equalToSuperview().inset(20)
+        }
+    }
+    
+    func togglePlaceHolder(with noItems: Bool) {
+        self.placeHolder.isHidden = !noItems
+        self.collectionView.isHidden = noItems
     }
 }
