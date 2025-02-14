@@ -138,6 +138,7 @@ extension ItemSearchView: ViewModelBindable {
         
         let output = itemSearchViewModel.transform(input: input)
         
+        // 검색 결과값 CollectionView에 바인딩
         output.searchResult
             .drive(itemCollectionView.rx.items(
                 cellIdentifier: String(describing: ItemCollectionViewCell.self),
@@ -147,6 +148,7 @@ extension ItemSearchView: ViewModelBindable {
             }
             .disposed(by: disposeBag)
         
+        // 검색 결과를 CardStack으로 표시해주는 코드
         output.searchResult
             .do(onNext: { [weak self] _ in
                 self?.setCardStack()
@@ -170,10 +172,13 @@ extension ItemSearchView: ViewModelBindable {
                 
                 card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
                 
+                card.layer.cornerRadius = 8
+                
                 return card
             }))
             .disposed(by: disposeBag)
         
+        // 카드 선택 시 아이템 상세화면 표시
         output.selectedCard
             .drive(onNext: { cardItem in
                 
@@ -186,6 +191,7 @@ extension ItemSearchView: ViewModelBindable {
             })
             .disposed(by: disposeBag)
         
+        // 카드 스와이프 제스쳐 지정
         output.swipedCard
             .drive(onNext: { [weak self] swipedCard in
                 switch swipedCard.direction {
@@ -207,6 +213,7 @@ extension ItemSearchView: ViewModelBindable {
             })
             .disposed(by: disposeBag)
         
+        // 모든 카드 스와이프 완료
         output.swipedAllCards
             .drive(onNext: { [unowned self] in
                 cardStack.removeFromSuperview()
@@ -215,6 +222,7 @@ extension ItemSearchView: ViewModelBindable {
             })
             .disposed(by: disposeBag)
         
+        // CollectionView에서 셀 선택 시 동작
         output.selectedCell
             .drive(onNext: { item in
                 let detailVC = DetailViewController(item: item)
@@ -250,16 +258,7 @@ extension ItemSearchView: UICollectionViewDelegate {
         
         return UICollectionReusableView()
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let selectedItem = items[indexPath.item]
-//        let detailVC = DetailViewController(item: selectedItem)
-//        detailVC.hidesBottomBarWhenPushed = true
-//
-//        if let viewController = self.next as? UIViewController {
-//            viewController.navigationController?.pushViewController(detailVC, animated: true)
-//        }
-//    }
+
 }
 
 extension ItemSearchView: UICollectionViewDelegateFlowLayout {
