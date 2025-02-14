@@ -55,6 +55,20 @@ final class MyPageViewController: UIViewController {
     }()
     
     private let userProfileView = UserProfileView()
+    
+    private var recentItems: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 100, height: 100)
+        layout.minimumLineSpacing = 10
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .white100Zt
+        
+        collectionView.register(RecentItemCell.self, forCellWithReuseIdentifier: String(describing: RecentItemCell.self))
+        return collectionView
+    }()
+    
     private let tableView = UITableView(frame: .zero, style: .plain)
     
     override func viewWillAppear(_ animated: Bool) {
@@ -73,6 +87,7 @@ final class MyPageViewController: UIViewController {
         view = ZTView(frame: view.frame)
         
         addComponents()
+        setCollectionView()
         setTableView()
         setConstraints()
     }
@@ -83,6 +98,12 @@ final class MyPageViewController: UIViewController {
             userProfileView,
             tableView
         ].forEach { view.addSubview($0) }
+    }
+    
+    private func setCollectionView() {
+        recentItems.delegate = self
+        recentItems.dataSource = self
+        recentItems.showsHorizontalScrollIndicator = false
     }
     
     private func setTableView() {
@@ -226,5 +247,20 @@ extension MyPageViewController: UserProfileViewDelegate {
         guard !isLoggedIn else { return } // 로그인 상태라면 실행 안 함
         let loginVC = LoginViewController()
         navigationController?.pushViewController(loginVC, animated: true)
+    }
+}
+
+// 뷰모델 생성 후 수정 필요
+extension MyPageViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: RecentItemCell.self), for: indexPath) as? RecentItemCell else {
+            return UICollectionViewCell()
+        }
+        
+        return cell
     }
 }
