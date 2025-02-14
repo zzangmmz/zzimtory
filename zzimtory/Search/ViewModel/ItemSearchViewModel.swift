@@ -39,24 +39,24 @@ final class ItemSearchViewModel {
     func transform(input: Input) -> Output {
         let searchResult = input.query
             .withUnretained(self)
-            .flatMap { vm, query -> Observable<[Item]> in
-                let fetchedItems = vm.shoppingRepository.fetchForViewModel(with: query)
-                vm.currentItems = fetchedItems
+            .flatMap { viewModel, query -> Observable<[Item]> in
+                let fetchedItems = viewModel.shoppingRepository.fetchForViewModel(with: query)
+                viewModel.currentItems = fetchedItems
                 return fetchedItems
             }
             .asDriver(onErrorDriveWith: .empty())
         
         let selectedCard = input.didSelectCard
             .withUnretained(self)
-            .flatMap { vm, index -> Observable<Item> in
-                return vm.currentItems.compactMap { $0[index] }
+            .flatMap { viewModel, index -> Observable<Item> in
+                return viewModel.currentItems.compactMap { $0[index] }
             }
             .asDriver(onErrorDriveWith: .empty())
         
         let swipedCard = input.didSwipeCard
             .withUnretained(self)
-            .flatMap { vm, didSwipeCardAt -> Observable<SwipedCard> in
-                let observableItem = vm.currentItems.compactMap { $0[didSwipeCardAt.0] }
+            .flatMap { viewModel, didSwipeCardAt -> Observable<SwipedCard> in
+                let observableItem = viewModel.currentItems.compactMap { $0[didSwipeCardAt.0] }
                 
                 let swipedCard = observableItem
                     .map { SwipedCard(item: $0, direction: didSwipeCardAt.1)}
