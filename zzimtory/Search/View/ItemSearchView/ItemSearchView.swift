@@ -113,9 +113,8 @@ final class ItemSearchView: ZTView {
     
 }
 
-// ItemSearchView를 ViewModel에 바인딩해주기 위한 프로토콜 적용입니다.
-// 자세한 설명은 SearchViewModel+Bindable 참고 바랍니다.
-extension ItemSearchView: ViewModelBindable {
+// MARK: - View/ViewModel 바인딩
+extension ItemSearchView {
     func bind() {
         
         let input = ItemSearchViewModel.Input(
