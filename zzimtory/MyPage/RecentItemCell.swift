@@ -36,7 +36,9 @@ final class RecentItemCell: UICollectionViewCell {
     }
     
     func configure(with item: Item) {
-        guard let url = URL(string: item.image) else { return }
+        guard let url = URL(string: item.image) else {
+            self.itemImage.image = UIImage(named: "EmptyPocketIcon")
+            return }
         self.itemImage.kf.setImage(with: url)
     }
 }
