@@ -131,7 +131,7 @@ final class MyPageViewController: UIViewController {
         recentItemsView.snp.makeConstraints { make in
             make.top.equalTo(userProfileView.snp.bottom).offset(24)
             make.horizontalEdges.equalToSuperview().inset(24)
-            make.height.equalTo(74)
+            make.height.equalTo(140)
         }
         
         tableView.snp.makeConstraints { make in
@@ -235,6 +235,7 @@ extension MyPageViewController {
         } else {
             userProfileView.setForGuest()
         }
+        recentItemsView.togglePlaceHolder(with: viewModel.recentItems.isEmpty)
     }
     
     // 로그인뷰로 이동
