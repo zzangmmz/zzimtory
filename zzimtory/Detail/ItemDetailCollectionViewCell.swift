@@ -10,14 +10,7 @@ import SnapKit
 import RxSwift
 
 final class ItemDetailCollectionViewCell: UICollectionViewCell {
-
     var disposeBag = DisposeBag()
-
-    // 배경뷰로 사용할 ZTView 프로퍼티 추가
-    private let backgroundZTView: ZTView = {
-        let view = ZTView()
-        return view
-    }()
 
     // 유사 상품 데이터 저장 배열
     var similarItems: [Item] = []
@@ -131,6 +124,12 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: 150, height: 190)
+//        let cellHeight = UIScreen.main.bounds.height * 0.18
+//        let aspectRatio: CGFloat = 150.0 / 190.0
+//        let cellWidth = cellHeight * aspectRatio
+//        
+//        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+        
         layout.minimumLineSpacing = 10
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -207,10 +206,18 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
+    // 스크롤뷰
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        
+        scrollView.showsVerticalScrollIndicator = false
+        
+        return scrollView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .backgroundGradientBottom
-
+        scrollView.setContentOffset(.zero, animated: false)
         configureUI()
     }
     
@@ -219,23 +226,41 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     }
     
     private func configureUI() {
-        setupMainStackView()
+        // setupMainStackView()
+        setupScrollView()
         setupTopStackView()
         setupBottomStackView()
     }
     
-    private func setupMainStackView() {
-        contentView.addSubview(mainStackView)
+    private func setupScrollView() {
+        addSubview(scrollView)
+        scrollView.addSubview(mainStackView)
         
-        mainStackView.snp.makeConstraints { make in
+        scrollView.snp.makeConstraints { make in
             make.edges.equalTo(safeAreaLayoutGuide)
         }
+        
+        mainStackView.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalTo(scrollView)
+            make.bottom.equalTo(scrollView).inset(16)
+            make.width.equalTo(scrollView)
+        }
     }
+    
+//    private func setupMainStackView() {
+//        contentView.addSubview(mainStackView)
+//        
+//        mainStackView.snp.makeConstraints { make in
+////            make.horizontalEdges.top.equalToSuperview()
+////            make.bottom.equalToSuperview().offset(-30)
+//            make.edges.equalToSuperview()
+//        }
+//    }
     
     // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
     private func setupTopStackView() {
         topStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
+            make.top.equalToSuperview()/*.offset(16)*/
             make.leading.trailing.equalToSuperview()
         }
         
@@ -294,7 +319,8 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        disposeBag = DisposeBag() // 이전 구독들을 모두 해제
+        scrollView.setContentOffset(.zero, animated: false)
+        disposeBag = DisposeBag()
     }
 }
 
