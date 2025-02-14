@@ -19,7 +19,9 @@ enum MyPageContents: String {
 }
 
 final class MyPageViewController: UIViewController {
-        
+    
+    private let viewModel = MyPageViewModel()
+    
     private var isLoggedIn: Bool {
         return DatabaseManager.shared.hasUserLoggedIn()
     }
@@ -55,20 +57,7 @@ final class MyPageViewController: UIViewController {
     }()
     
     private let userProfileView = UserProfileView()
-    
-    private var recentItems: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 100, height: 100)
-        layout.minimumLineSpacing = 10
-        
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white100Zt
-        
-        collectionView.register(RecentItemCell.self, forCellWithReuseIdentifier: String(describing: RecentItemCell.self))
-        return collectionView
-    }()
-    
+    private var recentItemsView = RecentItemsView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     
     override func viewWillAppear(_ animated: Bool) {
@@ -76,7 +65,14 @@ final class MyPageViewController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: animated)
         
         checkUserState()
+        loadRecentItems()
         tableView.reloadData()
+    }
+    
+    private func loadRecentItems() {
+        // 뷰모델에서 유저디폴트로 아이템 받아오기
+        viewModel.loadItems()
+        recentItemsView.collectionView.reloadData()
     }
     
     override func viewDidLoad() {
@@ -95,15 +91,16 @@ final class MyPageViewController: UIViewController {
     private func addComponents() {
         [
             logoImageView,
+            recentItemsView,
             userProfileView,
             tableView
         ].forEach { view.addSubview($0) }
     }
     
     private func setCollectionView() {
-        recentItems.delegate = self
-        recentItems.dataSource = self
-        recentItems.showsHorizontalScrollIndicator = false
+        recentItemsView.collectionView.delegate = self
+        recentItemsView.collectionView.dataSource = self
+        recentItemsView.collectionView.showsHorizontalScrollIndicator = false
     }
     
     private func setTableView() {
@@ -131,8 +128,14 @@ final class MyPageViewController: UIViewController {
             make.height.equalTo(74)
         }
         
-        tableView.snp.makeConstraints { make in
+        recentItemsView.snp.makeConstraints { make in
             make.top.equalTo(userProfileView.snp.bottom).offset(24)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(74)
+        }
+        
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(recentItemsView.snp.bottom).offset(24)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(tableView.contentSize.height).priority(.low)
         }
@@ -164,8 +167,8 @@ extension MyPageViewController: UITableViewDataSource {
         if indexPath.row == 0 || indexPath.row == tableViewContents.count - 1 {
             cell.layer.cornerRadius = 15
             cell.layer.maskedCorners = indexPath.row == 0
-                ? [.layerMinXMinYCorner, .layerMaxXMinYCorner]  // 첫 번째 셀 (왼쪽 위 / 오른쪽 위)
-                : [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]  // 마지막 셀
+            ? [.layerMinXMinYCorner, .layerMaxXMinYCorner]  // 첫 번째 셀 (왼쪽 위 / 오른쪽 위)
+            : [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]  // 마지막 셀
             cell.layer.masksToBounds = true
         }
         
@@ -216,7 +219,7 @@ extension MyPageViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 45
     }
-
+    
 }
 
 extension MyPageViewController {
@@ -250,17 +253,22 @@ extension MyPageViewController: UserProfileViewDelegate {
     }
 }
 
-// 뷰모델 생성 후 수정 필요
 extension MyPageViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return viewModel.recentItems.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: RecentItemCell.self), for: indexPath) as? RecentItemCell else {
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: String(describing: RecentItemCell.self),
+            for: indexPath
+        ) as? RecentItemCell else {
             return UICollectionViewCell()
         }
         
+        let item = viewModel.recentItems[indexPath.item]
+        cell.configure(with: item)
         return cell
     }
 }
