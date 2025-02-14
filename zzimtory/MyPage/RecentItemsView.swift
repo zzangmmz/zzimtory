@@ -78,8 +78,13 @@ final class RecentItemsView: UIView {
         }
     }
     
-    func togglePlaceHolder(with noItems: Bool) {
-        self.placeHolder.isHidden = !noItems
-        self.collectionView.isHidden = noItems
+    func showPlaceHolderLabel() {
+        self.placeHolder.isHidden = false
+        self.collectionView.isHidden = true
+    }
+    
+    func hidePlaceHolderLabel() {
+        self.placeHolder.isHidden = true
+        self.collectionView.isHidden = false
     }
 }
