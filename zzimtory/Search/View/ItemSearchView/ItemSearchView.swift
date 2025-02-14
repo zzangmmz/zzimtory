@@ -12,6 +12,7 @@ import RxCocoa
 final class ItemSearchView: ZTView {
     
     private let searchBar = UISearchBar()
+    private let searchHistory = UITableView()
     private let itemCollectionView = ItemCollectionView()
     
     private let cardStack = SwipeCardStack()
@@ -38,7 +39,9 @@ final class ItemSearchView: ZTView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        addComponents()
         setSearchBar()
+        setSearchHistory()
         setColletionView()
         setConstraints()
         
@@ -50,22 +53,39 @@ final class ItemSearchView: ZTView {
     }
     
     // MARK: - Private functions
+    private func addComponents() {
+        [
+            searchBar,
+            searchHistory,
+            itemCollectionView
+        ].forEach { addSubview($0) }
+    }
+    
     private func setSearchBar() {
         searchBar.placeholder = "검색"
 
         searchBar.searchTextField.backgroundColor = .white100Zt
         searchBar.searchBarStyle = .minimal
         
-        addSubview(searchBar)
-        
         searchBar.rx.searchButtonClicked.subscribe(onNext: { [unowned self] in
-            searchBar.resignFirstResponder() // 키보드 내리기
+            // 키보드 내리기
+            searchBar.resignFirstResponder()
+            
+            // 검색 기록 숨기기
+            
             
             // TabBar 숨기기
             if let viewController = self.next as? UIViewController {
                 viewController.tabBarController?.tabBar.isHidden = true
             }
         }).disposed(by: disposeBag)
+    }
+    
+    private func setSearchHistory() {
+        searchHistory.backgroundColor = .clear
+        
+        searchHistory.register(ItemSearchHistoryTableCell.self,
+                               forCellReuseIdentifier: String(describing: ItemSearchHistoryTableCell.self))
     }
     
     private func setColletionView() {
@@ -76,13 +96,17 @@ final class ItemSearchView: ZTView {
         itemCollectionView.register(ItemCollectionViewHeader.self,
                                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                     withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
-        
-        addSubview(itemCollectionView)
     }
     
     private func setConstraints() {
         searchBar.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(safeAreaLayoutGuide)
+        }
+        
+        searchHistory.snp.makeConstraints { make in
+            make.top.equalTo(searchBar.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview().inset(12)
         }
         
         itemCollectionView.snp.makeConstraints { make in
@@ -232,6 +256,15 @@ extension ItemSearchView {
                     viewController.navigationController?.pushViewController(detailVC, animated: true)
                 }
             })
+            .disposed(by: disposeBag)
+        
+        // MARK: -
+        output.searchHistory
+            .drive(searchHistory.rx.items(cellIdentifier: String(describing: ItemSearchHistoryTableCell.self),
+                                          cellType: ItemSearchHistoryTableCell.self)
+            ) { row, element, cell in
+                cell.setCell(with: element)
+            }
             .disposed(by: disposeBag)
     }
 }
