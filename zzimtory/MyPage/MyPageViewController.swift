@@ -140,6 +140,18 @@ final class MyPageViewController: UIViewController {
         
     }
     
+    private func showAlert(title: String, completion: @escaping () -> ()) {
+        let alert = UIAlertController(title: title,
+                                      message: nil,
+                                      preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "확인", style: .destructive) { _ in
+            completion()
+        })
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+        present(alert, animated: true)
+    }
+    
 }
 
 extension MyPageViewController: UITableViewDataSource {
@@ -199,22 +211,26 @@ extension MyPageViewController: UITableViewDelegate {
         case .login:
             pushToLoginView()
         case .logOut:
-            GoogleAuthManager().logout()
-            KakaoAuthManager().logout()
-            NaverAuthManager().logout()
-            AppleAuthManager().logout()
-            DatabaseManager.shared.logout()
-            
-            pushToLoginView()
+            showAlert(title: "로그아웃 하시겠습니까?") { [weak self] in
+                GoogleAuthManager().logout()
+                KakaoAuthManager().logout()
+                NaverAuthManager().logout()
+                AppleAuthManager().logout()
+                DatabaseManager.shared.logout()
+                
+                self?.pushToLoginView()
+            }
         case .deleteAccount:
-            GoogleAuthManager().logout()
-            KakaoAuthManager().logout()
-            NaverAuthManager().logout()
-            AppleAuthManager().logout()
-            DatabaseManager.shared.deleteUser()
-            DatabaseManager.shared.logout()
-            
-            pushToLoginView()
+            showAlert(title: "탈퇴 하시겠습니까?") { [weak self] in
+                GoogleAuthManager().logout()
+                KakaoAuthManager().logout()
+                NaverAuthManager().logout()
+                AppleAuthManager().logout()
+                DatabaseManager.shared.deleteUser()
+                DatabaseManager.shared.logout()
+                
+                self?.pushToLoginView()
+            }
         }
     }
     
