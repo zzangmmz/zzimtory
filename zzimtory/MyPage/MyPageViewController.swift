@@ -68,8 +68,14 @@ final class MyPageViewController: UIViewController {
     }
     
     private func loadRecentItems() {
-        // 뷰모델에서 유저디폴트로 아이템 받아오기
         viewModel.loadItems()
+        
+        if viewModel.recentItems.isEmpty {
+            recentItemsView.showPlaceHolderLabel()
+        } else {
+            recentItemsView.hidePlaceHolderLabel()
+        }
+        
         recentItemsView.collectionView.reloadData()
     }
     
@@ -257,7 +263,6 @@ extension MyPageViewController {
         } else {
             userProfileView.setForGuest()
         }
-        recentItemsView.togglePlaceHolder(with: viewModel.recentItems.isEmpty)
     }
     
     // 로그인뷰로 이동
