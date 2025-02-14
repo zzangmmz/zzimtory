@@ -123,7 +123,8 @@ extension ItemSearchView: ViewModelBindable {
                 .withLatestFrom(searchBar.rx.text.orEmpty),
             didSelectCard: cardStack.rx.didSelectCardAt,
             didSwipeCard: cardStack.rx.didSwipeCardAt,
-            didSwipeAllCards: cardStack.rx.didSwipeAllCards
+            didSwipeAllCards: cardStack.rx.didSwipeAllCards,
+            didSelectItemAt: itemCollectionView.rx.itemSelected
         )
         
         searchBar.rx.searchButtonClicked.subscribe(onNext: { [unowned self] in
@@ -144,54 +145,6 @@ extension ItemSearchView: ViewModelBindable {
             ) { (row, element, cell) in
                 cell.setCell(with: element)
             }
-            .disposed(by: disposeBag)
-        
-        output.searchResult
-            .drive(onNext: { [unowned self] items in
-                self.items = items
-                setCardStack()
-                cardStack.reloadData()
-            })
-            .disposed(by: disposeBag)
-        
-        output.selectedCard
-            .drive(onNext: { cardItem in
-                
-                let detailVC = DetailViewController(item: cardItem)
-                detailVC.hidesBottomBarWhenPushed = true
-                
-                if let viewController = self.next as? UIViewController {
-                    viewController.navigationController?.pushViewController(detailVC, animated: true)
-                }
-            })
-            .disposed(by: disposeBag)
-        
-        output.swipedCard
-            .drive(onNext: { [unowned self] swipedCard in
-                switch swipedCard.direction {
-                case .right: break
-                case .left: break
-                case .up:
-                    guard DatabaseManager.shared.hasUserLoggedIn() else {
-                        self.window?.rootViewController?.present(LoginViewController(),
-                                                                 animated: true)
-                        return
-                    }
-                    
-                    let pocketSelectionVC = PocketSelectionViewController(selectedItems: [swipedCard.item])
-                    
-                    self.window?.rootViewController?.present(pocketSelectionVC, animated: true)
-                    
-                default: print("Undefined swipe direction")
-                }
-            })
-            .disposed(by: disposeBag)
-        
-        output.swipedAllCards
-            .drive(onNext: { [unowned self] in
-                self.cardStack.removeFromSuperview()
-                self.dimLayer.removeFromSuperlayer()
-            })
             .disposed(by: disposeBag)
         
         output.searchResult
@@ -219,6 +172,58 @@ extension ItemSearchView: ViewModelBindable {
                 
                 return card
             }))
+            .disposed(by: disposeBag)
+        
+        output.selectedCard
+            .drive(onNext: { cardItem in
+                
+                let detailVC = DetailViewController(item: cardItem)
+                detailVC.hidesBottomBarWhenPushed = true
+                
+                if let viewController = self.next as? UIViewController {
+                    viewController.navigationController?.pushViewController(detailVC, animated: true)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.swipedCard
+            .drive(onNext: { [weak self] swipedCard in
+                switch swipedCard.direction {
+                case .right: break
+                case .left: break
+                case .up:
+                    guard DatabaseManager.shared.hasUserLoggedIn() else {
+                        self?.window?.rootViewController?.present(LoginViewController(),
+                                                                 animated: true)
+                        return
+                    }
+                    
+                    let pocketSelectionVC = PocketSelectionViewController(selectedItems: [swipedCard.item])
+                    
+                    self?.window?.rootViewController?.present(pocketSelectionVC, animated: true)
+                    
+                default: print("Undefined swipe direction")
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.swipedAllCards
+            .drive(onNext: { [unowned self] in
+                cardStack.removeFromSuperview()
+                dimLayer.removeFromSuperlayer()
+                removeGestureRecognizer(dimLayerTapRecognizer)
+            })
+            .disposed(by: disposeBag)
+        
+        output.selectedCell
+            .drive(onNext: { item in
+                let detailVC = DetailViewController(item: item)
+                detailVC.hidesBottomBarWhenPushed = true
+                
+                if let viewController = self.next as? UIViewController {
+                    viewController.navigationController?.pushViewController(detailVC, animated: true)
+                }
+            })
             .disposed(by: disposeBag)
     }
 }

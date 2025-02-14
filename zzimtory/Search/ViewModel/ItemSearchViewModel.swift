@@ -22,6 +22,7 @@ final class ItemSearchViewModel {
         var didSelectCard: Observable<Int>
         var didSwipeCard: Observable<(Int, SwipeDirection)>
         var didSwipeAllCards: Observable<Void>
+        var didSelectItemAt: ControlEvent<IndexPath>
     }
     
     struct Output {
@@ -29,6 +30,7 @@ final class ItemSearchViewModel {
         let selectedCard: Driver<Item>
         let swipedCard: Driver<SwipedCard>
         let swipedAllCards: Driver<Void>
+        let selectedCell: Driver<Item>
     }
     
     struct SwipedCard {
@@ -68,10 +70,18 @@ final class ItemSearchViewModel {
         let swipedAllCards = input.didSwipeAllCards
             .asDriver(onErrorJustReturn: ())
         
+        let selectedCell = input.didSelectItemAt
+            .withUnretained(self)
+            .flatMap { viewModel, indexPath -> Observable<Item> in
+                return viewModel.currentItems.compactMap { $0[indexPath.item] }
+            }
+            .asDriver(onErrorDriveWith: .empty())
+        
         let output = Output(searchResult: searchResult,
                             selectedCard: selectedCard,
                             swipedCard: swipedCard,
-                            swipedAllCards: swipedAllCards
+                            swipedAllCards: swipedAllCards,
+                            selectedCell: selectedCell
         )
         
         return output
