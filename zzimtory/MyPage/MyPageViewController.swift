@@ -192,7 +192,7 @@ extension MyPageViewController: UITableViewDelegate {
         
         switch selectedContent.name {
         case .support:
-            break
+            showEmailComposer()
         case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
         case .versionInfo:
             break
@@ -285,5 +285,33 @@ extension MyPageViewController:  MFMailComposeViewControllerDelegate {
                                didFinishWith result: MFMailComposeResult,
                                error: Error?) {
         controller.dismiss(animated: true, completion: nil)
+    }
+    
+    private func showEmailComposer() {
+        if MFMailComposeViewController.canSendMail() {
+            let composer = MFMailComposeViewController()
+            composer.mailComposeDelegate = self
+            composer.setToRecipients(["zzimtory@gmail.com"])
+            composer.setSubject("[찜토리] 1:1 문의")
+            
+            let messageBody = """
+                앱 버전: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")
+                기기: \(UIDevice.current.model)
+                iOS 버전: \(UIDevice.current.systemVersion)
+                
+                문의 내용:
+                
+                """
+            composer.setMessageBody(messageBody, isHTML: false)
+            
+            present(composer, animated: true)
+        } else {
+            let alert = UIAlertController(title: "메일 전송 실패",
+                                          message: "메일을 보낼 수 없습니다. 메일 계정이 등록되어 있는지 확인해 주세요.",
+                                          preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "확인", style: .default))
+            present(alert, animated: true)
+        }
     }
 }
