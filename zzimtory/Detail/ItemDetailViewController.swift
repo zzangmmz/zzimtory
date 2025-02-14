@@ -9,17 +9,31 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class ItemDetailViewController: UIViewController {
-    
-    private var itemDetailCollectionView: UICollectionView!
+final class ItemDetailViewController: ZTViewController {
+
     private let viewModel: ItemDetailViewModel
     private let disposeBag = DisposeBag()
     private let items: [Item]    // 전체 아이템 배열
     private let currentIndex: Int // 현재 아이템의 인덱스
     
-    // ZTView를 배경으로 추가
-    private let backgroundView = ZTView()
+    private var itemDetailCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 0
     
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        
+        collectionView.backgroundColor = .clear
+        collectionView.showsVerticalScrollIndicator = false
+        
+        collectionView.isPagingEnabled = true
+        
+        collectionView.register(ItemDetailCollectionViewCell.self, forCellWithReuseIdentifier: "ItemDetailCollectionViewCell")
+        
+        return collectionView
+    }()
+
     init(items: [Item], currentIndex: Int) {
         self.items = items
         self.currentIndex = currentIndex
@@ -35,42 +49,25 @@ final class ItemDetailViewController: UIViewController {
         super.viewDidLoad()
         navigationController?.navigationBar.isHidden = false
         
-        setupUI()
         setupNavigationBar()
         setupCollectionView()
         bind()
     }
     
-    private func setupUI() {
-        // 기존의 view를 backgroundZTView로 변경
-        // view = backgroundView
-        //        backgroundView.frame = view.bounds
-        //
-        //        view.addSubview(backgroundView)
-        //        backgroundView.snp.makeConstraints { make in
-        //            make.edges.equalToSuperview()
-        //        }
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if let layout = itemDetailCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            layout.itemSize = itemDetailCollectionView.bounds.size
+        }
     }
-    
+
     private func setupCollectionView() {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        layout.minimumLineSpacing = 0
-        
-        itemDetailCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        // itemDetailCollectionView.contentInsetAdjustmentBehavior = .always
-        itemDetailCollectionView.isPagingEnabled = true
-        itemDetailCollectionView.register(ItemDetailCollectionViewCell.self, forCellWithReuseIdentifier: "ItemDetailCollectionViewCell")
-        
-        // ZTView를 컬렉션 뷰의 배경으로 설정
-        // let backgroundView = ZTView()
-        
         view.addSubview(itemDetailCollectionView)
+
         itemDetailCollectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-            //            make.horizontalEdges.bottom.equalToSuperview()
-            //            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(view.safeAreaLayoutGuide) // 네비게이션바 아래부터
+            make.horizontalEdges.bottom.equalToSuperview()
+            // make.edges.equalToSuperview() // 네비게이션바를 덮도록
         }
     }
     
@@ -83,7 +80,7 @@ final class ItemDetailViewController: UIViewController {
             )) { [weak self] _, item, cell in
                 cell.setCell(with: item)
                 
-                // 유사 상품 바인딩
+                // 유사 상품 바인딩 //셀 아이템 마다 검색해야함
                 self?.viewModel.similarItems
                     .bind(to: cell.similarItemCollectionView.rx.items(
                         cellIdentifier: ItemCollectionViewCell.id,
@@ -92,7 +89,7 @@ final class ItemDetailViewController: UIViewController {
                         similarCell.setCell(with: similarItem)
                     }
                     .disposed(by: cell.disposeBag)
-                
+
                 // 유사 상품 선택
                 cell.similarItemCollectionView.rx.modelSelected(Item.self)
                     .subscribe(onNext: { [weak self] selectedItem in
@@ -177,17 +174,10 @@ final class ItemDetailViewController: UIViewController {
 
 extension ItemDetailViewController {
     private func setupNavigationBar() {
-        // 네비게이션 바를 투명하게 설정 (시도 중)
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
-        appearance.backgroundColor = .clear
-        appearance.backgroundEffect = nil
-        
         navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.compactScrollEdgeAppearance = appearance
-        
+       
         // 커스텀 백버튼 생성
         let button = UIButton()
 
