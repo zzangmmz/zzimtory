@@ -9,7 +9,6 @@ import UIKit
 import SnapKit
 
 enum MyPageContents: String {
-    case faq = "자주 묻는 질문"
     case support = "1:1 문의하기"
     case terms = "이용약관"
     case versionInfo = "버전 정보"
@@ -29,7 +28,6 @@ final class MyPageViewController: UIViewController {
     private var tableViewContents: [(name: MyPageContents, color: UIColor)] {
         if isLoggedIn {
             return [
-                (.faq, .black900Zt),
                 (.support, .black900Zt),
                 (.terms, .black900Zt),
                 (.versionInfo, .black900Zt),
@@ -38,7 +36,6 @@ final class MyPageViewController: UIViewController {
             ]
         } else {
             return [
-                (.faq, .black900Zt),
                 (.support, .black900Zt),
                 (.terms, .black900Zt),
                 (.versionInfo, .black900Zt),
@@ -150,13 +147,23 @@ extension MyPageViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .default, reuseIdentifier: String(describing: UITableViewCell.self))
+        let cell = UITableViewCell(style: .value1, reuseIdentifier: String(describing: UITableViewCell.self))
         
         let content = tableViewContents[indexPath.item]
         
         cell.textLabel?.text = content.name.rawValue
         cell.textLabel?.textColor = content.color
         cell.backgroundColor = .white100Zt
+        
+        if content.name == .versionInfo {
+            if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+                cell.detailTextLabel?.text = version
+                cell.detailTextLabel?.textColor = .gray500Zt
+                cell.detailTextLabel?.textAlignment = .right
+            }
+            cell.selectionStyle = .none
+            cell.isUserInteractionEnabled = false
+        }
         
         // 마지막 셀만 separator 없애기
         if indexPath.row == tableViewContents.count - 1 {
@@ -183,8 +190,6 @@ extension MyPageViewController: UITableViewDelegate {
         let selectedContent = tableViewContents[indexPath.item]
         
         switch selectedContent.name {
-        case .faq:
-            break
         case .support:
             break
         case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
