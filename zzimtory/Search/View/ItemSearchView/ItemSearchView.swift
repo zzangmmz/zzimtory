@@ -57,6 +57,15 @@ final class ItemSearchView: ZTView {
         searchBar.searchBarStyle = .minimal
         
         addSubview(searchBar)
+        
+        searchBar.rx.searchButtonClicked.subscribe(onNext: { [unowned self] in
+            searchBar.resignFirstResponder() // 키보드 내리기
+            
+            // TabBar 숨기기
+            if let viewController = self.next as? UIViewController {
+                viewController.tabBarController?.tabBar.isHidden = true
+            }
+        }).disposed(by: disposeBag)
     }
     
     private func setColletionView() {
@@ -116,7 +125,7 @@ final class ItemSearchView: ZTView {
 // MARK: - View/ViewModel 바인딩
 extension ItemSearchView {
     func bind() {
-        
+        // MARK: - Inputs
         let input = ItemSearchViewModel.Input(
             query: searchBar.rx.searchButtonClicked
                 .withLatestFrom(searchBar.rx.text.orEmpty),
@@ -126,18 +135,10 @@ extension ItemSearchView {
             didSelectItemAt: itemCollectionView.rx.itemSelected
         )
         
-        searchBar.rx.searchButtonClicked.subscribe(onNext: { [unowned self] in
-            searchBar.resignFirstResponder() // 키보드 내리기
-            
-            // TabBar 숨기기
-            if let viewController = self.next as? UIViewController {
-                viewController.tabBarController?.tabBar.isHidden = true
-            }
-        }).disposed(by: disposeBag)
-        
+        // MARK: - Outputs
         let output = itemSearchViewModel.transform(input: input)
         
-        // 검색 결과값 CollectionView에 바인딩
+        // MARK: - 검색 결과값 CollectionView에 바인딩
         output.searchResult
             .drive(itemCollectionView.rx.items(
                 cellIdentifier: String(describing: ItemCollectionViewCell.self),
@@ -147,7 +148,7 @@ extension ItemSearchView {
             }
             .disposed(by: disposeBag)
         
-        // 검색 결과를 CardStack으로 표시해주는 코드
+        // MARK: - 검색 결과를 CardStack으로 표시해주는 코드
         output.searchResult
             .do(onNext: { [weak self] _ in
                 self?.setCardStack()
@@ -177,7 +178,7 @@ extension ItemSearchView {
             }))
             .disposed(by: disposeBag)
         
-        // 카드 선택 시 아이템 상세화면 표시
+        // MARK: - 카드 선택 시 아이템 상세화면 표시
         output.selectedCard
             .drive(onNext: { cardItem in
                 
@@ -190,7 +191,7 @@ extension ItemSearchView {
             })
             .disposed(by: disposeBag)
         
-        // 카드 스와이프 제스쳐 지정
+        // MARK: - 카드 스와이프 제스쳐 지정
         output.swipedCard
             .drive(onNext: { [weak self] swipedCard in
                 switch swipedCard.direction {
@@ -212,7 +213,7 @@ extension ItemSearchView {
             })
             .disposed(by: disposeBag)
         
-        // 모든 카드 스와이프 완료
+        // MARK: - 모든 카드 스와이프 완료
         output.swipedAllCards
             .drive(onNext: { [unowned self] in
                 cardStack.removeFromSuperview()
@@ -221,7 +222,7 @@ extension ItemSearchView {
             })
             .disposed(by: disposeBag)
         
-        // CollectionView에서 셀 선택 시 동작
+        // MARK: - CollectionView에서 셀 선택 시 동작
         output.selectedCell
             .drive(onNext: { item in
                 let detailVC = DetailViewController(item: item)
