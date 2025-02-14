@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import MessageUI
 
 enum MyPageContents: String {
     case support = "1:1 문의하기"
@@ -276,5 +277,13 @@ extension MyPageViewController: UICollectionViewDelegate, UICollectionViewDataSo
         let item = viewModel.recentItems[indexPath.item]
         cell.configure(with: item)
         return cell
+    }
+}
+
+extension MyPageViewController:  MFMailComposeViewControllerDelegate {
+    func mailComposeController(_ controller: MFMailComposeViewController,
+                               didFinishWith result: MFMailComposeResult,
+                               error: Error?) {
+        controller.dismiss(animated: true, completion: nil)
     }
 }
