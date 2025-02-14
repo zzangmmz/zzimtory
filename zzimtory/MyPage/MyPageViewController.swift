@@ -193,7 +193,7 @@ extension MyPageViewController: UITableViewDelegate {
         switch selectedContent.name {
         case .support:
             showEmailComposer()
-        case .terms: navigationController?.pushViewController(TermsOfService(), animated: true)
+        case .terms: navigationController?.pushViewController(TermsOfServiceViewController(), animated: true)
         case .versionInfo:
             break
         case .login:
