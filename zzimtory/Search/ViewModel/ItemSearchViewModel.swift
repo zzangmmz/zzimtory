@@ -16,6 +16,15 @@ final class ItemSearchViewModel {
     var disposeBag = DisposeBag()
 
     var currentItems: Observable<[Item]> = Observable.just([])
+    var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
+        didSet {
+            // 10개 이상일 경우 초과되는 기록 제거
+            if searchHistory.count > 10 {
+                searchHistory.removeSubrange(10..<searchHistory.count)
+            }
+            UserDefaults.standard.set(searchHistory, forKey: "searchHistory")
+        }
+    }
     
     struct Input {
         var query: Observable<String>
@@ -31,6 +40,7 @@ final class ItemSearchViewModel {
         let swipedCard: Driver<SwipedCard>
         let swipedAllCards: Driver<Void>
         let selectedCell: Driver<Item>
+        let searchHistory: Driver<[String]>
     }
     
     struct SwipedCard {
@@ -43,6 +53,7 @@ final class ItemSearchViewModel {
             .withUnretained(self)
             .flatMap { viewModel, query -> Observable<[Item]> in
                 let fetchedItems = viewModel.shoppingRepository.fetchForViewModel(with: query)
+                viewModel.searchHistory.insert(query, at: 0)
                 viewModel.currentItems = fetchedItems
                 return fetchedItems
             }
@@ -77,11 +88,15 @@ final class ItemSearchViewModel {
             }
             .asDriver(onErrorDriveWith: .empty())
         
+        
+        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
+        
         let output = Output(searchResult: searchResult,
                             selectedCard: selectedCard,
                             swipedCard: swipedCard,
                             swipedAllCards: swipedAllCards,
-                            selectedCell: selectedCell
+                            selectedCell: selectedCell,
+                            searchHistory: searchHistory
         )
         
         return output
