@@ -110,7 +110,9 @@ final class ItemDetailWebViewController: UIViewController {
                 
                 // 주머니에 이미 존재하는 경우 → handlePocketButton() 호출
                 if self.viewModel.isInPocketStatus {
-                    self.viewModel.handlePocketButton()
+                    showDeleteItemAlert {
+                        self.viewModel.handlePocketButton()
+                    }
                     return
                 }
                 
@@ -129,6 +131,21 @@ final class ItemDetailWebViewController: UIViewController {
     private func presentLoginView() {
         let loginVC = LoginViewController()
         navigationController?.pushViewController(loginVC, animated: true)
+    }
+    
+    private func showDeleteItemAlert(completion: @escaping () -> Void) {
+        let alert = UIAlertController(
+            title: "주머니에서 삭제",
+            message: "주머니에서 삭제하시겠습니까?",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "삭제", style: .destructive) { _ in
+            completion()
+        })
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        
+        present(alert, animated: true)
     }
     
     @objc private func backButtonTapped() {
