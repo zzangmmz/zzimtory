@@ -7,16 +7,17 @@
 
 import UIKit
 
-
 class MainPocketViewModel {
     // 주머니 이름과 이미지 배열을 함께 관리
     private(set) var pockets: [Pocket] = []
     private(set) var filterPockets: [Pocket] = []
+    var displayPockets: [Pocket] = []
     
     func fetchData(completion: @escaping ([Pocket]?) -> Void) {
         DatabaseManager.shared.readPocket { [weak self] pockets in
             self?.pockets = pockets
             self?.filterPockets = pockets
+            self?.displayPockets = pockets
             completion(self?.filterPockets)
         }
     }
@@ -30,14 +31,31 @@ class MainPocketViewModel {
         }
     }
     
-    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {  
+    func sortPockets(by order: SortOrder, completion: @escaping () -> Void) {
         switch order {
-        case .descending:
-            filterPockets.sort { $0.title > $1.title }   // 사전 역순 정렬
-        case .ascending:
-            filterPockets.sort { $0.title < $1.title }   // 사전순 정렬
+        case .dictionary:
+            filterPockets.sort { $0.title < $1.title }
+            
+        case .newest:
+            filterPockets.sort { pocket1, pocket2 in
+                switch (pocket1.saveDate, pocket2.saveDate) {
+                case (nil, nil): return false
+                case (nil, _): return false
+                case (_, nil): return true
+                case (let date1?, let date2?): return date1 > date2
+                }
+            }
+            
+        case .oldest:
+            filterPockets.sort { pocket1, pocket2 in
+                switch (pocket1.saveDate, pocket2.saveDate) {
+                case (nil, nil): return false
+                case (nil, _): return false
+                case (_, nil): return true
+                case (let date1?, let date2?): return date1 < date2
+                }
+            }
         }
-
         completion()
     }
     

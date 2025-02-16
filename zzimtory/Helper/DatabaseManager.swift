@@ -85,7 +85,8 @@ final class DatabaseManager {
             let newPocket: [String: Any] = [
                 "title": title,
                 "items": [:],
-                "image": ""
+                "images": [],
+                "saveDate": ServerValue.timestamp()
             ]
             
             self.ref.child("users").child(uid).child("pockets").child("pocket\(title)").setValue(newPocket) { error, _ in
@@ -104,7 +105,7 @@ final class DatabaseManager {
     func readPocket(completion: @escaping ([Pocket]) -> Void) {
         guard let uid = self.userUID else { return }
         
-        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot, _ in
             guard let pocketData = snapshot.value as? [String: [String: Any]] else {
                 print("❌ No data found or wrong format")
                 completion([])
@@ -120,12 +121,16 @@ final class DatabaseManager {
                       let title = pocketInfo["title"] as? String else { continue }
                 
                 var items: [Item] = []
+                
                 if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
                     for itemKey in itemsDict.keys {
                         if let itemData = itemsDict[itemKey] {
                             do {
                                 let itemJsonData = try JSONSerialization.data(withJSONObject: itemData)
-                                if let item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
+                                if var item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
+                                    if let saveDate = itemData["saveDate"] as? TimeInterval {
+                                        item.saveDate = Date(timeIntervalSince1970: saveDate / 1000)
+                                    }
                                     items.append(item)
                                 }
                             } catch {
@@ -134,18 +139,40 @@ final class DatabaseManager {
                             }
                         }
                     }
-                    items.sort { $0.title < $1.title }
+                    items.sort {
+                        switch ($0.saveDate, $1.saveDate) {
+                        case (nil, nil): return false
+                        case (nil, _): return false
+                        case (_, nil): return true
+                        case (let date1?, let date2?): return date1 > date2
+                        }
+                    }
                 }
                 
-                let pocket = Pocket(title: title, items: items)
+                var pocket = Pocket(title: title, items: items)
+                
+                if let saveDateTimestamp = pocketInfo["saveDate"] as? TimeInterval {
+                    pocket.saveDate = Date(timeIntervalSince1970: saveDateTimestamp / 1000)
+                } else {
+                    pocket.saveDate = nil
+                }
                 pockets.append(pocket)
             }
-            pockets.sort { $0.title < $1.title }
+            
+            pockets.sort { pocket1, pocket2 in
+                switch (pocket1.saveDate, pocket2.saveDate) {
+                case (nil, nil): return false
+                case (nil, _): return false
+                case (_, nil): return true
+                case (let date1?, let date2?): return date1 > date2
+                }
+            }
+            
             print("✅ 최종 Pocket 데이터: \(pockets)")
             completion(pockets)
         }
     }
-
+    
     /// 유저 프로필(이메일, 닉네임) 읽어오는 메서드
     func readUserProfile(completion: @escaping ((email: String, nickname: String)?) -> Void) {
         guard let uid = self.userUID else { return }
@@ -168,24 +195,31 @@ final class DatabaseManager {
     func updatePocketItem(newItem: Item, pocketTitle: String) {
         guard let uid = self.userUID else { return }
         
-        let itemsRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items")
+        let pocketRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)")
         
-        itemsRef.observeSingleEvent(of: .value) { snapshot in
+        pocketRef.observeSingleEvent(of: .value) { snapshot in
             let newIndex = String("zzimtory\(newItem.productID)")
             
-            do {
-                let data = try JSONEncoder().encode(newItem)
-                let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
-                
-                itemsRef.child(newIndex).setValue(dict) { error, _ in
-                    if let error = error {
-                        print("아이템 추가 실패: \(error.localizedDescription)")
-                    } else {
-                        print("아이템 추가 성공")
-                    }
+            var updatedItem = newItem
+            updatedItem.saveDate = Date()
+            
+            // as? 를 사용하여 안전하게 타입 캐스팅
+            guard let dict = updatedItem.asAny() as? [String: Any] else {
+                print("아이템 데이터 변환 실패")
+                return
+            }
+            
+            let updates: [String: Any] = [
+                "items/\(newIndex)": dict,
+                "saveDate": ServerValue.timestamp()
+            ]
+            
+            pocketRef.updateChildValues(updates) { error, _ in
+                if let error = error {
+                    print("아이템 추가 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 추가 성공")
                 }
-            } catch {
-                print("아이템 변환 실패: \(error)")
             }
         }
     }
