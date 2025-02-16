@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 
 final class ItemDetailViewController: ZTViewController {
-
+    
     private let viewModel: ItemDetailViewModel
     private let disposeBag = DisposeBag()
     private let items: [Item]    // 전체 아이템 배열
@@ -21,7 +21,7 @@ final class ItemDetailViewController: ZTViewController {
         
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
-    
+        
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         
         collectionView.backgroundColor = .clear
@@ -33,7 +33,7 @@ final class ItemDetailViewController: ZTViewController {
         
         return collectionView
     }()
-
+    
     init(items: [Item], currentIndex: Int) {
         self.items = items
         self.currentIndex = currentIndex
@@ -60,10 +60,10 @@ final class ItemDetailViewController: ZTViewController {
             layout.itemSize = itemDetailCollectionView.bounds.size
         }
     }
-
+    
     private func setupCollectionView() {
         view.addSubview(itemDetailCollectionView)
-
+        
         itemDetailCollectionView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide) // 네비게이션바 아래부터
             make.horizontalEdges.bottom.equalToSuperview()
@@ -78,25 +78,8 @@ final class ItemDetailViewController: ZTViewController {
                 cellIdentifier: "ItemDetailCollectionViewCell",
                 cellType: ItemDetailCollectionViewCell.self
             )) { [weak self] _, item, cell in
+                cell.delegate = self
                 cell.setCell(with: item)
-                
-                // 유사 상품 바인딩 //셀 아이템 마다 검색해야함
-                self?.viewModel.similarItems
-                    .bind(to: cell.similarItemCollectionView.rx.items(
-                        cellIdentifier: ItemCollectionViewCell.id,
-                        cellType: ItemCollectionViewCell.self
-                    )) { _, similarItem, similarCell in
-                        similarCell.setCell(with: similarItem)
-                    }
-                    .disposed(by: cell.disposeBag)
-
-                // 유사 상품 선택
-                cell.similarItemCollectionView.rx.modelSelected(Item.self)
-                    .subscribe(onNext: { [weak self] selectedItem in
-                        let detailVC = DetailViewController(item: selectedItem)
-                        self?.navigationController?.pushViewController(detailVC, animated: true)
-                    })
-                    .disposed(by: cell.disposeBag)
                 
                 // 웹사이트 이동
                 cell.websiteButton.rx.tap
@@ -177,10 +160,10 @@ extension ItemDetailViewController {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         navigationController?.navigationBar.standardAppearance = appearance
-       
+        
         // 커스텀 백버튼 생성
         let button = UIButton()
-
+        
         button.setAsIconButton()
         button.setButtonWithSystemImage(imageName: "chevron.left")
         button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
@@ -188,8 +171,15 @@ extension ItemDetailViewController {
         // 네비게이션 아이템으로 설정
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: button)
     }
-
+    
     @objc private func backButtonTapped() {
-       navigationController?.popViewController(animated: true)
+        navigationController?.popViewController(animated: true)
+    }
+}
+
+extension ItemDetailViewController: ItemDetailCollectionViewCellDelegate {
+    func didSelectSimilarItem(_ item: Item) {
+        let detailVC = ItemDetailViewController(items: [item], currentIndex: 0)
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }
