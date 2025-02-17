@@ -35,6 +35,7 @@ final class ItemSearchViewModel {
         var didSwipeAllCards: Observable<Void>
         var didSelectItemAt: ControlEvent<IndexPath>
         var didSelectSearchHistoryAt: ControlEvent<IndexPath>
+        var didRemoveItemAt: ControlEvent<IndexPath>
     }
     
     struct Output {
@@ -115,14 +116,24 @@ final class ItemSearchViewModel {
             }
             .asDriver(onErrorDriveWith: .empty())
         
-        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
+        let searchHistoryRemoved = input.didRemoveItemAt
+            .withUnretained(self)
+            .flatMap { viewModel, indexPath -> Observable<[String]> in
+                viewModel.searchHistory.remove(at: indexPath.item)
+                return Observable.just(viewModel.searchHistory)
+            }
+        
+        let searchHistory = Observable.merge(
+            Observable.just(searchHistory),
+            searchHistoryRemoved
+        )
         
         let output = Output(searchResult: searchResult,
                             selectedCard: selectedCard,
                             swipedCard: swipedCard,
                             swipedAllCards: swipedAllCards,
                             selectedCell: selectedCell,
-                            searchHistory: searchHistory,
+                            searchHistory: searchHistory.asDriver(onErrorDriveWith: .empty()),
                             selectedSearchHistory: selectedSearchHistory.asDriver(onErrorDriveWith: .empty())
         )
         

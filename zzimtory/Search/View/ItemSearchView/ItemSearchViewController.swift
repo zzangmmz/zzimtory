@@ -97,6 +97,7 @@ final class ItemSearchViewController: ZTViewController {
         searchHistory.showsHorizontalScrollIndicator = false
         searchHistory.rowHeight = 40
         
+        
 //        let headerLabel: UILabel = {
 //            let label = UILabel()
 //            
@@ -195,7 +196,8 @@ extension ItemSearchViewController {
             didSwipeCard: cardStack.rx.didSwipeCardAt,
             didSwipeAllCards: cardStack.rx.didSwipeAllCards,
             didSelectItemAt: itemCollectionView.rx.itemSelected,
-            didSelectSearchHistoryAt: searchHistory.rx.itemSelected
+            didSelectSearchHistoryAt: searchHistory.rx.itemSelected,
+            didRemoveItemAt: searchHistory.rx.itemDeleted
         )
         
         // MARK: - Outputs
