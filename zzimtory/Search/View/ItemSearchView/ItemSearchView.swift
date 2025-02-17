@@ -72,7 +72,6 @@ final class ItemSearchView: ZTView {
     private func setColletionView() {
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
-        itemCollectionView.delegate = self
         itemCollectionView.isScrollEnabled = true
         itemCollectionView.register(ItemCollectionViewHeader.self,
                                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
@@ -146,6 +145,10 @@ extension ItemSearchView {
         
         // MARK: - Outputs
         let output = itemSearchViewModel.transform(input: input)
+        
+        // MARK: - 컬렉션뷰 delegate 설정
+        itemCollectionView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
         
         // MARK: - 검색 결과값 CollectionView에 바인딩
         output.searchResult
