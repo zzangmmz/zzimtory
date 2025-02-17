@@ -15,18 +15,11 @@ final class ItemDetailViewModel {
     private let shoppingRepository = ShoppingRepository()
     
     private var itemsRelay = BehaviorRelay<[Item]>(value: [])
-    var items: Driver<[Item]>/* { return itemsRelay.asDriver() }*/
+    var items: Driver<[Item]>
     
-    // Input
     let currentItem: Item // 현재 보여줄 아이템
     private var searchQuery: String = ""
-    
-    // Output
-    let itemTitle = BehaviorSubject<String>(value: "")
-    let itemBrand = BehaviorSubject<String>(value: "")
-    let itemPrice = BehaviorSubject<String>(value: "")
-    let itemImageUrl = BehaviorSubject<String>(value: "")
-    let itemUrl = BehaviorSubject<String>(value: "")
+
     let similarItems = BehaviorSubject<[Item]>(value: [])
     
     let isInPocket = BehaviorSubject<Bool>(value: false)
@@ -37,31 +30,10 @@ final class ItemDetailViewModel {
         self.items = itemsRelay.asDriver()
         self.currentItem = items[currentIndex]
         
-        // setupData()
         setupSearchQuery()
         fetchSimilarItems()
         checkItemStatus()
     }
-    
-//    private func setupData() {
-//        // HTML 태그 제거하여 타이틀 설정
-//        let cleanTitle = currentItem.title.removingHTMLTags
-//        itemTitle.onNext(cleanTitle)
-//        
-//        // 브랜드명 설정
-//        let brandText = currentItem.brand.isEmpty ? currentItem.mallName : currentItem.brand
-//        itemBrand.onNext("\(brandText) >")
-//        
-//        // 가격 설정
-//        if let price = Int(currentItem.price) {
-//            itemPrice.onNext("\(price.withSeparator)원")
-//        }
-//        
-//        // 이미지 URL 설정
-//        itemImageUrl.onNext(currentItem.image)
-//        
-//        itemUrl.onNext(currentItem.link)
-//    }
     
     // 검색어 설정 메서드
     private func setupSearchQuery() {
