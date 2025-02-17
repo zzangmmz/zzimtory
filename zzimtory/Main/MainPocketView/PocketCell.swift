@@ -188,7 +188,7 @@ class PocketCell: UICollectionViewCell {
                 singlePocketImageView.backgroundColor = .white100Zt
             } else {
                 if let imageUrl = URL(string: pocket.images[0]) {
-                    singlePocketImageView.loadImage(from: imageUrl)
+                    singlePocketImageView.kf.setImage(with: imageUrl)
                     singlePocketImageView.contentMode = .scaleAspectFill
                 }
             }
@@ -199,7 +199,7 @@ class PocketCell: UICollectionViewCell {
             for (index, imageView) in previews.enumerated() {
                 if index < pocket.items.count {
                     if let imageUrl = URL(string: pocket.images[index]) {
-                        imageView.loadImage(from: imageUrl)
+                        imageView.kf.setImage(with: imageUrl)
                         imageView.isHidden = false
                     }
                 } else {

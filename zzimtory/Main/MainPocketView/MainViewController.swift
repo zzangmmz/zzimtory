@@ -207,6 +207,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         let deleteAction = UIAlertAction(title: "네", style: .destructive) { [weak self] _ in
             selectedPockets.forEach { pocket in
                 DatabaseManager.shared.deletePocket(title: pocket.title)
+                DatabaseManager.shared.deletePocket(title: "전체보기")
             }
  
             self?.bind()
