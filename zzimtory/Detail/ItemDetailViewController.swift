@@ -65,6 +65,7 @@ final class ItemDetailViewController: ZTViewController {
         setupNavigationBar()
         setupCollectionView()
         bind()
+        saveRecentItem()
     }
     
     override func viewDidLayoutSubviews() {
@@ -72,11 +73,6 @@ final class ItemDetailViewController: ZTViewController {
         if let layout = itemDetailCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.itemSize = itemDetailCollectionView.bounds.size
         }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        saveRecentItem()
     }
     
     private func setupCollectionView() {
