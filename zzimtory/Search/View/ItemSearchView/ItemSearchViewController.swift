@@ -12,6 +12,7 @@ import RxCocoa
 final class ItemSearchViewController: ZTViewController {
     
     private let searchBar = UISearchBar()
+    private let recentItemsView = RecentItemsView()
     private let searchHistory = UITableView()
     private let itemCollectionView = ItemCollectionView()
     
@@ -43,6 +44,7 @@ final class ItemSearchViewController: ZTViewController {
         
         addComponents()
         setSearchBar()
+        setRecectItems()
         setSearchHistory()
         setConstraints()
         
@@ -53,6 +55,7 @@ final class ItemSearchViewController: ZTViewController {
     private func addComponents() {
         [
             searchBar,
+            recentItemsView,
             searchHistory
         ].forEach { view.addSubview($0) }
     }
@@ -81,6 +84,35 @@ final class ItemSearchViewController: ZTViewController {
             view.addSubview(searchHistory)
             
         }).disposed(by: disposeBag)
+    }
+    
+    private func setRecectItems() {
+        recentItemsView.backgroundColor = .clear
+        
+        [
+            recentItemsView.titleLabel,
+            recentItemsView.collectionView,
+            recentItemsView.placeHolder
+        ]
+            .forEach {
+            $0.snp.makeConstraints { make in
+                make.horizontalEdges.equalToSuperview()
+            }
+        }
+        
+        loadRecentItems()
+    }
+    
+    private func loadRecentItems() {
+        itemSearchViewModel.loadItems()
+        
+        if itemSearchViewModel.recentItems.isEmpty {
+            recentItemsView.showPlaceHolderLabel()
+        } else {
+            recentItemsView.hidePlaceHolderLabel()
+        }
+        
+        recentItemsView.collectionView.reloadData()
     }
     
     private func setSearchHistory() {
@@ -140,10 +172,16 @@ final class ItemSearchViewController: ZTViewController {
             make.edges.equalToSuperview()
         }
         
-        searchHistory.snp.makeConstraints { make in
+        recentItemsView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom).offset(12)
-            make.width.equalToSuperview().inset(12)
-            make.bottom.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(140)
+        }
+        
+        searchHistory.snp.makeConstraints { make in
+            make.top.equalTo(recentItemsView.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(400)
         }
 
     }
