@@ -34,6 +34,13 @@ final class ItemDetailViewController: ZTViewController {
         return collectionView
     }()
     
+    init(items: [Item]) {
+        self.items = items
+        self.currentIndex = 0
+        self.viewModel = ItemDetailViewModel(items: items, currentIndex: currentIndex)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
     init(items: [Item], currentIndex: Int) {
         self.items = items
         self.currentIndex = currentIndex
@@ -47,7 +54,7 @@ final class ItemDetailViewController: ZTViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        navigationController?.setNavigationBarHidden(false, animated: true)
         navigationController?.tabBarController?.tabBar.isHidden = true
     }
     
@@ -65,6 +72,11 @@ final class ItemDetailViewController: ZTViewController {
         if let layout = itemDetailCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             layout.itemSize = itemDetailCollectionView.bounds.size
         }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        saveRecentItem()
     }
     
     private func setupCollectionView() {
@@ -175,6 +187,39 @@ final class ItemDetailViewController: ZTViewController {
         alert.addAction(UIAlertAction(title: "취소", style: .cancel))
         
         present(alert, animated: true)
+    }
+    
+    private func saveRecentItem() {
+        let userDefaults = UserDefaults.standard
+        let recentItemsKey = "recentItems"
+        let maxRecentItems = 10
+        
+        // 현재 저장된 아이템들 로드
+        var recentItems: [Item] = []
+        if let data = userDefaults.data(forKey: recentItemsKey) {
+            do {
+                recentItems = try JSONDecoder().decode([Item].self, from: data)
+            } catch {
+                print("최근 본 아이템 - 유저 디폴트 디코딩 에러: \(error)")
+            }
+        }
+        
+        // 현재 아이템이 이미 있다면 제거
+        recentItems.removeAll { $0.productID == viewModel.currentItem.productID }
+        recentItems.insert(viewModel.currentItem, at: 0)
+        
+        // 최대 개수 넘어가면 이전 아이템 삭제
+        if recentItems.count > maxRecentItems {
+            recentItems.removeLast(recentItems.count - maxRecentItems)
+        }
+        
+        // 순서 보장을 위해 배열로 저장
+        do {
+            let data = try JSONEncoder().encode(recentItems)
+            userDefaults.set(data, forKey: recentItemsKey)
+        } catch {
+            print("최근 본 아이템 - 유저 디폴트 인코딩 에러: \(error)")
+        }
     }
 }
 
