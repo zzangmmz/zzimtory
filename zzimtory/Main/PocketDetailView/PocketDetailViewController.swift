@@ -160,9 +160,14 @@ class PocketDetailViewController: UIViewController,
         
         let deleteAction = UIAlertAction(title: "네", style: .destructive) { _ in
             selectedItems.forEach { item in
-                DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+                if self.viewModel.pocket.title == "전체보기" {
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+                }else{
+                    
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: "전체보기")
+                }
             }
-            
             
             self.bind()
             
@@ -191,7 +196,11 @@ class PocketDetailViewController: UIViewController,
         pocketVC.onComplete = { [weak self] in
             guard let self = self else { return }
             selectedItems.forEach { item in
+                if self.viewModel.pocket.title != "전체보기" {
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: "전체보기")
+                }
                 DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+                
             }
             self.bind()
             editMode = false

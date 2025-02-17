@@ -189,6 +189,7 @@ class PocketCell: UICollectionViewCell {
             } else {
                 if let imageUrl = URL(string: pocket.images[0]) {
                     singlePocketImageView.loadImage(from: imageUrl)
+                    singlePocketImageView.contentMode = .scaleAspectFill
                 }
             }
             
