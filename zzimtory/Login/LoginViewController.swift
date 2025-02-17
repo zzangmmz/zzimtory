@@ -8,8 +8,6 @@
 import UIKit
 import RxSwift
 import RxCocoa
-import CryptoKit
-import AuthenticationServices
 
 final class LoginViewController: UIViewController {
     private var loginView: LoginView?
@@ -21,7 +19,7 @@ final class LoginViewController: UIViewController {
         loginView = LoginView(frame: view.frame)
         bind()
         view = loginView
-        navigationController?.isNavigationBarHidden = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.tabBarController?.tabBar.isHidden = true
     }
     
@@ -60,7 +58,13 @@ final class LoginViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] bool in
                 if bool {
-                    self?.dismiss(animated: true)
+                    let tabbarVC = TabbarViewController()
+                    
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first {
+                        window.rootViewController = tabbarVC
+                        window.makeKeyAndVisible()
+                    }
                 }
             })
             .disposed(by: disposeBag)

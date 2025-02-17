@@ -1,15 +1,15 @@
 //
-//  ItemWebView.swift
+//  ItemDetailWebView.swift
 //  zzimtory
 //
-//  Created by seohuibaek on 1/28/25.
+//  Created by seohuibaek on 2/13/25.
 //
 
 import UIKit
 import WebKit
 import SnapKit
 
-final class ItemWebView: UIView {
+final class ItemDetailWebView: UIView {
     
     // 아이템 웹뷰
     let itemWebView: WKWebView = {
@@ -153,7 +153,7 @@ final class ItemWebView: UIView {
     }
 }
 
-extension ItemWebView {
+extension ItemDetailWebView {
     private func configurePageButtonActions() {
         websiteBackButton.addTarget(self, action: #selector(handleBackButton), for: .touchUpInside)
         websiteForwardButton.addTarget(self, action: #selector(handleForwardButton), for: .touchUpInside)
@@ -170,7 +170,7 @@ extension ItemWebView {
     }
 }
 
-extension ItemWebView: WKNavigationDelegate {
+extension ItemDetailWebView: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         // 원형 인디케이터
         activityIndicator.startAnimating()
@@ -192,7 +192,7 @@ extension ItemWebView: WKNavigationDelegate {
     }
 }
 
-extension ItemWebView {
+extension ItemDetailWebView {
     func setSaveButton(_ isInPocket: Bool) {
         let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
         let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage

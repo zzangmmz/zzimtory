@@ -114,21 +114,25 @@ extension KakaoAuthManager: ThirdPartyAuthProtocol {
     }
     
     func logout() {
-        UserApi.shared.logout { error in
-            if let error = error {
-                print("카카오 로그아웃 실패: \(error)")
-            } else {
-                print("카카오 로그아웃 성공")
+        if AuthApi.hasToken() {
+            UserApi.shared.logout { error in
+                if let error = error {
+                    print("카카오 로그아웃 실패: \(error)")
+                } else {
+                    print("카카오 로그아웃 성공")
+                }
             }
         }
     }
     
     func disconnect() {
-        UserApi.shared.unlink { error in
-            if let error = error {
-                print("카카오 로그인 연결끊기 실패: \(error)")
-            } else {
-                print("카카오 로그인 연결끊기 성공")
+        if AuthApi.hasToken() {
+            UserApi.shared.unlink { error in
+                if let error = error {
+                    print("카카오 로그인 연결끊기 실패: \(error)")
+                } else {
+                    print("카카오 로그인 연결끊기 성공")
+                }
             }
         }
     }

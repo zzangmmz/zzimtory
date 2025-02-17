@@ -27,6 +27,7 @@ struct Item: Codable {
     let category2: String
     let category3: String
     let category4: String
+    var saveDate: Date?
     
     enum CodingKeys: String, CodingKey {
         case title
@@ -48,7 +49,7 @@ struct Item: Codable {
 
 extension Item {
     func asAny() -> Any {
-        return [
+        var dict: [String: Any] = [
             "title": self.title,
             "link": self.link,
             "image": self.image,
@@ -63,9 +64,14 @@ extension Item {
             "category3": self.category3,
             "category4": self.category4
         ]
+        
+        if let saveDate = self.saveDate {
+            dict["saveDate"] = Int(saveDate.timeIntervalSince1970 * 1000)
+        }
+        
+        return dict
     }
 }
-
 
 // MARK: - API Response 참고용 JSON (추후 삭제 요망)
 //{

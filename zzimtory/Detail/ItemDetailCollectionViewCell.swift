@@ -1,14 +1,23 @@
 //
-//  DetailView.swift
+//  ItemDetailCollectionViewCell.swift
 //  zzimtory
 //
-//  Created by seohuibaek on 1/24/25.
+//  Created by seohuibaek on 2/12/25.
 //
 
 import UIKit
 import SnapKit
+import RxSwift
 
-final class DetailView: ZTView {
+protocol ItemDetailCollectionViewCellDelegate: AnyObject { // 유사 상품 선택 시 화면 전환을 위한 delegate 설정
+    func didSelectSimilarItem(_ item: Item)
+}
+
+final class ItemDetailCollectionViewCell: UICollectionViewCell {
+    weak var delegate: ItemDetailCollectionViewCellDelegate?
+    
+    var similarItemViewModel: SimilarItemViewModel?
+    var disposeBag = DisposeBag()
     
     // 유사 상품 데이터 저장 배열
     var similarItems: [Item] = []
@@ -52,7 +61,7 @@ final class DetailView: ZTView {
     // 공유 버튼
     let shareButton: UIButton = {
         let button = UIButton()
-
+        
         button.setAsIconButton()
         button.setButtonWithSystemImage(imageName: ButtonImageConstants.shareButtonImage)
         
@@ -87,7 +96,7 @@ final class DetailView: ZTView {
         
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
-
+        
         button.setButtonWithCustomImage(imageName: ButtonImageConstants.PocketButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
@@ -122,6 +131,12 @@ final class DetailView: ZTView {
         
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: 150, height: 190)
+        //        let cellHeight = UIScreen.main.bounds.height * 0.18
+        //        let aspectRatio: CGFloat = 150.0 / 190.0
+        //        let cellWidth = cellHeight * aspectRatio
+        //
+        //        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+        
         layout.minimumLineSpacing = 10
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -209,6 +224,7 @@ final class DetailView: ZTView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        scrollView.setContentOffset(.zero, animated: false)
         configureUI()
     }
     
@@ -217,6 +233,7 @@ final class DetailView: ZTView {
     }
     
     private func configureUI() {
+        // setupMainStackView()
         setupScrollView()
         setupTopStackView()
         setupBottomStackView()
@@ -237,10 +254,20 @@ final class DetailView: ZTView {
         }
     }
     
+    //    private func setupMainStackView() {
+    //        contentView.addSubview(mainStackView)
+    //
+    //        mainStackView.snp.makeConstraints { make in
+    //            make.horizontalEdges.top.equalToSuperview()
+    //            make.bottom.equalToSuperview().offset(-30)
+    //            make.edges.equalToSuperview()
+    //        }
+    //    }
+    
     // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
     private func setupTopStackView() {
         topStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
+            make.top.equalToSuperview()/*.offset(16)*/
             make.leading.trailing.equalToSuperview()
         }
         
@@ -296,9 +323,45 @@ final class DetailView: ZTView {
             make.height.equalTo(190)
         }
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        scrollView.setContentOffset(.zero, animated: false)
+        disposeBag = DisposeBag()
+    }
 }
 
-extension DetailView {
+extension ItemDetailCollectionViewCell {
+    func setCell(with item: Item) {
+        itemImageView.kf.setImage(with: URL(string: item.image))
+        
+        let brandText = item.brand.isEmpty ? item.mallName : item.brand
+        brandButton.setTitle(brandText, for: .normal)
+        
+        itemNameLabel.text = item.title.removingHTMLTags
+        
+        priceLabel.text = Int(item.price)?.withSeparator
+        
+        
+        similarItemViewModel = SimilarItemViewModel(item: item)
+        
+        similarItemViewModel?.similarItems
+            .bind(to: similarItemCollectionView.rx.items(
+                cellIdentifier: ItemCollectionViewCell.id,
+                cellType: ItemCollectionViewCell.self
+            )) { _, similarItem, similarCell in
+                similarCell.setCell(with: similarItem)
+            }
+            .disposed(by: disposeBag)
+        
+        // 유사 상품 선택
+        similarItemCollectionView.rx.modelSelected(Item.self)
+            .subscribe(onNext: { [weak self] selectedItem in
+                self?.delegate?.didSelectSimilarItem(selectedItem)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     func setSaveButton(_ isInPocket: Bool) {
         let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
         let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage

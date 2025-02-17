@@ -34,16 +34,13 @@ class PocketCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray500Zt
         label.textAlignment = .left
-        label.snp.makeConstraints { make in
-            make.height.equalTo(16)
-        }
         return label
     }()
     
     private lazy var titleStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [titleLabel, countLabelOnTitle])
         stackView.axis = .vertical
-        stackView.spacing = 4
+        stackView.spacing = 2
         return stackView
     }()
     
@@ -62,18 +59,6 @@ class PocketCell: UICollectionViewCell {
         return label
     }()
     
-    private let emptyPocketImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .center
-        imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "PocketIcon")
-        imageView.layer.cornerRadius = 15
-        imageView.layer.masksToBounds = true
-        imageView.backgroundColor = .white100Zt
-        imageView.isHidden = true
-        return imageView
-    }()
-    
     private let singlePocketImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -84,10 +69,17 @@ class PocketCell: UICollectionViewCell {
         return imageView
     }()
     
+    let pocketOverlayView: ZTView = {
+        let view = ZTView()
+        view.backgroundColor = UIColor.black900Zt.withAlphaComponent(0.5)
+        view.isHidden = true
+        view.layer.cornerRadius = 15
+        return view
+    }()
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        emptyPocketImageView.image = UIImage(named: "PocketIcon")
         [singlePocketImageView,
          previewImageView1, previewImageView2, previewImageView3, previewImageView4].forEach {
             $0.image = nil
@@ -97,7 +89,6 @@ class PocketCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .clear
         setupUI()
     }
     
@@ -106,7 +97,8 @@ class PocketCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        contentView.backgroundColor = .clear
+        contentView.backgroundColor = .white100Zt
+        contentView.layer.cornerRadius = 16
         
         let leftImageStackView = UIStackView(arrangedSubviews: [previewImageView1, previewImageView3])
         leftImageStackView.axis = .horizontal
@@ -122,7 +114,7 @@ class PocketCell: UICollectionViewCell {
         
         let imageStackView = UIStackView(arrangedSubviews: [leftImageStackView, rightImageStackView])
         imageStackView.axis = .vertical
-        imageStackView.spacing = 0
+        imageStackView.spacing = 10
         imageStackView.alignment = .fill
         imageStackView.distribution = .fillEqually
         imageStackView.layer.cornerRadius = 15
@@ -134,29 +126,39 @@ class PocketCell: UICollectionViewCell {
         titleImageStackView.alignment = .fill
         titleImageStackView.distribution = .fillProportionally
         
+        
         contentView.addSubview(titleImageStackView)
-        contentView.addSubview(emptyPocketImageView)
         contentView.addSubview(singlePocketImageView)
         contentView.addSubview(countLabelOnImage)
+        contentView.addSubview(pocketOverlayView)
         
         titleImageStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(6)
+            make.leading.equalToSuperview().offset(10)
+            make.top.equalTo(imageStackView.snp.bottom).offset(10)
+            make.bottom.equalTo(imageStackView.snp.bottom).offset(20)
+            make.height.equalTo(18)
         }
         
+        countLabelOnTitle.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(16)
+            make.height.equalTo(16)
+            }
+            
         imageStackView.snp.makeConstraints { make in
             make.height.equalTo(contentView).multipliedBy(0.8)
         }
         
-        emptyPocketImageView.snp.makeConstraints { make in
-            make.edges.equalTo(imageStackView)
+        singlePocketImageView.snp.makeConstraints { make in
+            make.edges.equalTo(imageStackView).inset(10)
+            
         }
         
-        singlePocketImageView.snp.makeConstraints { make in
-            make.edges.equalTo(imageStackView)
+        pocketOverlayView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
         countLabelOnImage.snp.makeConstraints { make in
@@ -182,27 +184,44 @@ class PocketCell: UICollectionViewCell {
         
         let previews = [previewImageView1, previewImageView2, previewImageView3, previewImageView4]
         
-        if pocket.items.isEmpty {
-            // 주머니 빈 경우 기본 이미지 설정
-            emptyPocketImageView.isHidden = false
+        if pocket.items.count <= 1 {
+            // 주머니 빈 경우
+            // 혹은 아이템 1개 들어있는 경우
+            singlePocketImageView.isHidden = false
             previews.forEach { $0.isHidden = true }
-        } else {
-            if pocket.items.count == 1 {
-                emptyPocketImageView.isHidden = true
-                singlePocketImageView.isHidden = false
-                singlePocketImageView.kf.setImage(with: URL(string: pocket.image!))
+            
+            if pocket.images.isEmpty {
+                singlePocketImageView.image = UIImage(named: "EmptyPocketIcon")
+                singlePocketImageView.contentMode = .center
+                singlePocketImageView.tintColor = .gray400Zt
+                singlePocketImageView.backgroundColor = .white100Zt
             } else {
-                emptyPocketImageView.isHidden = true
-                // 아이템 개수에 따라 이미지 설정
-                for (index, imageView) in previews.enumerated() {
-                    if index < pocket.items.count {
-                        imageView.kf.setImage(with: URL(string: pocket.image!))
+                if let imageUrl = URL(string: pocket.images[0]) {
+                    singlePocketImageView.loadImage(from: imageUrl)
+                }
+            }
+            
+        } else {
+            singlePocketImageView.isHidden = true
+            // 아이템 개수에 따라 이미지 설정
+            for (index, imageView) in previews.enumerated() {
+                if index < pocket.items.count {
+                    if let imageUrl = URL(string: pocket.images[index]) {
+                        imageView.loadImage(from: imageUrl)
                         imageView.isHidden = false
-                    } else {
-                        imageView.isHidden = true
                     }
+                } else {
+                    imageView.isHidden = true
                 }
             }
         }
     }
+    func setEditModePocket(with editMode: Bool) {
+        if editMode {
+            self.pocketOverlayView.isHidden = false
+        } else {
+            self.pocketOverlayView.isHidden = true
+        }
+    }
+    
 }

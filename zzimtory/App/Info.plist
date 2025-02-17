@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<array>
+		<string></string>
+	</array>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleExecutable</key>
@@ -21,7 +25,7 @@
 			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.752146162744-t5km1qfgvo7ocf0nbvi3f7farf91i1ko</string>
+				<string>com.googleusercontent.apps.752146162744-5tjqc79imbgcirfc7fht8rgl122gmdqr</string>
 			</array>
 		</dict>
 		<dict>
@@ -51,6 +55,7 @@
 	<string>$(GIDClientID)</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+		<string>mailto</string>
 		<string>naversearchthirdlogin</string>
 		<string>naversearchapp</string>
 		<string>kakaotalk</string>
