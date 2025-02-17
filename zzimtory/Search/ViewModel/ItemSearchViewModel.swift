@@ -22,6 +22,8 @@ final class ItemSearchViewModel {
             if searchHistory.count > 10 {
                 searchHistory.removeSubrange(10..<searchHistory.count)
             }
+            
+            searchHistory = searchHistory.filter { !$0.isEmpty }
             UserDefaults.standard.set(searchHistory, forKey: "searchHistory")
         }
     }
