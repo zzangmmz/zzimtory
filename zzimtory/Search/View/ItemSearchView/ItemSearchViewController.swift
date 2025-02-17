@@ -122,13 +122,16 @@ final class ItemSearchViewController: ZTViewController {
         searchHistory.register(ItemSearchHistoryTableCell.self,
                                forCellReuseIdentifier: String(describing: ItemSearchHistoryTableCell.self))
         searchHistory.showsHorizontalScrollIndicator = false
+        searchHistory.showsVerticalScrollIndicator = false
+        searchHistory.isScrollEnabled = false
+        searchHistory.separatorInset = .zero
         searchHistory.rowHeight = 40
         
         let headerLabel: UILabel = {
             let label = UILabel()
             
             label.text = "최근 검색어"
-            label.font = .systemFont(ofSize: 16, weight: .semibold)
+            label.font = .systemFont(ofSize: 16, weight: .bold)
             label.textColor = .black900Zt
             label.textAlignment = .left
             
@@ -138,8 +141,12 @@ final class ItemSearchViewController: ZTViewController {
         searchHistory.tableHeaderView = headerLabel
         
         headerLabel.snp.makeConstraints { make in
-            make.width.equalTo(searchHistory.snp.width).inset(24)
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(50)
         }
+        
+        headerLabel.setNeedsLayout()
+        headerLabel.layoutIfNeeded()
     }
     
     private func setColletionView() {
@@ -180,10 +187,9 @@ final class ItemSearchViewController: ZTViewController {
         
         searchHistory.snp.makeConstraints { make in
             make.top.equalTo(recentItemsView.snp.bottom).offset(12)
-            make.horizontalEdges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(400)
         }
-
     }
     
     private func setCardStack() {
