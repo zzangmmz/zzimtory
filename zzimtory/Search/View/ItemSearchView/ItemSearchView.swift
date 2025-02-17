@@ -83,7 +83,13 @@ final class ItemSearchView: ZTView {
     
     private func setConstraints() {
         searchBar.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(safeAreaLayoutGuide)
+            make.top.horizontalEdges.equalTo(safeAreaLayoutGuide).offset(16)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(44)
+        }
+        
+        searchBar.searchTextField.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
         itemCollectionView.snp.makeConstraints { make in
