@@ -34,6 +34,13 @@ final class ItemDetailViewController: ZTViewController {
         return collectionView
     }()
     
+    init(items: [Item]) {
+        self.items = items
+        self.currentIndex = 0
+        self.viewModel = ItemDetailViewModel(items: items, currentIndex: currentIndex)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
     init(items: [Item], currentIndex: Int) {
         self.items = items
         self.currentIndex = currentIndex
