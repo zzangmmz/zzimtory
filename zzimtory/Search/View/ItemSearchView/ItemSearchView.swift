@@ -93,8 +93,9 @@ final class ItemSearchView: ZTView {
         }
         
         itemCollectionView.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview().inset(12)
             make.top.equalTo(searchBar.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
         }
     }
     
