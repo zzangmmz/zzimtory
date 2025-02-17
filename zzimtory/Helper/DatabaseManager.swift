@@ -19,7 +19,6 @@ final class DatabaseManager {
     private init() {
         // 파이어베이스 참조 설정
         ref = Database.database(url: "https://zzimtory-default-rtdb.asia-southeast1.firebasedatabase.app").reference()
-        getUserUID()
     }
     
     func hasUserLoggedIn() -> Bool {
@@ -39,12 +38,12 @@ final class DatabaseManager {
         }
     }
     
-    private func getUserUID() {
+    private func getUserUID() -> String? {
         guard let currentUser = Auth.auth().currentUser else {
             print("현재 인증된 유저가 없습니다.")
-            return
+            return nil
         }
-        self.userUID = currentUser.uid
+        return currentUser.uid
     }
     
     // MARK: - Data Create Method
@@ -79,7 +78,7 @@ final class DatabaseManager {
     
     /// 주머니 만드는 메서드
     func createPocket(title: String, completion: @escaping () -> Void) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
             let newPocket: [String: Any] = [
@@ -103,7 +102,10 @@ final class DatabaseManager {
     // MARK: - Data Read Method
     /// 유저 주머니 읽어오는 메서드
     func readPocket(completion: @escaping ([Pocket]) -> Void) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else {
+            completion([])
+            return
+        }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot, _ in
             guard let pocketData = snapshot.value as? [String: [String: Any]] else {
@@ -175,7 +177,7 @@ final class DatabaseManager {
     
     /// 유저 프로필(이메일, 닉네임) 읽어오는 메서드
     func readUserProfile(completion: @escaping ((email: String, nickname: String)?) -> Void) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [String: Any],
@@ -193,7 +195,7 @@ final class DatabaseManager {
     // MARK: - Data Update Methods
     /// 아이템 추가하는 메서드
     func updatePocketItem(newItem: Item, pocketTitle: String) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         let pocketRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)")
         
@@ -227,7 +229,7 @@ final class DatabaseManager {
     // MARK: - Data Delete Methods
     /// 유저 삭제 메서드
     func deleteUser() {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         ref.child("users").child(uid).removeValue() { error, _ in
             if let error = error {
@@ -240,7 +242,7 @@ final class DatabaseManager {
     
     /// 주머니 삭제 메서드
     func deletePocket(title: String) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         ref.child("users").child(uid).child("pockets").child("pocket\(title)").removeValue { error, _ in
             if let error = error {
@@ -253,7 +255,7 @@ final class DatabaseManager {
     
     /// 아이템 삭제 메서드
     func deleteItem(productID: String, from pocketTitle: String) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").observeSingleEvent(of: .value) { snapshot in
             guard let pocket = snapshot.value as? [String: Any],

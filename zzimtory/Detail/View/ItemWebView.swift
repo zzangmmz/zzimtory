@@ -26,7 +26,7 @@ final class ItemWebView: UIView {
     private let websiteBackButton: UIButton = {
         let button = UIButton()
         
-        button.setButtonWithSystemImage(imageName: "chevron.left")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.backButtonImage)
         
         return button
     }()
@@ -35,7 +35,7 @@ final class ItemWebView: UIView {
     private let websiteForwardButton: UIButton = {
         let button = UIButton()
         
-        button.setButtonWithSystemImage(imageName: "chevron.right")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.frontButtonImage)
         
         return button
     }()
@@ -44,7 +44,7 @@ final class ItemWebView: UIView {
     let shareButton: UIButton = {
         let button = UIButton()
         
-        button.setButtonWithSystemImage(imageName: "square.and.arrow.up")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.shareButtonImage)
         
         return button
     }()
@@ -60,7 +60,7 @@ final class ItemWebView: UIView {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
-        button.setButtonWithSystemImage(imageName: "tray.fill")
+        button.setButtonWithCustomImage(imageName: ButtonImageConstants.PocketButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -189,5 +189,15 @@ extension ItemWebView: WKNavigationDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.progressBar.isHidden = true
         }
+    }
+}
+
+extension ItemWebView {
+    func setSaveButton(_ isInPocket: Bool) {
+        let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
+        let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage
+        
+        saveButton.setTitle(title, for: .normal)
+        saveButton.setButtonWithCustomImage(imageName: imageName)
     }
 }
