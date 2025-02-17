@@ -342,7 +342,6 @@ extension ItemDetailCollectionViewCell {
         
         priceLabel.text = Int(item.price)?.withSeparator
         
-        
         similarItemViewModel = SimilarItemViewModel(item: item)
         
         similarItemViewModel?.similarItems
