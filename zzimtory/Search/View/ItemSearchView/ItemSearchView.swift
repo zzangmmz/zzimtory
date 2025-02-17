@@ -14,12 +14,15 @@ final class ItemSearchView: ZTView {
     private let searchBar = UISearchBar()
     private let itemCollectionView = ItemCollectionView()
     
-    private let itemCardsView = ItemCardsView()
+    private let cardStack = SwipeCardStack()
     
     private let itemSearchViewModel = ItemSearchViewModel()
     private let disposeBag = DisposeBag()
     
     var items: [Item] = []
+    
+    private lazy var dimLayerTapRecognizer = UITapGestureRecognizer(target: self,
+                                                               action: #selector(onTap))
     
     // MARK: - Background layer
     private lazy var dimLayer: CALayer = {
@@ -38,11 +41,8 @@ final class ItemSearchView: ZTView {
         setSearchBar()
         setColletionView()
         setConstraints()
-        setupSearchBarTapGesture()
         
-        bind(to: itemSearchViewModel)
-        itemCardsView.setDelegate(to: self)
-        itemCardsView.bind(to: itemSearchViewModel)
+        bind()
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -51,19 +51,26 @@ final class ItemSearchView: ZTView {
     
     // MARK: - Private functions
     private func setSearchBar() {
-        searchBar.delegate = self
         searchBar.placeholder = "검색"
 
         searchBar.searchTextField.backgroundColor = .white100Zt
         searchBar.searchBarStyle = .minimal
         
         addSubview(searchBar)
+        
+        searchBar.rx.searchButtonClicked.subscribe(onNext: { [unowned self] in
+            searchBar.resignFirstResponder() // 키보드 내리기
+            
+            // TabBar 숨기기
+            if let viewController = self.next as? UIViewController {
+                viewController.tabBarController?.tabBar.isHidden = true
+            }
+        }).disposed(by: disposeBag)
     }
     
     private func setColletionView() {
         itemCollectionView.register(ItemCollectionViewCell.self,
-                                    forCellWithReuseIdentifier: ItemCollectionViewCell.id)
-        itemCollectionView.dataSource = self
+                                    forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         itemCollectionView.delegate = self
         itemCollectionView.isScrollEnabled = true
         itemCollectionView.register(ItemCollectionViewHeader.self,
@@ -84,120 +91,152 @@ final class ItemSearchView: ZTView {
         }
     }
     
-}
-
-// ItemSearchView를 ViewModel에 바인딩해주기 위한 프로토콜 적용입니다.
-// 자세한 설명은 SearchViewModel+Bindable 참고 바랍니다.
-extension ItemSearchView: SearchViewModelBindable {
-    func bind(to viewModel: some SearchViewModel) {
-        viewModel.searchResult.observe(on: MainScheduler.instance)
-            .subscribe(
-                onNext: { [weak self] result in
-                    self?.items = result
-                    self?.itemCollectionView.reloadData()
-                },
-                onError: { error in
-                    print("error: \(error)")
-                }
-            ).disposed(by: disposeBag)
-    }
-}
-
-extension ItemSearchView: SwipeCardStackDelegate {
-    func cardStack(_ cardStack: SwipeCardStack, didSelectCardAt index: Int) {
-        let selectedItem = items[index]
-        let detailVC = DetailViewController(item: selectedItem)
-        detailVC.hidesBottomBarWhenPushed = true
-
-        if let viewController = self.next as? UIViewController {
-            viewController.navigationController?.pushViewController(detailVC, animated: true)
-        }
-    }
-    
-    func cardStack(_ cardStack: SwipeCardStack, didSwipeCardAt index: Int, with direction: SwipeDirection) {
-        switch direction {
-        case .right: break
-        case .left: break
-        case .up:
-            self.window?.rootViewController?.present(PocketSelectionViewController(selectedItems: [items[index]]),
-                                                     animated: true)
-  
-        default: print("Undefined swipe action")
-        }
-    }
-    
-    func cardStack(_ cardStack: SwipeCardStack, didUndoCardAt index: Int, from direction: SwipeDirection) {
+    private func setCardStack() {
+        cardStack.backgroundColor = .clear
         
-    }
-    
-    func didSwipeAllCards(_ cardStack: SwipeCardStack) {
-        itemCardsView.removeFromSuperview()
-        dimLayer.removeFromSuperlayer()
-    }
-    
-}
-
-extension ItemSearchView: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print(searchText)
-        itemSearchViewModel.setQuery(to: searchText)
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder() // 키보드 내리기
-        
-        itemSearchViewModel.search()
         layer.addSublayer(dimLayer)
-        addSubview(itemCardsView)
-        itemCardsView.frame = self.frame
-        itemCardsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onTap)))
+        addSubview(cardStack)
         
-        // TabBar 숨기기
-        if let viewController = self.next as? UIViewController {
-            viewController.tabBarController?.tabBar.isHidden = true
+        cardStack.snp.makeConstraints { make in
+            make.width.equalTo(UIScreen.main.bounds.width * 0.9)
+            make.height.equalTo(UIScreen.main.bounds.height * 0.7)
+            make.center.equalToSuperview()
         }
+        
+        addGestureRecognizer(dimLayerTapRecognizer)
+        
     }
     
-    // 외부 탭 하면 키보드 사라지게 함
-    private func setupSearchBarTapGesture() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-        tapGesture.delegate = self
-        self.addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func handleTap() {
-        searchBar.resignFirstResponder()
-    }
-    
-    @objc func onTap() {
+    @objc private func onTap() {
         print("ItemCardsView Tapped")
-        itemCardsView.removeFromSuperview()
+        cardStack.removeFromSuperview()
         dimLayer.removeFromSuperlayer()
         
         // TabBar 다시 보이기
         if let viewController = self.next as? UIViewController {
             viewController.tabBarController?.tabBar.isHidden = false
         }
+        
+        removeGestureRecognizer(dimLayerTapRecognizer)
+    }
+    
+}
+
+// MARK: - View/ViewModel 바인딩
+extension ItemSearchView {
+    func bind() {
+        // MARK: - Inputs
+        let input = ItemSearchViewModel.Input(
+            query: searchBar.rx.searchButtonClicked
+                .withLatestFrom(searchBar.rx.text.orEmpty),
+            didSelectCard: cardStack.rx.didSelectCardAt,
+            didSwipeCard: cardStack.rx.didSwipeCardAt,
+            didSwipeAllCards: cardStack.rx.didSwipeAllCards,
+            didSelectItemAt: itemCollectionView.rx.itemSelected
+        )
+        
+        // MARK: - Outputs
+        let output = itemSearchViewModel.transform(input: input)
+        
+        // MARK: - 검색 결과값 CollectionView에 바인딩
+        output.searchResult
+            .drive(itemCollectionView.rx.items(
+                cellIdentifier: String(describing: ItemCollectionViewCell.self),
+                cellType: ItemCollectionViewCell.self)
+            ) { (row, element, cell) in
+                cell.setCell(with: element)
+            }
+            .disposed(by: disposeBag)
+        
+        // MARK: - 검색 결과를 CardStack으로 표시해주는 코드
+        output.searchResult
+            .do(onNext: { [weak self] _ in
+                self?.setCardStack()
+            })
+            .drive(cardStack.rx.items(with: { item in
+                let card = SwipeCard()
+                
+                card.swipeDirections = [.left, .right, .up]
+                // TO-DO: card.footer 확인해서 넣을지 결정
+                card.content = ItemCardContents(item: item)
+                card.contentMode = .scaleAspectFill
+                
+                let leftOverlay = UIView()
+                leftOverlay.backgroundColor = .clear
+                
+                let rightOverlay = UIView()
+                rightOverlay.backgroundColor = .clear
+                
+                let upOverlay = UIView()
+                upOverlay.backgroundColor = .clear
+                
+                card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
+                
+                card.layer.cornerRadius = 8
+                
+                return card
+            }))
+            .disposed(by: disposeBag)
+        
+        // MARK: - 카드 선택 시 아이템 상세화면 표시
+        output.selectedCard
+            .drive(onNext: { cardItem in
+                
+                let detailVC = DetailViewController(item: cardItem)
+                detailVC.hidesBottomBarWhenPushed = true
+                
+                if let viewController = self.next as? UIViewController {
+                    viewController.navigationController?.pushViewController(detailVC, animated: true)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: - 카드 스와이프 제스쳐 지정
+        output.swipedCard
+            .drive(onNext: { [weak self] swipedCard in
+                switch swipedCard.direction {
+                case .right: break
+                case .left: break
+                case .up:
+                    guard DatabaseManager.shared.hasUserLoggedIn() else {
+                        self?.window?.rootViewController?.present(LoginViewController(),
+                                                                 animated: true)
+                        return
+                    }
+                    
+                    let pocketSelectionVC = PocketSelectionViewController(selectedItems: [swipedCard.item])
+                    
+                    self?.window?.rootViewController?.present(pocketSelectionVC, animated: true)
+                    
+                default: print("Undefined swipe direction")
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: - 모든 카드 스와이프 완료
+        output.swipedAllCards
+            .drive(onNext: { [unowned self] in
+                cardStack.removeFromSuperview()
+                dimLayer.removeFromSuperlayer()
+                removeGestureRecognizer(dimLayerTapRecognizer)
+            })
+            .disposed(by: disposeBag)
+        
+        // MARK: - CollectionView에서 셀 선택 시 동작
+        output.selectedCell
+            .drive(onNext: { item in
+                let detailVC = DetailViewController(item: item)
+                detailVC.hidesBottomBarWhenPushed = true
+                
+                if let viewController = self.next as? UIViewController {
+                    viewController.navigationController?.pushViewController(detailVC, animated: true)
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
 
-extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView,
-                        numberOfItemsInSection section: Int) -> Int {
-        return items.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ItemCollectionViewCell.id,
-                                                            for: indexPath)
-                as? ItemCollectionViewCell else { return UICollectionViewCell() }
-        
-        cell.setCell(with: items[indexPath.item])
-        
-        return cell
-    }
-    
+extension ItemSearchView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView,
                         viewForSupplementaryElementOfKind kind: String,
                         at indexPath: IndexPath) -> UICollectionReusableView {
@@ -219,16 +258,7 @@ extension ItemSearchView: UICollectionViewDataSource, UICollectionViewDelegate {
         
         return UICollectionReusableView()
     }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedItem = items[indexPath.item]
-        let detailVC = DetailViewController(item: selectedItem)
-        detailVC.hidesBottomBarWhenPushed = true
 
-        if let viewController = self.next as? UIViewController {
-            viewController.navigationController?.pushViewController(detailVC, animated: true)
-        }
-    }
 }
 
 extension ItemSearchView: UICollectionViewDelegateFlowLayout {
