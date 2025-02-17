@@ -110,7 +110,9 @@ final class ItemSearchViewController: ZTViewController {
 //        
 //        searchHistory.tableHeaderView = headerLabel
         
-// 
+//        headerLabel.snp.makeConstraints { make in
+//            make.width.equalTo(searchHistory.snp.width).inset(24)
+//        }
     }
     
     private func setColletionView() {
