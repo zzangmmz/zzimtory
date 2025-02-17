@@ -52,9 +52,10 @@ final class ItemSearchView: ZTView {
     // MARK: - Private functions
     private func setSearchBar() {
         searchBar.placeholder = "검색"
-
+        searchBar.searchBarStyle = .default
+        searchBar.layer.cornerRadius = 14
+        searchBar.backgroundImage = UIImage()
         searchBar.searchTextField.backgroundColor = .white100Zt
-        searchBar.searchBarStyle = .minimal
         
         addSubview(searchBar)
         
