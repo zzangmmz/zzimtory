@@ -16,6 +16,15 @@ final class ItemSearchViewModel {
     var disposeBag = DisposeBag()
 
     var currentItems: Observable<[Item]> = Observable.just([])
+    var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
+        didSet {
+            // 10개 이상일 경우 초과되는 기록 제거
+            if searchHistory.count > 10 {
+                searchHistory.removeSubrange(10..<searchHistory.count)
+            }
+            UserDefaults.standard.set(searchHistory, forKey: "searchHistory")
+        }
+    }
     
     struct Input {
         var query: Observable<String>
@@ -23,6 +32,7 @@ final class ItemSearchViewModel {
         var didSwipeCard: Observable<(Int, SwipeDirection)>
         var didSwipeAllCards: Observable<Void>
         var didSelectItemAt: ControlEvent<IndexPath>
+        var didSelectSearchHistoryAt: ControlEvent<IndexPath>
     }
     
     struct Output {
@@ -31,6 +41,8 @@ final class ItemSearchViewModel {
         let swipedCard: Driver<SwipedCard>
         let swipedAllCards: Driver<Void>
         let selectedCell: Driver<Item>
+        let searchHistory: Driver<[String]>
+        let selectedSearchHistory: Driver<String>
     }
     
     struct SwipedCard {
@@ -39,9 +51,31 @@ final class ItemSearchViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let searchResult = input.query
+        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
+        
+        let selectedSearchHistory = input.didSelectSearchHistoryAt
+            .withUnretained(self)
+            .flatMap { viewModel, indexPath -> Observable<String> in
+                print("tapped \(indexPath.item)")
+                let selectedHistory = viewModel.searchHistory[indexPath.item]
+                return Observable.just(selectedHistory)
+            }
+            
+        let query = Observable.merge(
+            input.query,
+            selectedSearchHistory
+        )
+        
+        let searchResult = query
             .withUnretained(self)
             .flatMap { viewModel, query -> Observable<[Item]> in
+                
+                if viewModel.searchHistory.contains(query) {
+                    viewModel.searchHistory.removeAll(where: { $0 == query })
+                }
+                
+                viewModel.searchHistory.insert(query, at: 0)
+                
                 let fetchedItems = viewModel.shoppingRepository.fetchForViewModel(with: query)
                 viewModel.currentItems = fetchedItems
                 return fetchedItems
@@ -81,7 +115,9 @@ final class ItemSearchViewModel {
                             selectedCard: selectedCard,
                             swipedCard: swipedCard,
                             swipedAllCards: swipedAllCards,
-                            selectedCell: selectedCell
+                            selectedCell: selectedCell,
+                            searchHistory: searchHistory,
+                            selectedSearchHistory: selectedSearchHistory.asDriver(onErrorDriveWith: .empty())
         )
         
         return output
