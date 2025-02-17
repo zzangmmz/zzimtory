@@ -22,4 +22,11 @@ final class ShoppingRepository: ShoppingRepositoryProtocol {
         provider.rx.request(.search(query: query))
             .map(ShoppingAPIResponse.self)
     }
+    
+    func fetchForViewModel(with query: String) -> Observable<[Item]> {
+        provider.rx.request(.search(query: query))
+            .map(ShoppingAPIResponse.self)
+            .map { $0.items }
+            .asObservable()
+    }
 }
