@@ -77,6 +77,7 @@ final class ItemSearchView: ZTView {
         itemCollectionView.register(ItemCollectionViewHeader.self,
                                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                     withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
+        itemCollectionView.showsVerticalScrollIndicator = false
         
         addSubview(itemCollectionView)
     }
