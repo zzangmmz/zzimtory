@@ -246,9 +246,8 @@ extension ItemSearchViewController {
                 let detailVC = ItemDetailViewController(items: [cardItem])
                 detailVC.hidesBottomBarWhenPushed = true
                 
-                if let viewController = self.next as? UIViewController {
-                    viewController.navigationController?.pushViewController(detailVC, animated: true)
-                }
+                self.navigationController?.pushViewController(detailVC, animated: true)
+
             })
             .disposed(by: disposeBag)
         
@@ -291,10 +290,6 @@ extension ItemSearchViewController {
                 detailVC.hidesBottomBarWhenPushed = true
                 
                 self.navigationController?.pushViewController(detailVC, animated: true)
-                
-//                if let viewController = self.next as? UIViewController {
-//                    viewController.navigationController?.pushViewController(detailVC, animated: true)
-//                }
             })
             .disposed(by: disposeBag)
         
