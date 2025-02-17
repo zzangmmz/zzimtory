@@ -42,7 +42,6 @@ final class ItemSearchView: ZTView {
         addComponents()
         setSearchBar()
         setSearchHistory()
-        setColletionView()
         setConstraints()
         
         bind()
@@ -56,8 +55,7 @@ final class ItemSearchView: ZTView {
     private func addComponents() {
         [
             searchBar,
-            searchHistory,
-            itemCollectionView
+            searchHistory
         ].forEach { addSubview($0) }
     }
     
@@ -72,12 +70,19 @@ final class ItemSearchView: ZTView {
             searchBar.resignFirstResponder()
             
             // 검색 기록 숨기기
-            
+            searchHistory.removeFromSuperview()
             
             // TabBar 숨기기
             if let viewController = self.next as? UIViewController {
                 viewController.tabBarController?.tabBar.isHidden = true
             }
+        }).disposed(by: disposeBag)
+        
+        searchBar.rx.cancelButtonClicked.subscribe(onNext: { [unowned self] in
+            
+            searchBar.becomeFirstResponder()
+            
+            addSubview(searchHistory)
         }).disposed(by: disposeBag)
     }
     
@@ -89,6 +94,8 @@ final class ItemSearchView: ZTView {
     }
     
     private func setColletionView() {
+        addSubview(itemCollectionView)
+        
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         itemCollectionView.delegate = self
@@ -96,6 +103,11 @@ final class ItemSearchView: ZTView {
         itemCollectionView.register(ItemCollectionViewHeader.self,
                                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                     withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
+        
+        itemCollectionView.snp.makeConstraints { make in
+            make.bottom.horizontalEdges.equalToSuperview().inset(12)
+            make.top.equalTo(searchBar.snp.bottom).offset(12)
+        }
     }
     
     private func setConstraints() {
@@ -107,11 +119,6 @@ final class ItemSearchView: ZTView {
             make.top.equalTo(searchBar.snp.bottom).offset(12)
             make.horizontalEdges.equalToSuperview().inset(12)
             make.bottom.equalToSuperview().inset(12)
-        }
-        
-        itemCollectionView.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(12)
-            make.top.equalTo(searchBar.snp.bottom).offset(12)
         }
     }
     
@@ -156,7 +163,8 @@ extension ItemSearchView {
             didSelectCard: cardStack.rx.didSelectCardAt,
             didSwipeCard: cardStack.rx.didSwipeCardAt,
             didSwipeAllCards: cardStack.rx.didSwipeAllCards,
-            didSelectItemAt: itemCollectionView.rx.itemSelected
+            didSelectItemAt: itemCollectionView.rx.itemSelected,
+            didSelectSearchHistoryAt: searchHistory.rx.itemSelected
         )
         
         // MARK: - Outputs
@@ -164,6 +172,9 @@ extension ItemSearchView {
         
         // MARK: - 검색 결과값 CollectionView에 바인딩
         output.searchResult
+            .do(onNext: { [weak self] _ in
+                self?.setColletionView()
+            })
             .drive(itemCollectionView.rx.items(
                 cellIdentifier: String(describing: ItemCollectionViewCell.self),
                 cellType: ItemCollectionViewCell.self)
@@ -265,6 +276,16 @@ extension ItemSearchView {
             ) { row, element, cell in
                 cell.setCell(with: element)
             }
+            .disposed(by: disposeBag)
+        
+        output.selectedSearchHistory
+            .drive(onNext: { [unowned self] query in
+                print(query)
+                self.searchBar.searchTextField.text = query
+                self.searchHistory.reloadData()
+                self.searchBar.resignFirstResponder()
+                self.searchHistory.removeFromSuperview()
+            })
             .disposed(by: disposeBag)
     }
 }

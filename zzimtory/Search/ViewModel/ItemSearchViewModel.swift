@@ -32,6 +32,7 @@ final class ItemSearchViewModel {
         var didSwipeCard: Observable<(Int, SwipeDirection)>
         var didSwipeAllCards: Observable<Void>
         var didSelectItemAt: ControlEvent<IndexPath>
+        var didSelectSearchHistoryAt: ControlEvent<IndexPath>
     }
     
     struct Output {
@@ -41,6 +42,7 @@ final class ItemSearchViewModel {
         let swipedAllCards: Driver<Void>
         let selectedCell: Driver<Item>
         let searchHistory: Driver<[String]>
+        let selectedSearchHistory: Driver<String>
     }
     
     struct SwipedCard {
@@ -49,11 +51,32 @@ final class ItemSearchViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let searchResult = input.query
+        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
+        
+        let selectedSearchHistory = input.didSelectSearchHistoryAt
+            .withUnretained(self)
+            .flatMap { viewModel, indexPath -> Observable<String> in
+                print("tapped \(indexPath.item)")
+                let selectedHistory = viewModel.searchHistory[indexPath.item]
+                return Observable.just(selectedHistory)
+            }
+            
+        let query = Observable.merge(
+            input.query,
+            selectedSearchHistory
+        )
+        
+        let searchResult = query
             .withUnretained(self)
             .flatMap { viewModel, query -> Observable<[Item]> in
-                let fetchedItems = viewModel.shoppingRepository.fetchForViewModel(with: query)
+                
+                if viewModel.searchHistory.contains(query) {
+                    viewModel.searchHistory.removeAll(where: { $0 == query })
+                }
+                
                 viewModel.searchHistory.insert(query, at: 0)
+                
+                let fetchedItems = viewModel.shoppingRepository.fetchForViewModel(with: query)
                 viewModel.currentItems = fetchedItems
                 return fetchedItems
             }
@@ -88,15 +111,13 @@ final class ItemSearchViewModel {
             }
             .asDriver(onErrorDriveWith: .empty())
         
-        
-        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
-        
         let output = Output(searchResult: searchResult,
                             selectedCard: selectedCard,
                             swipedCard: swipedCard,
                             swipedAllCards: swipedAllCards,
                             selectedCell: selectedCell,
-                            searchHistory: searchHistory
+                            searchHistory: searchHistory,
+                            selectedSearchHistory: selectedSearchHistory.asDriver(onErrorDriveWith: .empty())
         )
         
         return output
