@@ -18,7 +18,7 @@ final class ItemSearchViewController: ZTViewController {
     private let cardStack = SwipeCardStack()
     
     private let itemSearchViewModel = ItemSearchViewModel()
-    private let disposeBag = DisposeBag()
+    private var disposeBag = DisposeBag()
     
     var items: [Item] = []
     
@@ -39,14 +39,19 @@ final class ItemSearchViewController: ZTViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print("ItemSearchViewController Loaded")
-        navigationController?.navigationBar.isHidden = true
         
         addComponents()
         setSearchBar()
         setSearchHistory()
         setConstraints()
+        itemCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
         
         bind()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.isHidden = true
     }
     
     // MARK: - Private functions
@@ -77,7 +82,7 @@ final class ItemSearchViewController: ZTViewController {
         
         searchBar.rx.cancelButtonClicked.subscribe(onNext: { [unowned self] in
             
-//            searchBar.becomeFirstResponder()
+            searchBar.becomeFirstResponder()
             view.addSubview(searchHistory)
             
         }).disposed(by: disposeBag)
@@ -115,7 +120,7 @@ final class ItemSearchViewController: ZTViewController {
         
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
-        itemCollectionView.delegate = self
+        
         itemCollectionView.isScrollEnabled = true
     
         itemCollectionView.register(ItemCollectionViewHeader.self,
