@@ -59,16 +59,15 @@ final class ItemSearchViewController: ZTViewController {
     
     private func setSearchBar() {
         searchBar.placeholder = "검색"
-
+        searchBar.searchBarStyle = .default
+        searchBar.layer.cornerRadius = 14
+        searchBar.backgroundImage = UIImage()
         searchBar.searchTextField.backgroundColor = .white100Zt
-        searchBar.searchBarStyle = .minimal
+        
+        view.addSubview(searchBar)
         
         searchBar.rx.searchButtonClicked.subscribe(onNext: { [unowned self] in
-            // 키보드 내리기
-            searchBar.resignFirstResponder()
-            
-            // 검색 기록 숨기기
-            searchHistory.removeFromSuperview()
+            searchBar.resignFirstResponder() // 키보드 내리기
             
             // TabBar 숨기기
             if let viewController = self.next as? UIViewController {
@@ -78,17 +77,37 @@ final class ItemSearchViewController: ZTViewController {
         
         searchBar.rx.cancelButtonClicked.subscribe(onNext: { [unowned self] in
             
-            searchBar.becomeFirstResponder()
-            
+//            searchBar.becomeFirstResponder()
             view.addSubview(searchHistory)
+            
         }).disposed(by: disposeBag)
     }
     
     private func setSearchHistory() {
         searchHistory.backgroundColor = .clear
+        searchHistory.separatorStyle = .singleLine
         
         searchHistory.register(ItemSearchHistoryTableCell.self,
                                forCellReuseIdentifier: String(describing: ItemSearchHistoryTableCell.self))
+        searchHistory.showsHorizontalScrollIndicator = false
+        searchHistory.rowHeight = 40
+        
+        let headerLabel: UILabel = {
+            let label = UILabel()
+            
+            label.text = "최근 검색어"
+            label.font = .systemFont(ofSize: 16, weight: .semibold)
+            label.textColor = .black900Zt
+            label.textAlignment = .left
+            
+            return label
+        }()
+        
+        searchHistory.tableHeaderView = headerLabel
+        
+        headerLabel.snp.makeConstraints { make in
+            make.width.equalTo(searchHistory.snp.width).inset(24)
+        }
     }
     
     private func setColletionView() {
@@ -98,26 +117,35 @@ final class ItemSearchViewController: ZTViewController {
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         itemCollectionView.delegate = self
         itemCollectionView.isScrollEnabled = true
+    
         itemCollectionView.register(ItemCollectionViewHeader.self,
                                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                     withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
         
         itemCollectionView.snp.makeConstraints { make in
-            make.bottom.horizontalEdges.equalToSuperview().inset(12)
+            make.bottom.equalToSuperview().inset(12)
             make.top.equalTo(searchBar.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
         }
     }
     
     private func setConstraints() {
         searchBar.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(44)
+        }
+        
+        searchBar.searchTextField.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
         searchHistory.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom).offset(12)
-            make.horizontalEdges.equalToSuperview().inset(12)
+            make.width.equalToSuperview().inset(12)
             make.bottom.equalToSuperview().inset(12)
         }
+
     }
     
     private func setCardStack() {
@@ -258,16 +286,19 @@ extension ItemSearchViewController {
         // MARK: - CollectionView에서 셀 선택 시 동작
         output.selectedCell
             .drive(onNext: { item in
+                print("Tapped: \(item)")
                 let detailVC = ItemDetailViewController(items: [item])
                 detailVC.hidesBottomBarWhenPushed = true
                 
-                if let viewController = self.next as? UIViewController {
-                    viewController.navigationController?.pushViewController(detailVC, animated: true)
-                }
+                self.navigationController?.pushViewController(detailVC, animated: true)
+                
+//                if let viewController = self.next as? UIViewController {
+//                    viewController.navigationController?.pushViewController(detailVC, animated: true)
+//                }
             })
             .disposed(by: disposeBag)
         
-        // MARK: -
+        // MARK: - 최근 검색기록 바인딩
         output.searchHistory
             .drive(searchHistory.rx.items(cellIdentifier: String(describing: ItemSearchHistoryTableCell.self),
                                           cellType: ItemSearchHistoryTableCell.self)
@@ -276,6 +307,7 @@ extension ItemSearchViewController {
             }
             .disposed(by: disposeBag)
         
+        // MARK: - 최근 검색기록 선택 시 동작
         output.selectedSearchHistory
             .drive(onNext: { [unowned self] query in
                 print(query)

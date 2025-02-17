@@ -42,7 +42,7 @@ final class ItemSearchHistoryTableCell: UITableViewCell {
     
     private func setConstraints() {
         titleLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(8)
+            make.horizontalEdges.equalToSuperview().inset(24)
             make.verticalEdges.equalToSuperview().inset(4)
         }
     }
