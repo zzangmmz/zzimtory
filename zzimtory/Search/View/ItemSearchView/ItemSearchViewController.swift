@@ -97,22 +97,20 @@ final class ItemSearchViewController: ZTViewController {
         searchHistory.showsHorizontalScrollIndicator = false
         searchHistory.rowHeight = 40
         
-        let headerLabel: UILabel = {
-            let label = UILabel()
-            
-            label.text = "최근 검색어"
-            label.font = .systemFont(ofSize: 16, weight: .semibold)
-            label.textColor = .black900Zt
-            label.textAlignment = .left
-            
-            return label
-        }()
+//        let headerLabel: UILabel = {
+//            let label = UILabel()
+//            
+//            label.text = "최근 검색어"
+//            label.font = .systemFont(ofSize: 16, weight: .semibold)
+//            label.textColor = .black900Zt
+//            label.textAlignment = .left
+//            
+//            return label
+//        }()
+//        
+//        searchHistory.tableHeaderView = headerLabel
         
-        searchHistory.tableHeaderView = headerLabel
-        
-        headerLabel.snp.makeConstraints { make in
-            make.width.equalTo(searchHistory.snp.width).inset(24)
-        }
+// 
     }
     
     private func setColletionView() {
