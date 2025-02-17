@@ -305,7 +305,7 @@ extension ItemSearchViewController {
         // MARK: - 최근 검색기록 선택 시 동작
         output.selectedSearchHistory
             .drive(onNext: { [unowned self] query in
-                print(query)
+                print("Rx: VC Output selected search history: \(query)")
                 self.searchBar.searchTextField.text = query
                 self.searchHistory.reloadData()
                 self.searchBar.resignFirstResponder()

@@ -53,15 +53,16 @@ final class ItemSearchViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
         
         let selectedSearchHistory = input.didSelectSearchHistoryAt
+            .debug("Rx: selectedSearchHistory")
             .withUnretained(self)
             .flatMap { viewModel, indexPath -> Observable<String> in
                 print("tapped \(indexPath.item)")
                 let selectedHistory = viewModel.searchHistory[indexPath.item]
                 return Observable.just(selectedHistory)
             }
+            .share()
             
         let query = Observable.merge(
             input.query,
@@ -69,6 +70,7 @@ final class ItemSearchViewModel {
         )
         
         let searchResult = query
+            .debug("Rx: searchResult")
             .withUnretained(self)
             .flatMap { viewModel, query -> Observable<[Item]> in
                 
@@ -112,6 +114,8 @@ final class ItemSearchViewModel {
                 return viewModel.currentItems.compactMap { $0[indexPath.item] }
             }
             .asDriver(onErrorDriveWith: .empty())
+        
+        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
         
         let output = Output(searchResult: searchResult,
                             selectedCard: selectedCard,
