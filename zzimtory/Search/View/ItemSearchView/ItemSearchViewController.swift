@@ -49,6 +49,7 @@ final class ItemSearchViewController: ZTViewController {
         setConstraints()
         
         bind()
+        otherRxCocoaStuff()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -199,6 +200,23 @@ final class ItemSearchViewController: ZTViewController {
         
     }
     
+    private func showRecentsAndHideSearchResults() {
+        recentItemsView.isHidden = false
+        searchHistory.isHidden = false
+        searchHistoryHeader.isHidden = false
+        
+        itemCollectionView.isHidden = true
+        searchHistory.reloadData()
+    }
+    
+    private func hideRecentsAndShowSearchResults() {
+        recentItemsView.isHidden = true
+        searchHistory.isHidden = true
+        searchHistoryHeader.isHidden = true
+        
+        itemCollectionView.isHidden = false
+    }
+    
     @objc private func onTap() {
         print("ItemCardsView Tapped")
         cardStack.removeFromSuperview()
@@ -237,6 +255,7 @@ extension ItemSearchViewController {
         output.searchResult
             .do(onNext: { [weak self] _ in
                 self?.setColletionView()
+                self?.hideRecentsAndShowSearchResults()
             })
             .drive(itemCollectionView.rx.items(
                 cellIdentifier: String(describing: ItemCollectionViewCell.self),
@@ -344,13 +363,21 @@ extension ItemSearchViewController {
             .drive(onNext: { [unowned self] query in
                 print("Rx: VC Output selected search history: \(query)")
                 self.searchBar.searchTextField.text = query
-                self.searchHistory.reloadData()
                 self.searchBar.resignFirstResponder()
-                self.searchHistory.removeFromSuperview()
+                self.hideRecentsAndShowSearchResults()
             })
             .disposed(by: disposeBag)
-        
+    }
+    
+    func otherRxCocoaStuff() {
+        // MARK: - Delegate 설정
         itemCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
+        
+        // MARK: -
+        searchBar.rx.textDidBeginEditing
+            .subscribe(onNext: { [unowned self] _ in
+                self.showRecentsAndHideSearchResults()
+            }).disposed(by: disposeBag)
     }
 }
 
