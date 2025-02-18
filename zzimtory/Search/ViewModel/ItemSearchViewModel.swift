@@ -32,6 +32,12 @@ final class ItemSearchViewModel {
         }
     }
     
+    // MARK: - 무한 스크롤 프로퍼티
+    private var currentPage = 1     // 현재 페이지
+    private var isLoading = false   // 로딩중인지 체크
+    private var hasMoreData = true  // 더 가져올 데이터가 있는지 체크
+    private let itemsPerPage = 10   // request당 가져올 데이터 개수
+    
     struct Input {
         var query: Observable<String>
         var didSelectCard: Observable<Int>
