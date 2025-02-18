@@ -46,7 +46,6 @@ final class ItemSearchViewController: ZTViewController {
         setRecectItems()
         setSearchHistory()
         setConstraints()
-        itemCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
         
         bind()
     }
@@ -168,6 +167,7 @@ final class ItemSearchViewController: ZTViewController {
     private func setColletionView() {
         view.addSubview(itemCollectionView)
         
+        itemCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         
