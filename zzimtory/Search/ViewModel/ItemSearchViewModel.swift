@@ -14,14 +14,20 @@ import RxCocoa
 final class ItemSearchViewModel {
     private let shoppingRepository = ShoppingRepository()
     var disposeBag = DisposeBag()
-
-    var currentItems: Observable<[Item]> = Observable.just([])
-    var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
+    
+    private let userDefaults = UserDefaults.standard
+    private let recentItemsKey = "recentItems"
+    private(set) var recentItems = [Item]()
+    
+    private var currentItems: Observable<[Item]> = Observable.just([])
+    private var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
         didSet {
             // 10개 이상일 경우 초과되는 기록 제거
             if searchHistory.count > 10 {
                 searchHistory.removeSubrange(10..<searchHistory.count)
             }
+            
+            searchHistory = searchHistory.filter { !$0.isEmpty }
             UserDefaults.standard.set(searchHistory, forKey: "searchHistory")
         }
     }
@@ -33,6 +39,8 @@ final class ItemSearchViewModel {
         var didSwipeAllCards: Observable<Void>
         var didSelectItemAt: ControlEvent<IndexPath>
         var didSelectSearchHistoryAt: ControlEvent<IndexPath>
+        var didRemoveItemAt: ControlEvent<IndexPath>
+        var didTapClearHistory: ControlEvent<Void>
     }
     
     struct Output {
@@ -52,15 +60,16 @@ final class ItemSearchViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let searchHistory = Observable.just(searchHistory).asDriver(onErrorDriveWith: .empty())
         
         let selectedSearchHistory = input.didSelectSearchHistoryAt
+            .debug("Rx: selectedSearchHistory")
             .withUnretained(self)
             .flatMap { viewModel, indexPath -> Observable<String> in
                 print("tapped \(indexPath.item)")
                 let selectedHistory = viewModel.searchHistory[indexPath.item]
                 return Observable.just(selectedHistory)
             }
+            .share()
             
         let query = Observable.merge(
             input.query,
@@ -68,6 +77,7 @@ final class ItemSearchViewModel {
         )
         
         let searchResult = query
+            .debug("Rx: searchResult")
             .withUnretained(self)
             .flatMap { viewModel, query -> Observable<[Item]> in
                 
@@ -121,15 +131,47 @@ final class ItemSearchViewModel {
             }
             .asDriver(onErrorDriveWith: .empty())
         
+        // MARK: - 검색 기록
+        let searchHistoryRemoved = input.didRemoveItemAt
+            .withUnretained(self)
+            .flatMap { viewModel, indexPath -> Observable<[String]> in
+                viewModel.searchHistory.remove(at: indexPath.item)
+                return Observable.just(viewModel.searchHistory)
+            }
+        
+        let searchHistoryCleared = input.didTapClearHistory
+            .withUnretained(self)
+            .flatMap { viewModel, _ -> Observable<[String]> in
+                viewModel.searchHistory.removeAll()
+                return Observable.just(viewModel.searchHistory)
+            }
+        
+        let searchHistory = Observable.merge(
+            Observable.just(searchHistory),
+            searchHistoryRemoved,
+            searchHistoryCleared
+        )
+        
         let output = Output(searchResult: searchResult,
                             selectedCard: selectedCard,
                             swipedCard: swipedCard,
                             swipedAllCards: swipedAllCards,
                             selectedCell: selectedCell,
-                            searchHistory: searchHistory,
+                            searchHistory: searchHistory.asDriver(onErrorDriveWith: .empty()),
                             selectedSearchHistory: selectedSearchHistory.asDriver(onErrorDriveWith: .empty())
         )
         
         return output
+    }
+    
+    func loadItems() {
+        if let data = userDefaults.data(forKey: recentItemsKey) {
+            do {
+                let items = try JSONDecoder().decode([Item].self, from: data)
+                self.recentItems = items
+            } catch {
+                print("최근 본 아이템 - 유저 디폴트 디코딩 에러: \(error)")
+            }
+        }
     }
 }

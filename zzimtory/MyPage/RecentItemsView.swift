@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class RecentItemsView: UIView {
-    private let titleLabel: UILabel = {
+    private(set) var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "최근 본 상품"
         label.textColor = .black900Zt
@@ -30,7 +30,7 @@ final class RecentItemsView: UIView {
         return collectionView
     }()
     
-    private let placeHolder: UILabel = {
+    private(set) var placeHolder: UILabel = {
         let label = UILabel()
         label.text = "최근 본 상품이 없습니다."
         label.textColor = .gray300Zt
