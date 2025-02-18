@@ -191,7 +191,6 @@ final class DatabaseManager {
         }
     }
     
-    
     // MARK: - Data Update Methods
     /// 아이템 추가하는 메서드
     func updatePocketItem(newItem: Item, pocketTitle: String) {
@@ -281,4 +280,57 @@ final class DatabaseManager {
             }
         }
     }
+    
+    /// "전체보기" 주머니를 새로 생성하거나 업데이트합니다.
+        func createOrUpdateAggregatePocket(pocket: Pocket, completion: @escaping () -> Void) {
+            guard let uid = self.userUID else { return }
+            
+            // Item 배열을 딕셔너리로 변환 (각 아이템의 key는 "zzimtory{productID}" 형식)
+            var itemsDict: [String: Any] = [:]
+            for item in pocket.items {
+                if let itemDict = item.asAny() as? [String: Any] {
+                    let key = "zzimtory\(item.productID)"
+                    itemsDict[key] = itemDict
+                }
+            }
+            
+            let pocketData: [String: Any] = [
+                "title": pocket.title,
+                "items": itemsDict,
+                "images": pocket.images,
+                "saveDate": ServerValue.timestamp()
+            ]
+            
+            self.ref.child("users").child(uid).child("pockets").child("pocket\(pocket.title)").setValue(pocketData) { error, _ in
+                if let error = error {
+                    print("전체보기 주머니 생성/업데이트 실패: \(error.localizedDescription)")
+                } else {
+                    print("전체보기 주머니가 DB에 업데이트되었습니다.")
+                }
+                completion()
+            }
+        }
+        
+        /// "전체보기" 주머니에 직접 아이템을 추가하는 메서드
+        func addItemToAggregatePocket(newItem: Item, completion: @escaping () -> Void) {
+            guard let uid = self.userUID else { return }
+            let aggregateRef = self.ref.child("users").child(uid).child("pockets").child("pocket전체보기")
+            let newIndex = "zzimtory\(newItem.productID)"
+            
+            var updatedItem = newItem
+            updatedItem.saveDate = Date()
+            guard let itemDict = updatedItem.asAny() as? [String: Any] else {
+                print("아이템 변환 실패")
+                return
+            }
+            
+            aggregateRef.child("items").child(newIndex).setValue(itemDict) { error, _ in
+                if let error = error {
+                    print("전체보기 주머니에 아이템 추가 실패: \(error.localizedDescription)")
+                } else {
+                    print("전체보기 주머니에 아이템이 직접 추가되었습니다.")
+                }
+                completion()
+            }
+        }
 }

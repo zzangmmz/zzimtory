@@ -36,7 +36,7 @@ class PocketDetailViewController: UIViewController,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
-
+        
         bind()
     }
     
@@ -70,9 +70,12 @@ class PocketDetailViewController: UIViewController,
         pocketDetailView?.searchBar.delegate = self
         pocketDetailView?.cancelButton.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)
         pocketDetailView?.editButton.addTarget(self, action: #selector (editButtonDidTap), for: .touchUpInside)
-        pocketDetailView?.moveCancelButton.addTarget(self, action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
-        pocketDetailView?.seedDeleteButton.addTarget(self, action: #selector(seedDeleteButtonDidTap), for: .touchUpInside)
-        pocketDetailView?.seedMoveButton.addTarget(self, action: #selector(seedMoveButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.moveCancelButton.addTarget(self
+                                                     , action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.seedDeleteButton.addTarget(self
+                                                     , action: #selector(seedDeleteButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.seedMoveButton.addTarget(self
+                                                   , action: #selector(seedMoveButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
@@ -153,19 +156,36 @@ class PocketDetailViewController: UIViewController,
         
         let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
         
-        selectedItems.forEach { item in
-            DatabaseManager.shared.deleteItem(productID: item.productID, from: viewModel.pocket.title)
+        let alert = UIAlertController(title: "씨앗 삭제", message: "씨앗을 삭제하시겠습니까?", preferredStyle: .alert)
+        
+        let deleteAction = UIAlertAction(title: "네", style: .destructive) { _ in
+            selectedItems.forEach { item in
+                if self.viewModel.pocket.title == "전체보기" {
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+                }else{
+                    
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: "전체보기")
+                }
+            }
+            
+            self.bind()
+            
+            self.editMode = false
+            self.pocketDetailView?.toggleButtonHidden()
         }
+        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
         
-        bind()
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
         
-        editMode = false
-        pocketDetailView?.toggleButtonHidden()
+        present(alert, animated: true, completion: nil)
     }
     
+    
     @objc func seedMoveButtonDidTap() {
-        guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
         
+        guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
         let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
         
         // 주머니에 없으면 모달 띄우기
@@ -176,7 +196,11 @@ class PocketDetailViewController: UIViewController,
         pocketVC.onComplete = { [weak self] in
             guard let self = self else { return }
             selectedItems.forEach { item in
+                if self.viewModel.pocket.title != "전체보기" {
+                    DatabaseManager.shared.deleteItem(productID: item.productID, from: "전체보기")
+                }
                 DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+                
             }
             self.bind()
             editMode = false

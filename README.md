@@ -51,6 +51,7 @@
     - KakaoSDK
     - NaverThirdPartyLogin
     - AuthenticationServices (Apple Login)
+  - [Shuffle](https://github.com/mac-gallagher/Shuffle): 카드 스와이프 화면
 #### API
   - Naver Shopping API: 상품 검색 및 정보 제공
 
