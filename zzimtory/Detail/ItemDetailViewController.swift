@@ -14,7 +14,7 @@ final class ItemDetailViewController: ZTViewController {
     private let viewModel: ItemDetailViewModel
     private let disposeBag = DisposeBag()
     private let items: [Item]    // 전체 아이템 배열
-    private let currentIndex: Int // 현재 아이템의 인덱스
+    private var currentIndex: Int // 현재 아이템의 인덱스
     
     private var itemDetailCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -34,14 +34,7 @@ final class ItemDetailViewController: ZTViewController {
         return collectionView
     }()
     
-    init(items: [Item]) {
-        self.items = items
-        self.currentIndex = 0
-        self.viewModel = ItemDetailViewModel(items: items, currentIndex: currentIndex)
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    init(items: [Item], currentIndex: Int) {
+    init(items: [Item], currentIndex: Int = 0) {
         self.items = items
         self.currentIndex = currentIndex
         self.viewModel = ItemDetailViewModel(items: items, currentIndex: currentIndex)
@@ -61,6 +54,11 @@ final class ItemDetailViewController: ZTViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.isHidden = false
+        
+        DispatchQueue.main.async {
+            let indexPath = IndexPath(item: self.currentIndex, section: 0)
+            self.itemDetailCollectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+        }
         
         setupNavigationBar()
         setupCollectionView()
@@ -91,7 +89,8 @@ final class ItemDetailViewController: ZTViewController {
             .drive(itemDetailCollectionView.rx.items(
                 cellIdentifier: "ItemDetailCollectionViewCell",
                 cellType: ItemDetailCollectionViewCell.self
-            )) { [weak self] _, item, cell in
+            )) { [weak self] index, item, cell in
+                print("Current index: \(index), Item title: \(item.title)")
                 cell.delegate = self
                 cell.setCell(with: item)
                 
@@ -162,6 +161,23 @@ final class ItemDetailViewController: ZTViewController {
                     })
                     .disposed(by: cell.disposeBag)
             }
+            .disposed(by: disposeBag)
+        
+        // 스크롤 시 현재 index 업데이트
+        itemDetailCollectionView.rx.didEndDecelerating
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                
+                let visibleIndexPaths = self.itemDetailCollectionView.indexPathsForVisibleItems
+                let sortedIndexPaths = visibleIndexPaths.sorted(by: { $0.item < $1.item })
+                
+                if let firstIndexPath = sortedIndexPaths.first {
+                    self.currentIndex = firstIndexPath.item
+                    self.viewModel.updateCurrentIndex(firstIndexPath.item)
+                    self.saveRecentItem()
+                    print("현재 선택된 index: \(self.currentIndex)")
+                }
+            })
             .disposed(by: disposeBag)
     }
     

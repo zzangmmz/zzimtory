@@ -17,7 +17,8 @@ final class ItemDetailViewModel {
     private var itemsRelay = BehaviorRelay<[Item]>(value: [])
     var items: Driver<[Item]>
     
-    let currentItem: Item // 현재 보여줄 아이템
+    private let currentIndexRelay: BehaviorRelay<Int>
+    var currentItem: Item { itemsRelay.value[currentIndexRelay.value] } // 현재 보여줄 아이템
     private var searchQuery: String = ""
 
     let similarItems = BehaviorSubject<[Item]>(value: [])
@@ -28,11 +29,16 @@ final class ItemDetailViewModel {
     init(items: [Item], currentIndex: Int) {
         self.itemsRelay = BehaviorRelay<[Item]>(value: items)
         self.items = itemsRelay.asDriver()
-        self.currentItem = items[currentIndex]
+        self.currentIndexRelay = BehaviorRelay<Int>(value: currentIndex)
         
         setupSearchQuery()
         fetchSimilarItems()
         checkItemStatus()
+    }
+    
+    // 인덱스 업데이트
+    func updateCurrentIndex(_ index: Int) {
+        currentIndexRelay.accept(index)
     }
     
     // 검색어 설정 메서드
