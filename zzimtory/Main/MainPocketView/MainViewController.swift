@@ -35,7 +35,6 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         super.viewDidLoad()
         self.mainView = MainView(frame: view.frame)
         self.view = self.mainView
-        
         setupActions()
         setupCollectionView()
     }
