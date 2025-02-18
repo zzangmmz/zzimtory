@@ -283,7 +283,8 @@ final class DatabaseManager {
     
     /// "전체보기" 주머니를 새로 생성하거나 업데이트합니다.
         func createOrUpdateAggregatePocket(pocket: Pocket, completion: @escaping () -> Void) {
-            guard let uid = self.userUID else { return }
+            guard let uid = self.getUserUID() else {
+                return }
             
             // Item 배열을 딕셔너리로 변환 (각 아이템의 key는 "zzimtory{productID}" 형식)
             var itemsDict: [String: Any] = [:]
@@ -313,7 +314,7 @@ final class DatabaseManager {
         
         /// "전체보기" 주머니에 직접 아이템을 추가하는 메서드
         func addItemToAggregatePocket(newItem: Item, completion: @escaping () -> Void) {
-            guard let uid = self.userUID else { return }
+            guard let uid = self.getUserUID() else { return }
             let aggregateRef = self.ref.child("users").child(uid).child("pockets").child("pocket전체보기")
             let newIndex = "zzimtory\(newItem.productID)"
             
