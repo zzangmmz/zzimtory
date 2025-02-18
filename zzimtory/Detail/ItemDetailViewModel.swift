@@ -100,7 +100,6 @@ final class ItemDetailViewModel {
                         // 해당 주머니에서 아이템 삭제
                         DatabaseManager.shared.deleteItem(productID: self.currentItem.productID, from: pocket.title)
                         print("아이템 삭제됨: \(self.currentItem.title) from \(pocket.title)")
-                        break
                     }
                 }
             }
@@ -110,6 +109,9 @@ final class ItemDetailViewModel {
     }
     
     func addToPocket() {
+        DatabaseManager.shared.addItemToAggregatePocket(newItem: currentItem) {
+            print("전체보기 주머니에 아이템 추가 완료")
+        }
         isInPocketStatus = true
         isInPocket.onNext(true)
     }
