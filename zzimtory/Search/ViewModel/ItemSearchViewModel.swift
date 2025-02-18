@@ -19,7 +19,7 @@ final class ItemSearchViewModel {
     private let recentItemsKey = "recentItems"
     private(set) var recentItems = [Item]()
     
-    private var currentItems: Observable<[Item]> = Observable.just([])
+    private var currentItems: BehaviorSubject<[Item]> = BehaviorSubject(value: [])
     private var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
         didSet {
             // 10개 이상일 경우 초과되는 기록 제거
@@ -34,8 +34,8 @@ final class ItemSearchViewModel {
     
     // MARK: - 무한 스크롤 프로퍼티
     private var currentPage = 1     // 현재 페이지
-    private var isLoading = false   // 로딩중인지 체크
-    private var hasMoreData = true  // 더 가져올 데이터가 있는지 체크
+    private(set) var isLoading = false   // 로딩중인지 체크
+    private(set) var hasMoreData = true  // 더 가져올 데이터가 있는지 체크
     private let itemsPerPage = 10   // request당 가져올 데이터 개수
     
     struct Input {
@@ -85,6 +85,8 @@ final class ItemSearchViewModel {
             .debug("Rx: searchResult")
             .withUnretained(self)
             .flatMap { viewModel, query -> Observable<[Item]> in
+                viewModel.currentPage = 1
+                viewModel.hasMoreData = true
                 
                 if viewModel.searchHistory.contains(query) {
                     viewModel.searchHistory.removeAll(where: { $0 == query })
@@ -93,8 +95,14 @@ final class ItemSearchViewModel {
                 viewModel.searchHistory.insert(query, at: 0)
                 
                 let fetchedItems = viewModel.shoppingRepository.fetchForViewModel(with: query)
-                viewModel.currentItems = fetchedItems
-                return fetchedItems
+                // 불러온 아이템들 추가
+                fetchedItems
+                    .subscribe(onNext: { [weak viewModel] items in
+                        viewModel?.currentItems.onNext(items)
+                    })
+                    .disposed(by: viewModel.disposeBag)
+                
+                return viewModel.currentItems
             }
             .asDriver(onErrorDriveWith: .empty())
         
@@ -169,5 +177,41 @@ final class ItemSearchViewModel {
                 print("최근 본 아이템 - 유저 디폴트 디코딩 에러: \(error)")
             }
         }
+    }
+    
+    func loadNextPage(query: String) -> Observable<[Item]> {
+        // 로딩중이 아니고 && 로드할 데이터가 남은 경우에만 다음 페이지 호출
+        guard !isLoading && hasMoreData else {
+            return Observable.just([])
+        }
+        
+        isLoading = true
+        currentPage += 1
+        
+        return shoppingRepository.fetchForViewModel(
+            with: query,
+            page: currentPage,
+            itemsPerPage: itemsPerPage
+        )
+        .do(
+            onNext: { [weak self] newItems in
+                guard let self = self else { return }
+                
+                // 기존 아이템에 새 아이템들 추가
+                if let currentItems = try? self.currentItems.value() {
+                    let updatedItems = currentItems + newItems
+                    // 추가로 불러온 데이터 합쳐서 방출
+                    self.currentItems.onNext(updatedItems)
+                }
+                
+                self.isLoading = false
+                self.hasMoreData = newItems.count == self.itemsPerPage
+            },
+            onError: { [weak self] error in
+                self?.isLoading = false
+                self?.hasMoreData = false
+                print("페이지 로드 중 에러 발생: \(error)")
+            }
+        )
     }
 }
