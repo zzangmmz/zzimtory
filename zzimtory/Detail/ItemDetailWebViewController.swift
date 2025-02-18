@@ -90,15 +90,16 @@ final class ItemDetailWebViewController: UIViewController {
             .disposed(by: disposeBag)
         
         // 주머니 상태에 따른 버튼 UI 업데이트
-        viewModel.isInPocket
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] isInPocket in
-                self?.itemDetailWebView.setSaveButton(isInPocket)
+        viewModel.itemStatus(for: self.viewModel.currentItem.productID)
+            .drive(onNext: { isInPocket in
+                self.itemDetailWebView.setSaveButton(isInPocket)
             })
             .disposed(by: disposeBag)
         
         itemDetailWebView.saveButton.rx.tap
-            .subscribe(onNext: { [weak self] in
+            .map { _ in self.viewModel.currentItem.productID }
+            .withLatestFrom(self.viewModel.itemStatus(for: self.viewModel.currentItem.productID) ?? .just(false)) { ($0, $1) }
+            .subscribe(onNext: { [weak self] (productID, isInPocket) in
                 guard let self = self else { return }
                 
                 // 로그인 상태 확인
@@ -107,21 +108,19 @@ final class ItemDetailWebViewController: UIViewController {
                     return
                 }
                 
-                // 주머니에 이미 존재하는 경우 → handlePocketButton() 호출
-                if self.viewModel.isInPocketStatus {
+                if isInPocket {
+                    // 삭제 확인
                     showDeleteItemAlert {
-                        self.viewModel.handlePocketButton()
+                        self.viewModel.togglePocketStatus(for: productID)
                     }
-                    return
-                }
-                
-                // 주머니에 없으면 모달 띄우기
-                let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
-                self.present(pocketVC, animated: true)
-                
-                // 모달에서 주머니 추가 완료 시 ViewModel 업데이트
-                pocketVC.onComplete = { [weak self] in
-                    self?.viewModel.addToPocket()
+                } else {
+                    // 주머니 선택 모달
+                    let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
+                    self.present(pocketVC, animated: true)
+                    
+                    pocketVC.onComplete = { [weak self] in
+                        self?.viewModel.togglePocketStatus(for: productID)
+                    }
                 }
             })
             .disposed(by: disposeBag)

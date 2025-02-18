@@ -104,6 +104,7 @@ final class ItemDetailViewController: ZTViewController {
                     })
                     .disposed(by: cell.disposeBag)
                 
+                // 공유 버튼
                 cell.shareButton.rx.tap
                     .map { item.link }
                     .subscribe(onNext: { [weak self] urlString in
@@ -125,39 +126,40 @@ final class ItemDetailViewController: ZTViewController {
                     })
                     .disposed(by: cell.disposeBag)
                 
-                self?.viewModel.isInPocket
-                    .observe(on: MainScheduler.instance)
-                    .subscribe(onNext: { [weak self] isInPocket in
-                        cell.setSaveButton(isInPocket)
-                    })
-                    .disposed(by: cell.disposeBag)
-                
+                // 저장/삭제 버튼 동작
                 cell.saveButton.rx.tap
-                    .subscribe(onNext: { [weak self] in
+                    .map { _ in item.productID }
+                    .withLatestFrom(self?.viewModel.itemStatus(for: item.productID) ?? .just(false)) { ($0, $1) }
+                    .subscribe(onNext: { [weak self] (productID, isInPocket) in
                         guard let self = self else { return }
                         
-                        // 로그인 상태 확인
+                        // 비회원일 경우 로그인 진행
                         guard DatabaseManager.shared.hasUserLoggedIn() else {
                             self.presentLoginView()
                             return
                         }
                         
-                        // 주머니에 이미 존재하는 경우 → handlePocketButton() 호출
-                        if self.viewModel.isInPocketStatus {
+                        if isInPocket {
+                            // 아이템이 있을 경우 -> 삭제
                             showDeleteItemAlert {
-                                self.viewModel.handlePocketButton()
+                                self.viewModel.togglePocketStatus(for: productID)
                             }
-                            return
+                        } else {
+                            // 아이템이 없을 경우 -> 저장: 주머니 선택 모달
+                            let pocketVC = PocketSelectionViewController(selectedItems: [item])
+                            self.present(pocketVC, animated: true)
+                            
+                            pocketVC.onComplete = { [weak self] in
+                                self?.viewModel.togglePocketStatus(for: productID)
+                            }
                         }
-                        
-                        // 주머니에 없으면 모달 띄우기
-                        let pocketVC = PocketSelectionViewController(selectedItems: [self.viewModel.currentItem])
-                        self.present(pocketVC, animated: true)
-                        
-                        // 모달에서 주머니 추가 완료 시 ViewModel 업데이트
-                        pocketVC.onComplete = { [weak self] in
-                            self?.viewModel.addToPocket()
-                        }
+                    })
+                    .disposed(by: cell.disposeBag)
+                
+                // 저장/삭제 버튼 상태 업데이트
+                self?.viewModel.itemStatus(for: item.productID)
+                    .drive(onNext: { isInPocket in
+                        cell.setSaveButton(isInPocket)
                     })
                     .disposed(by: cell.disposeBag)
             }
@@ -175,7 +177,7 @@ final class ItemDetailViewController: ZTViewController {
                     self.currentIndex = firstIndexPath.item
                     self.viewModel.updateCurrentIndex(firstIndexPath.item)
                     self.saveRecentItem()
-                    print("현재 선택된 index: \(self.currentIndex)")
+                    // print("현재 선택된 index: \(self.currentIndex)")
                 }
             })
             .disposed(by: disposeBag)
@@ -185,7 +187,32 @@ final class ItemDetailViewController: ZTViewController {
         let loginVC = LoginViewController()
         navigationController?.pushViewController(loginVC, animated: true)
     }
+}
+
+extension ItemDetailViewController {
+    private func setupNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        navigationController?.navigationBar.standardAppearance = appearance
+        
+        // 커스텀 백버튼 생성
+        let button = UIButton()
+        
+        button.setAsIconButton()
+        button.setButtonWithSystemImage(imageName: "chevron.left")
+        button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+        
+        // 네비게이션 아이템으로 설정
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: button)
+    }
     
+    @objc private func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
+    }
+}
+
+extension ItemDetailViewController {
+    // 삭제 알러트 창
     private func showDeleteItemAlert(completion: @escaping () -> Void) {
         let alert = UIAlertController(
             title: "주머니에서 삭제",
@@ -201,6 +228,7 @@ final class ItemDetailViewController: ZTViewController {
         present(alert, animated: true)
     }
     
+    // 최근 본 아이템 저장 UserDefaults
     private func saveRecentItem() {
         let userDefaults = UserDefaults.standard
         let recentItemsKey = "recentItems"
@@ -232,28 +260,6 @@ final class ItemDetailViewController: ZTViewController {
         } catch {
             print("최근 본 아이템 - 유저 디폴트 인코딩 에러: \(error)")
         }
-    }
-}
-
-extension ItemDetailViewController {
-    private func setupNavigationBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithTransparentBackground()
-        navigationController?.navigationBar.standardAppearance = appearance
-        
-        // 커스텀 백버튼 생성
-        let button = UIButton()
-        
-        button.setAsIconButton()
-        button.setButtonWithSystemImage(imageName: "chevron.left")
-        button.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
-        
-        // 네비게이션 아이템으로 설정
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: button)
-    }
-    
-    @objc private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
     }
 }
 
