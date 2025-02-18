@@ -14,6 +14,7 @@ final class ItemSearchViewController: ZTViewController {
     private let searchBar = UISearchBar()
     private let recentItemsView = RecentItemsView()
     private let searchHistory = UITableView()
+    private let searchHistoryHeader = SearchHistoryHeader()
     private let itemCollectionView = ItemCollectionView()
     
     private let cardStack = SwipeCardStack()
@@ -60,7 +61,8 @@ final class ItemSearchViewController: ZTViewController {
         [
             searchBar,
             recentItemsView,
-            searchHistory
+            searchHistory,
+            searchHistoryHeader
         ].forEach { view.addSubview($0) }
     }
     
@@ -130,33 +132,11 @@ final class ItemSearchViewController: ZTViewController {
         searchHistory.isScrollEnabled = false
         searchHistory.separatorInset = .zero
         searchHistory.rowHeight = 40
-        
-        let headerLabel: UILabel = {
-            let label = UILabel()
-            
-            label.text = "최근 검색어"
-            label.font = .systemFont(ofSize: 16, weight: .bold)
-            label.textColor = .black900Zt
-            label.textAlignment = .left
-            
-            return label
-        }()
-        
-        view.addSubview(headerLabel)
-        
-        headerLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview()
-            make.height.equalTo(50)
-        }
-        
-        headerLabel.setNeedsLayout()
-        headerLabel.layoutIfNeeded()
     }
     
     private func setColletionView() {
         view.addSubview(itemCollectionView)
         
-        itemCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         
@@ -190,8 +170,14 @@ final class ItemSearchViewController: ZTViewController {
             make.height.equalTo(140)
         }
         
-        searchHistory.snp.makeConstraints { make in
+        searchHistoryHeader.snp.makeConstraints { make in
             make.top.equalTo(recentItemsView.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            
+        }
+        
+        searchHistory.snp.makeConstraints { make in
+            make.top.equalTo(searchHistoryHeader.snp.bottom).offset(12)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(400)
         }
@@ -240,7 +226,8 @@ extension ItemSearchViewController {
             didSwipeAllCards: cardStack.rx.didSwipeAllCards,
             didSelectItemAt: itemCollectionView.rx.itemSelected,
             didSelectSearchHistoryAt: searchHistory.rx.itemSelected,
-            didRemoveItemAt: searchHistory.rx.itemDeleted
+            didRemoveItemAt: searchHistory.rx.itemDeleted,
+            didTapClearHistory: searchHistoryHeader.tappedClearHistory()
         )
         
         // MARK: - Outputs
@@ -362,6 +349,8 @@ extension ItemSearchViewController {
                 self.searchHistory.removeFromSuperview()
             })
             .disposed(by: disposeBag)
+        
+        itemCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
 }
 

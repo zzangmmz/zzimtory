@@ -40,6 +40,7 @@ final class ItemSearchViewModel {
         var didSelectItemAt: ControlEvent<IndexPath>
         var didSelectSearchHistoryAt: ControlEvent<IndexPath>
         var didRemoveItemAt: ControlEvent<IndexPath>
+        var didTapClearHistory: ControlEvent<Void>
     }
     
     struct Output {
@@ -120,6 +121,7 @@ final class ItemSearchViewModel {
             }
             .asDriver(onErrorDriveWith: .empty())
         
+        // MARK: - 검색 기록
         let searchHistoryRemoved = input.didRemoveItemAt
             .withUnretained(self)
             .flatMap { viewModel, indexPath -> Observable<[String]> in
@@ -127,9 +129,17 @@ final class ItemSearchViewModel {
                 return Observable.just(viewModel.searchHistory)
             }
         
+        let searchHistoryCleared = input.didTapClearHistory
+            .withUnretained(self)
+            .flatMap { viewModel, _ -> Observable<[String]> in
+                viewModel.searchHistory.removeAll()
+                return Observable.just(viewModel.searchHistory)
+            }
+        
         let searchHistory = Observable.merge(
             Observable.just(searchHistory),
-            searchHistoryRemoved
+            searchHistoryRemoved,
+            searchHistoryCleared
         )
         
         let output = Output(searchResult: searchResult,
