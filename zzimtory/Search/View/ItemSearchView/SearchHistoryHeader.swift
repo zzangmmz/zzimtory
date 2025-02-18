@@ -36,27 +36,6 @@ final class SearchHistoryHeader: UIView {
         return button
     }()
     
-//    let headerLabel: UILabel = {
-//        let label = UILabel()
-//        
-//        label.text = "최근 검색어"
-//        label.font = .systemFont(ofSize: 16, weight: .bold)
-//        label.textColor = .black900Zt
-//        label.textAlignment = .left
-//        
-//        return label
-//    }()
-//    
-//    view.addSubview(headerLabel)
-//    
-//    headerLabel.snp.makeConstraints { make in
-//        make.horizontalEdges.equalToSuperview()
-//        make.height.equalTo(50)
-//    }
-//    
-//    headerLabel.setNeedsLayout()
-//    headerLabel.layoutIfNeeded()
-    
     // MARK: - Initializers
     init() {
         super.init(frame: .zero)
