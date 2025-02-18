@@ -14,7 +14,11 @@ import RxCocoa
 final class ItemSearchViewModel {
     private let shoppingRepository = ShoppingRepository()
     var disposeBag = DisposeBag()
-
+    
+    private let userDefaults = UserDefaults.standard
+    private let recentItemsKey = "recentItems"
+    private(set) var recentItems = [Item]()
+    
     var currentItems: Observable<[Item]> = Observable.just([])
     var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
         didSet {
@@ -138,5 +142,16 @@ final class ItemSearchViewModel {
         )
         
         return output
+    }
+    
+    func loadItems() {
+        if let data = userDefaults.data(forKey: recentItemsKey) {
+            do {
+                let items = try JSONDecoder().decode([Item].self, from: data)
+                self.recentItems = items
+            } catch {
+                print("최근 본 아이템 - 유저 디폴트 디코딩 에러: \(error)")
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@ import RxCocoa
 final class ItemSearchViewController: ZTViewController {
     
     private let searchBar = UISearchBar()
+    private let recentItemsView = RecentItemsView()
     private let searchHistory = UITableView()
     private let itemCollectionView = ItemCollectionView()
     
@@ -42,6 +43,7 @@ final class ItemSearchViewController: ZTViewController {
         
         addComponents()
         setSearchBar()
+        setRecectItems()
         setSearchHistory()
         setConstraints()
         itemCollectionView.rx.setDelegate(self).disposed(by: disposeBag)
@@ -58,6 +60,7 @@ final class ItemSearchViewController: ZTViewController {
     private func addComponents() {
         [
             searchBar,
+            recentItemsView,
             searchHistory
         ].forEach { view.addSubview($0) }
     }
@@ -88,6 +91,35 @@ final class ItemSearchViewController: ZTViewController {
         }).disposed(by: disposeBag)
     }
     
+    private func setRecectItems() {
+        recentItemsView.backgroundColor = .clear
+        
+        [
+            recentItemsView.titleLabel,
+            recentItemsView.collectionView,
+            recentItemsView.placeHolder
+        ]
+            .forEach {
+            $0.snp.makeConstraints { make in
+                make.horizontalEdges.equalToSuperview()
+            }
+        }
+        
+        loadRecentItems()
+    }
+    
+    private func loadRecentItems() {
+        itemSearchViewModel.loadItems()
+        
+        if itemSearchViewModel.recentItems.isEmpty {
+            recentItemsView.showPlaceHolderLabel()
+        } else {
+            recentItemsView.hidePlaceHolderLabel()
+        }
+        
+        recentItemsView.collectionView.reloadData()
+    }
+    
     private func setSearchHistory() {
         searchHistory.backgroundColor = .clear
         searchHistory.separatorStyle = .singleLine
@@ -95,8 +127,21 @@ final class ItemSearchViewController: ZTViewController {
         searchHistory.register(ItemSearchHistoryTableCell.self,
                                forCellReuseIdentifier: String(describing: ItemSearchHistoryTableCell.self))
         searchHistory.showsHorizontalScrollIndicator = false
+        searchHistory.showsVerticalScrollIndicator = false
+        searchHistory.isScrollEnabled = false
+        searchHistory.separatorInset = .zero
         searchHistory.rowHeight = 40
         
+        let headerLabel: UILabel = {
+            let label = UILabel()
+            
+            label.text = "최근 검색어"
+            label.font = .systemFont(ofSize: 16, weight: .bold)
+            label.textColor = .black900Zt
+            label.textAlignment = .left
+            
+            return label
+        }()
         
 //        let headerLabel: UILabel = {
 //            let label = UILabel()
@@ -111,9 +156,13 @@ final class ItemSearchViewController: ZTViewController {
 //        
 //        searchHistory.tableHeaderView = headerLabel
         
-//        headerLabel.snp.makeConstraints { make in
-//            make.width.equalTo(searchHistory.snp.width).inset(24)
-//        }
+        headerLabel.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.height.equalTo(50)
+        }
+        
+        headerLabel.setNeedsLayout()
+        headerLabel.layoutIfNeeded()
     }
     
     private func setColletionView() {
@@ -146,12 +195,17 @@ final class ItemSearchViewController: ZTViewController {
             make.edges.equalToSuperview()
         }
         
-        searchHistory.snp.makeConstraints { make in
+        recentItemsView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom).offset(12)
-            make.width.equalToSuperview().inset(12)
-            make.bottom.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(140)
         }
-
+        
+        searchHistory.snp.makeConstraints { make in
+            make.top.equalTo(recentItemsView.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(400)
+        }
     }
     
     private func setCardStack() {
