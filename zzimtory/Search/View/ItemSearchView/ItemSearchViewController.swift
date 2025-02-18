@@ -142,18 +142,7 @@ final class ItemSearchViewController: ZTViewController {
             return label
         }()
         
-//        let headerLabel: UILabel = {
-//            let label = UILabel()
-//            
-//            label.text = "최근 검색어"
-//            label.font = .systemFont(ofSize: 16, weight: .semibold)
-//            label.textColor = .black900Zt
-//            label.textAlignment = .left
-//            
-//            return label
-//        }()
-//        
-//        searchHistory.tableHeaderView = headerLabel
+        view.addSubview(headerLabel)
         
         headerLabel.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
