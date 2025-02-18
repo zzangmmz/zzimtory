@@ -19,8 +19,8 @@ final class ItemSearchViewModel {
     private let recentItemsKey = "recentItems"
     private(set) var recentItems = [Item]()
     
-    var currentItems: Observable<[Item]> = Observable.just([])
-    var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
+    private var currentItems: Observable<[Item]> = Observable.just([])
+    private var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
         didSet {
             // 10개 이상일 경우 초과되는 기록 제거
             if searchHistory.count > 10 {
