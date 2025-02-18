@@ -104,8 +104,8 @@ class PocketDetailViewController: UIViewController,
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard editMode else {
-            let selectedItem = viewModel.displayItems[indexPath.item]
-            let detailVC = DetailViewController(item: selectedItem)
+            let selectedItem = viewModel.displayItems
+            let detailVC = ItemDetailViewController(items: selectedItem, currentIndex: indexPath.item)
             detailVC.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(detailVC, animated: true)
             return
