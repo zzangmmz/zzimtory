@@ -339,12 +339,20 @@ extension ItemSearchViewController {
             .disposed(by: disposeBag)
         
         // MARK: - CollectionView에서 셀 선택 시 동작
+//        output.selectedCell
+//            .drive(onNext: { item in
+//                print("Tapped: \(item)")
+//                let detailVC = ItemDetailViewController(items: [item])
+//                detailVC.hidesBottomBarWhenPushed = true
+//                
+//                self.navigationController?.pushViewController(detailVC, animated: true)
+//            })
+//            .disposed(by: disposeBag)
+//        
         output.selectedCell
-            .drive(onNext: { item in
-                print("Tapped: \(item)")
-                let detailVC = ItemDetailViewController(items: [item])
+            .drive(onNext: { (items, selectedIndex) in
+                let detailVC = ItemDetailViewController(items: items, currentIndex: selectedIndex)
                 detailVC.hidesBottomBarWhenPushed = true
-                
                 self.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)

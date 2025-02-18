@@ -249,7 +249,7 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         
         mainStackView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(scrollView)
-            make.bottom.equalTo(scrollView).inset(16)
+            make.bottom.equalTo(scrollView).offset(-40)
             make.width.equalTo(scrollView)
         }
     }
@@ -267,7 +267,7 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
     private func setupTopStackView() {
         topStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview()/*.offset(16)*/
+            make.top.equalToSuperview().offset(10)
             make.leading.trailing.equalToSuperview()
         }
         
@@ -341,7 +341,6 @@ extension ItemDetailCollectionViewCell {
         itemNameLabel.text = item.title.removingHTMLTags
         
         priceLabel.text = Int(item.price)?.withSeparator
-        
         
         similarItemViewModel = SimilarItemViewModel(item: item)
         

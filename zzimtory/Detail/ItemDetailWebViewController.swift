@@ -68,9 +68,8 @@ final class ItemDetailWebViewController: UIViewController {
     }
     
     private func bind() {
-        
         itemDetailWebView.shareButton.rx.tap
-            .withLatestFrom(viewModel.itemUrl) // tap 이벤트가 나타날 때마다 viewModel.itemUrl의 가장 최근 값을 방출
+            .map { self.viewModel.currentItem.link }
             .subscribe(onNext: { [weak self] urlString in
                 guard let self = self,
                       let url = URL(string: urlString) else { return }
