@@ -207,7 +207,9 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         showAlert(title: "주머니를 삭제하시겠습니까?") { [weak self] in
             selectedPockets.forEach { pocket in
-                DatabaseManager.shared.deletePocket(title: pocket.title)
+                DatabaseManager.shared.deletePocket(title: pocket.title) {
+                    self?.bind()  // 각 삭제 완료 후 데이터 새로고침 / 대신 주머니 3번 삭제하면 3번 호출됨
+                }
                 print()
                 print("삭제 성공 주머니 \(pocket.title)")
                 print()

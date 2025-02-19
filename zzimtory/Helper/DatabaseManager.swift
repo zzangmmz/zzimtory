@@ -267,17 +267,12 @@ final class DatabaseManager {
     }
     
     /// 주머니 삭제 메서드
-    func deletePocket(title: String) {
+    func deletePocket(title: String, completion: @escaping () -> Void) {
         guard let uid = self.getUserUID() else { return }
         
-        // 삭제할 주머니의 아이템 정보를 먼저 가져옴
+        // 주머니 정보를 먼저 확인
         ref.child("users").child(uid).child("pockets").child("pocket\(title)").observeSingleEvent(of: .value) { [weak self] snapshot in
-            guard let self = self,
-                  let pocketData = snapshot.value as? [String: Any],
-                  let itemsToDelete = pocketData["items"] as? [String: Any] else {
-                print("주머니 데이터 가져오기 실패")
-                return
-            }
+            guard let self = self else { return }
             
             // 1. 주머니 삭제
             self.ref.child("users").child(uid).child("pockets").child("pocket\(title)").removeValue { error, _ in
@@ -287,15 +282,22 @@ final class DatabaseManager {
                 }
                 print("주머니 \(title) 삭제 성공")
                 
-                // 2. 전체보기에서도 해당 아이템들 삭제
-                for itemKey in itemsToDelete.keys {
-                    self.ref.child("users").child(uid).child("pockets").child("pocket전체보기").child("items").child(itemKey).removeValue { error, _ in
-                        if let error = error {
-                            print("전체보기에서 아이템 삭제 실패: \(error.localizedDescription)")
-                        } else {
-                            print("전체보기에서 아이템 삭제 성공")
+                // 주머니에 아이템이 있는 경우에만 전체보기에서 삭제 진행
+                if let pocketData = snapshot.value as? [String: Any],
+                   let itemsToDelete = pocketData["items"] as? [String: Any] {
+                    // 2. 전체보기에서도 해당 아이템들 삭제
+                    for itemKey in itemsToDelete.keys {
+                        self.ref.child("users").child(uid).child("pockets").child("pocket전체보기").child("items").child(itemKey).removeValue { error, _ in
+                            if let error = error {
+                                print("전체보기에서 아이템 삭제 실패: \(error.localizedDescription)")
+                            } else {
+                                print("전체보기에서 아이템 삭제 성공")
+                                completion()
+                            }
                         }
                     }
+                } else {
+                    print("주머니 데이터 가져오기 실패")
                 }
             }
         }
