@@ -35,7 +35,6 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         super.viewDidLoad()
         self.mainView = MainView(frame: view.frame)
         self.view = self.mainView
-        
         setupActions()
         setupCollectionView()
     }
@@ -129,7 +128,7 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.filterPockets.count
+        return viewModel.displayPockets.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -199,13 +198,15 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
         
         guard let selectedIndexPaths = mainView?.collectionView.indexPathsForSelectedItems else { return }
 
-        let selectedPockets = selectedIndexPaths.map { viewModel.displayPockets[$0.item] }
+        let indexPathsToDelete = selectedIndexPaths.filter { $0.item != 0 }
+        let selectedPockets = indexPathsToDelete.map { viewModel.displayPockets[$0.item] }
         
         let alert = UIAlertController(title: "주머니 삭제", message: "주머니를 삭제하시겠습니까?", preferredStyle: .alert)
 
         let deleteAction = UIAlertAction(title: "네", style: .destructive) { [weak self] _ in
             selectedPockets.forEach { pocket in
                 DatabaseManager.shared.deletePocket(title: pocket.title)
+                DatabaseManager.shared.deletePocket(title: "전체보기")
             }
  
             self?.bind()

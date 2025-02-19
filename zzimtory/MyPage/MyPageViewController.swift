@@ -61,7 +61,8 @@ final class MyPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
-        
+        navigationController?.tabBarController?.tabBar.isHidden = false
+
         checkUserState()
         loadRecentItems()
         tableView.reloadData()
@@ -135,7 +136,7 @@ final class MyPageViewController: UIViewController {
         recentItemsView.snp.makeConstraints { make in
             make.top.equalTo(userProfileView.snp.bottom).offset(24)
             make.horizontalEdges.equalToSuperview().inset(24)
-            make.height.equalTo(140)
+            make.height.equalTo(170)
         }
         
         tableView.snp.makeConstraints { make in
@@ -298,6 +299,12 @@ extension MyPageViewController: UICollectionViewDelegate, UICollectionViewDataSo
         let item = viewModel.recentItems[indexPath.item]
         cell.configure(with: item)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedItem = viewModel.recentItems[indexPath.item]
+        let detailVC = ItemDetailViewController(items: [selectedItem], currentIndex: 0)
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }
 

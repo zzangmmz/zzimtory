@@ -20,11 +20,12 @@ final class RecentItemsView: UIView {
     var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: 40, height: 40)
-        layout.minimumLineSpacing = 8
+        layout.itemSize = CGSize(width: 100, height: 100)
+        layout.minimumLineSpacing = 10
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white100Zt
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
         
         collectionView.register(RecentItemCell.self, forCellWithReuseIdentifier: String(describing: RecentItemCell.self))
         return collectionView
@@ -61,14 +62,14 @@ final class RecentItemsView: UIView {
         
         titleLabel.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(20)
-            $0.top.equalToSuperview().inset(20)
+            $0.top.equalToSuperview().inset(16)
             $0.height.equalTo(24)
         }
         
         collectionView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(20)
             $0.top.equalTo(titleLabel.snp.bottom).offset(10)
-            $0.bottom.equalToSuperview().inset(20)
+            $0.bottom.equalToSuperview().inset(16)
         }
         
         placeHolder.snp.makeConstraints {
