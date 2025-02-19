@@ -51,7 +51,6 @@ final class ItemSearchViewModel {
         let selectedCard: Driver<Item>
         let swipedCard: Driver<SwipedCard>
         let swipedAllCards: Driver<Void>
-        // let selectedCell: Driver<Item>
         let selectedCell: Driver<([Item], Int)>
         let searchHistory: Driver<[String]>
         let selectedSearchHistory: Driver<String>
@@ -130,13 +129,6 @@ final class ItemSearchViewModel {
         
         let swipedAllCards = input.didSwipeAllCards
             .asDriver(onErrorJustReturn: ())
-        
-//        let selectedCell = input.didSelectItemAt
-//            .withUnretained(self)
-//            .flatMap { viewModel, indexPath -> Observable<Item> in
-//                return viewModel.currentItems.compactMap { $0[indexPath.item] }
-//            }
-//            .asDriver(onErrorDriveWith: .empty())
         
         let selectedCell = input.didSelectItemAt
             .withUnretained(self)
