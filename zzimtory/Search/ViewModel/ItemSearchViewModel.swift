@@ -191,21 +191,18 @@ final class ItemSearchViewModel {
         }
     }
     
-    func loadNextPage(query: String) -> Observable<[Item]> {
+    func loadNextPage(query: String) {
         // 로딩중이 아니고 && 로드할 데이터가 남은 경우에만 다음 페이지 호출
-        guard !isLoading && hasMoreData else {
-            return Observable.just([])
-        }
+        guard !isLoading && hasMoreData else { return }
         
         isLoading = true
         currentPage += 1
         
-        return shoppingRepository.fetchForViewModel(
+        shoppingRepository.fetchForViewModel(
             with: query,
             page: currentPage,
             itemsPerPage: itemsPerPage
-        )
-        .do(
+        ).subscribe(
             onNext: { [weak self] newItems in
                 guard let self = self else { return }
                 
@@ -224,6 +221,6 @@ final class ItemSearchViewModel {
                 self?.hasMoreData = false
                 print("페이지 로드 중 에러 발생: \(error)")
             }
-        )
+        ).disposed(by: disposeBag)
     }
 }
