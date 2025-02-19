@@ -20,6 +20,19 @@ final class ItemCollectionViewHeader: UICollectionReusableView {
         return label
     }()
     
+    private(set) var cardButton: UIButton = {
+        let button = UIButton()
+        
+        var config = UIButton.Configuration.plain()
+        config.image = UIImage(systemName: "square.stack.3d.down.right.fill")
+        config.baseForegroundColor = .black900Zt
+        config.baseBackgroundColor = .white100Zt
+        config.cornerStyle = .large
+        button.configuration = config
+        
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(titleLabel)
