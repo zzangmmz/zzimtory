@@ -22,7 +22,9 @@ class MainPocketViewModel {
             self.pockets = pockets
             self.filterPockets = pockets
             // 업데이트 후 전체보기 주머니도 DB에 최신 내용으로 저장
-            completion(self.filterPockets)
+            self.updateAggregatePocketInDB {
+                completion(self.filterPockets)
+            }
         }
     }
     
