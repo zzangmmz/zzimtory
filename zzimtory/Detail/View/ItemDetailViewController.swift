@@ -93,6 +93,7 @@ final class ItemDetailViewController: ZTViewController {
                     self?.itemDetailCollectionView.contentOffset.y = currentOffset
                 }
             }
+            UserDefaults.standard.set(true, forKey: "hasShownScrollOnboarding")
         }
     }
     
