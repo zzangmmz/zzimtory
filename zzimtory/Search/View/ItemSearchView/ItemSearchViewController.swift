@@ -49,12 +49,14 @@ final class ItemSearchViewController: ZTViewController {
         setConstraints()
         
         bind()
+        bindRecentItemsCollectionView()
         otherRxCocoaStuff()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.isHidden = true
+        itemSearchViewModel.loadItems()
     }
     
     // MARK: - Private functions
@@ -107,20 +109,20 @@ final class ItemSearchViewController: ZTViewController {
             }
         }
         
-        loadRecentItems()
+        // loadRecentItems()
     }
     
-    private func loadRecentItems() {
-        itemSearchViewModel.loadItems()
-        
-        if itemSearchViewModel.recentItems.isEmpty {
-            recentItemsView.showPlaceHolderLabel()
-        } else {
-            recentItemsView.hidePlaceHolderLabel()
-        }
-        
-        recentItemsView.collectionView.reloadData()
-    }
+//    private func loadRecentItems() {
+//        itemSearchViewModel.loadItems()
+//        
+//        if itemSearchViewModel.recentItems.isEmpty {
+//            recentItemsView.showPlaceHolderLabel()
+//        } else {
+//            recentItemsView.hidePlaceHolderLabel()
+//        }
+//        
+//        recentItemsView.collectionView.reloadData()
+//    }
     
     private func setSearchHistory() {
         searchHistory.backgroundColor = .clear
@@ -167,8 +169,10 @@ final class ItemSearchViewController: ZTViewController {
         
         recentItemsView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom).offset(12)
-            make.horizontalEdges.equalToSuperview().inset(24)
-            make.height.equalTo(140)
+            // make.horizontalEdges.equalToSuperview().inset(24)
+            make.leading.equalToSuperview().inset(24)
+            make.trailing.equalToSuperview().inset(4)
+            make.height.equalTo(170)
         }
         
         searchHistoryHeader.snp.makeConstraints { make in
@@ -339,12 +343,21 @@ extension ItemSearchViewController {
             .disposed(by: disposeBag)
         
         // MARK: - CollectionView에서 셀 선택 시 동작
+        //        output.selectedCell
+        //            .drive(onNext: { item in
+        //                print("Tapped: \(item)")
+        //                let detailVC = ItemDetailViewController(items: [item])
+        //                detailVC.hidesBottomBarWhenPushed = true
+        //
+        //                self.navigationController?.pushViewController(detailVC, animated: true)
+        //            })
+        //            .disposed(by: disposeBag)
+        // 
+        
         output.selectedCell
-            .drive(onNext: { item in
-                print("Tapped: \(item)")
-                let detailVC = ItemDetailViewController(items: [item])
+            .drive(onNext: { (items, selectedIndex) in
+                let detailVC = ItemDetailViewController(items: items, currentIndex: selectedIndex)
                 detailVC.hidesBottomBarWhenPushed = true
-                
                 self.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
@@ -365,6 +378,45 @@ extension ItemSearchViewController {
                 self.searchBar.searchTextField.text = query
                 self.searchBar.resignFirstResponder()
                 self.hideRecentsAndShowSearchResults()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // 최근 본 아이템 CollectionView 바인딩
+    func bindRecentItemsCollectionView() {
+        // 구독하여 UI 업데이트
+        itemSearchViewModel.recentItems
+            .subscribe(onNext: { [weak self] items in
+                guard let self = self else { return }
+                
+                if items.isEmpty {
+                    self.recentItemsView.showPlaceHolderLabel()
+                } else {
+                    self.recentItemsView.hidePlaceHolderLabel()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        // 데이터소스 바인딩
+        itemSearchViewModel.recentItems
+            .bind(to: recentItemsView.collectionView.rx.items(
+                cellIdentifier: String(describing: RecentItemCell.self),
+                cellType: RecentItemCell.self
+            )) { _, item, cell in
+                cell.configure(with: item)
+            }
+            .disposed(by: disposeBag)
+        
+        // 상세 화면 이동 로직
+        recentItemsView.collectionView.rx.itemSelected
+            .withLatestFrom(itemSearchViewModel.recentItems) { indexPath, items in
+                return items[indexPath.item]
+            }
+            .subscribe(onNext: { [weak self] item in
+                guard let self = self else { return }
+                let detailVC = ItemDetailViewController(items: [item])
+                detailVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
     }

@@ -17,7 +17,8 @@ final class ItemSearchViewModel {
     
     private let userDefaults = UserDefaults.standard
     private let recentItemsKey = "recentItems"
-    private(set) var recentItems = [Item]()
+    private let recentItemsRelay = BehaviorRelay<[Item]>(value: []) // 최근 아이템 Relay 적용
+    var recentItems: Observable<[Item]> { return recentItemsRelay.asObservable() }
     
     private var currentItems: Observable<[Item]> = Observable.just([])
     private var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
@@ -48,7 +49,8 @@ final class ItemSearchViewModel {
         let selectedCard: Driver<Item>
         let swipedCard: Driver<SwipedCard>
         let swipedAllCards: Driver<Void>
-        let selectedCell: Driver<Item>
+        // let selectedCell: Driver<Item>
+        let selectedCell: Driver<([Item], Int)>
         let searchHistory: Driver<[String]>
         let selectedSearchHistory: Driver<String>
     }
@@ -114,10 +116,19 @@ final class ItemSearchViewModel {
         let swipedAllCards = input.didSwipeAllCards
             .asDriver(onErrorJustReturn: ())
         
+//        let selectedCell = input.didSelectItemAt
+//            .withUnretained(self)
+//            .flatMap { viewModel, indexPath -> Observable<Item> in
+//                return viewModel.currentItems.compactMap { $0[indexPath.item] }
+//            }
+//            .asDriver(onErrorDriveWith: .empty())
+        
         let selectedCell = input.didSelectItemAt
             .withUnretained(self)
-            .flatMap { viewModel, indexPath -> Observable<Item> in
-                return viewModel.currentItems.compactMap { $0[indexPath.item] }
+            .flatMap { viewModel, indexPath -> Observable<([Item], Int)> in
+                return viewModel.currentItems.map { items in
+                    return (items, indexPath.item)
+                }
             }
             .asDriver(onErrorDriveWith: .empty())
         
@@ -158,7 +169,8 @@ final class ItemSearchViewModel {
         if let data = userDefaults.data(forKey: recentItemsKey) {
             do {
                 let items = try JSONDecoder().decode([Item].self, from: data)
-                self.recentItems = items
+                // self.recentItems = items
+                recentItemsRelay.accept(items) //relay에 넣어줌
             } catch {
                 print("최근 본 아이템 - 유저 디폴트 디코딩 에러: \(error)")
             }
