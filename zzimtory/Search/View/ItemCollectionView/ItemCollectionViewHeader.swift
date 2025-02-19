@@ -35,13 +35,22 @@ final class ItemCollectionViewHeader: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(titleLabel)
         
+        setSubviews()
         setConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setSubviews() {
+        [
+            titleLabel,
+            cardButton
+        ].forEach {
+            addSubview($0)
+        }
     }
     
     private func setConstraints() {
