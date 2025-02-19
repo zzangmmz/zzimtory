@@ -20,24 +20,20 @@ final class ItemSearchViewModel {
     private let recentItemsRelay = BehaviorRelay<[Item]>(value: []) // 최근 아이템 Relay 적용
     var recentItems: Observable<[Item]> { return recentItemsRelay.asObservable() }
     
-    private var currentItems: BehaviorSubject<[Item]> = BehaviorSubject(value: [])
-    private var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
-        didSet {
-            // 10개 이상일 경우 초과되는 기록 제거
-            if searchHistory.count > 10 {
-                searchHistory.removeSubrange(10..<searchHistory.count)
-            }
-            
-            searchHistory = searchHistory.filter { !$0.isEmpty }
-            UserDefaults.standard.set(searchHistory, forKey: "searchHistory")
-        }
-    }
+    private let searchHistoryKey = "searchHistory"
+    private let searchHistoryRelay = BehaviorRelay<[String]>(value: [])
+    private var currentItems = BehaviorRelay<[Item]>(value: [])
     
     // MARK: - 무한 스크롤 프로퍼티
     private var currentPage = 1     // 현재 페이지
     private(set) var isLoading = false   // 로딩중인지 체크
     private(set) var hasMoreData = true  // 더 가져올 데이터가 있는지 체크
     private let itemsPerPage = 10   // request당 가져올 데이터 개수
+    
+    init() {
+        let searchHistory = userDefaults.array(forKey: searchHistoryKey) as? [String] ?? []
+        searchHistoryRelay.accept(searchHistory)
+    }
     
     struct Input {
         var query: Observable<String>
@@ -55,7 +51,6 @@ final class ItemSearchViewModel {
         let selectedCard: Driver<Item>
         let swipedCard: Driver<SwipedCard>
         let swipedAllCards: Driver<Void>
-        // let selectedCell: Driver<Item>
         let selectedCell: Driver<([Item], Int)>
         let searchHistory: Driver<[String]>
         let selectedSearchHistory: Driver<String>
@@ -73,7 +68,8 @@ final class ItemSearchViewModel {
             .withUnretained(self)
             .flatMap { viewModel, indexPath -> Observable<String> in
                 print("tapped \(indexPath.item)")
-                let selectedHistory = viewModel.searchHistory[indexPath.item]
+                let searchHistory = viewModel.searchHistoryRelay.value
+                let selectedHistory = searchHistory[indexPath.item]
                 return Observable.just(selectedHistory)
             }
             .share()
@@ -86,21 +82,23 @@ final class ItemSearchViewModel {
         let searchResult = query
             .debug("Rx: searchResult")
             .withUnretained(self)
-            .flatMap { viewModel, query -> Observable<[Item]> in
+            .flatMap { viewModel, query -> BehaviorRelay<[Item]> in
                 viewModel.currentPage = 1
                 viewModel.hasMoreData = true
                 
-                if viewModel.searchHistory.contains(query) {
-                    viewModel.searchHistory.removeAll(where: { $0 == query })
+                var searchHistory = viewModel.searchHistoryRelay.value
+                
+                if searchHistory.contains(query) {
+                    searchHistory.removeAll(where: { $0 == query })
                 }
                 
-                viewModel.searchHistory.insert(query, at: 0)
+                searchHistory.insert(query, at: 0)
                 
                 let fetchedItems = viewModel.shoppingRepository.fetchForViewModel(with: query)
                 // 불러온 아이템들 추가
                 fetchedItems
                     .subscribe(onNext: { [weak viewModel] items in
-                        viewModel?.currentItems.onNext(items)
+                        viewModel?.currentItems.accept(items)
                     })
                     .disposed(by: viewModel.disposeBag)
                 
@@ -111,14 +109,16 @@ final class ItemSearchViewModel {
         let selectedCard = input.didSelectCard
             .withUnretained(self)
             .flatMap { viewModel, index -> Observable<Item> in
-                return viewModel.currentItems.compactMap { $0[index] }
+                let items = viewModel.currentItems.value
+                return Observable.just(items[index])
             }
             .asDriver(onErrorDriveWith: .empty())
         
         let swipedCard = input.didSwipeCard
             .withUnretained(self)
             .flatMap { viewModel, didSwipeCardAt -> Observable<SwipedCard> in
-                let observableItem = viewModel.currentItems.compactMap { $0[didSwipeCardAt.0] }
+                let items = viewModel.currentItems.value
+                let observableItem = Observable.just(items[didSwipeCardAt.0])
                 
                 let swipedCard = observableItem
                     .map { SwipedCard(item: $0, direction: didSwipeCardAt.1)}
@@ -130,49 +130,56 @@ final class ItemSearchViewModel {
         let swipedAllCards = input.didSwipeAllCards
             .asDriver(onErrorJustReturn: ())
         
-//        let selectedCell = input.didSelectItemAt
-//            .withUnretained(self)
-//            .flatMap { viewModel, indexPath -> Observable<Item> in
-//                return viewModel.currentItems.compactMap { $0[indexPath.item] }
-//            }
-//            .asDriver(onErrorDriveWith: .empty())
-        
         let selectedCell = input.didSelectItemAt
             .withUnretained(self)
             .flatMap { viewModel, indexPath -> Observable<([Item], Int)> in
-                return viewModel.currentItems.map { items in
-                    return (items, indexPath.item)
-                }
+                let items = viewModel.currentItems.value
+                return Observable.just((items, indexPath.item))
             }
             .asDriver(onErrorDriveWith: .empty())
         
         // MARK: - 검색 기록
-        let searchHistoryRemoved = input.didRemoveItemAt
-            .withUnretained(self)
-            .flatMap { viewModel, indexPath -> Observable<[String]> in
-                viewModel.searchHistory.remove(at: indexPath.item)
-                return Observable.just(viewModel.searchHistory)
-            }
+        let _ = query.subscribe(onNext: { [weak self] query in
+            let searchHistory = self?.searchHistoryRelay.value.filter { $0 != query }
+            
+            let updatedSearchHistory: [String] = [query] + (searchHistory ?? [])
+            
+            self?.searchHistoryRelay.accept(updatedSearchHistory)
+        })
         
-        let searchHistoryCleared = input.didTapClearHistory
-            .withUnretained(self)
-            .flatMap { viewModel, _ -> Observable<[String]> in
-                viewModel.searchHistory.removeAll()
-                return Observable.just(viewModel.searchHistory)
-            }
+        let _ = input.didRemoveItemAt.subscribe(onNext: { [weak self] index in
+            var searchHistory = self?.searchHistoryRelay.value ?? []
+            
+            searchHistory.remove(at: index.item)
+            
+            self?.searchHistoryRelay.accept(searchHistory)
+        })
         
-        let searchHistory = Observable.merge(
-            Observable.just(searchHistory),
-            searchHistoryRemoved,
-            searchHistoryCleared
-        )
+        let _ = input.didTapClearHistory.subscribe(onNext: { [weak self] in
+            self?.searchHistoryRelay.accept([])
+        }).disposed(by: disposeBag)
+        
+        let searchHistory = searchHistoryRelay.asDriver(onErrorDriveWith: .empty())
+        
+        searchHistoryRelay.bind { [weak self] history in
+            var updatedSearchHistory = history
+            
+            if updatedSearchHistory.count > 10 {
+                updatedSearchHistory.removeSubrange(10..<history.count)
+                self?.searchHistoryRelay.accept(updatedSearchHistory)
+            }
+            
+            updatedSearchHistory = updatedSearchHistory.filter { !$0.isEmpty }
+            self?.userDefaults.set(updatedSearchHistory, forKey: self?.searchHistoryKey ?? "searchHistory")
+
+        }.disposed(by: disposeBag)
         
         let output = Output(searchResult: searchResult,
                             selectedCard: selectedCard,
                             swipedCard: swipedCard,
                             swipedAllCards: swipedAllCards,
                             selectedCell: selectedCell,
-                            searchHistory: searchHistory.asDriver(onErrorDriveWith: .empty()),
+                            searchHistory: searchHistory,
                             selectedSearchHistory: selectedSearchHistory.asDriver(onErrorDriveWith: .empty())
         )
         
@@ -207,12 +214,11 @@ final class ItemSearchViewModel {
                 guard let self = self else { return }
                 
                 // 기존 아이템에 새 아이템들 추가
-                if let currentItems = try? self.currentItems.value() {
-                    let updatedItems = currentItems + newItems
-                    // 추가로 불러온 데이터 합쳐서 방출
-                    self.currentItems.onNext(updatedItems)
-                }
-                
+                let currentItems = self.currentItems.value
+                let updatedItems = currentItems + newItems
+                // 추가로 불러온 데이터 합쳐서 방출
+                self.currentItems.accept(updatedItems)
+
                 self.isLoading = false
                 self.hasMoreData = newItems.count == self.itemsPerPage
             },
