@@ -107,9 +107,7 @@ final class ItemDetailViewModel {
             }
         } else {
             if let item = itemsRelay.value.first(where: { $0.productID == productID }) {
-                DatabaseManager.shared.addItemToAggregatePocket(newItem: item) {
-                    // print("전체보기 주머니에 아이템 추가 완료")
-                }
+                DatabaseManager.shared.updatePocketItem(newItem: item, pocketTitle: "전체보기")
                 var currentMap = self.itemStatusRelay.value
                 currentMap[productID] = true
                 self.itemStatusRelay.accept(currentMap)
