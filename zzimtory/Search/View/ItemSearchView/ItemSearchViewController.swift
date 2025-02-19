@@ -282,14 +282,11 @@ extension ItemSearchViewController {
                 card.content = ItemCardContents(item: item)
                 card.contentMode = .scaleAspectFill
                 
-                let leftOverlay = UIView()
-                leftOverlay.backgroundColor = .clear
+                let leftOverlay = ItemCardOverlay(with: .left)
                 
-                let rightOverlay = UIView()
-                rightOverlay.backgroundColor = .clear
+                let rightOverlay = ItemCardOverlay(with: .right)
                 
-                let upOverlay = UIView()
-                upOverlay.backgroundColor = .clear
+                let upOverlay = ItemCardOverlay(with: .up)
                 
                 card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
                 
