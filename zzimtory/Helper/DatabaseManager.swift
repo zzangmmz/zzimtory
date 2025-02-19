@@ -66,7 +66,9 @@ final class DatabaseManager {
                         print("유저 등록 실패: \(error.localizedDescription)")
                     } else {
                         print("유저 등록 성공")
-                        self.completedLogin.onNext(true)
+                        self.createPocket(title: "전체보기") {
+                            self.completedLogin.onNext(true)
+                        }
                     }
                 }
             } else {
