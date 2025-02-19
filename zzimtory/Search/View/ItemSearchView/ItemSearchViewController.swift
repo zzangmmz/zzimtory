@@ -509,7 +509,5 @@ extension ItemSearchViewController: UIScrollViewDelegate {
         
         // 다음 페이지 로드
         itemSearchViewModel.loadNextPage(query: query)
-            .subscribe()
-            .disposed(by: disposeBag)
     }
 }
