@@ -304,7 +304,10 @@ final class DatabaseManager {
     }
     
     /// 아이템 삭제 메서드
-    func deleteItem(productID: String, from pocketTitle: String) {
+    /// 아이템을 이동하는 경우에도  [ 기존 주머니 -> 이동 주머니 ] 과정을 거치며 기존 주머니에서 해당 메서드를 실행
+    /// 하지만 항상 해당 메서드에서는 항상 "전체보기"에서도 삭제를 진행하고 있어 제대로 이동 되지 않는 이슈 발생
+    /// 따라서 alsoRemoveFromDefaultPocket 매개변수를 추가하여 보통 때엔 true로, 아이템 이동할 때에는 false로 설정해주어 전체보기 주머니에서는 삭제가 되지 않도록 수정함
+    func deleteItem(productID: String, alsoRemoveFromDefaultPocket: Bool = true, from pocketTitle: String) {
         guard let uid = self.getUserUID() else { return }
         
         let itemKey = "zzimtory\(productID)"
@@ -334,12 +337,14 @@ final class DatabaseManager {
                 }
             }
             
-            // 2. 전체보기에서도 삭제
-            self.ref.child("users").child(uid).child("pockets").child("pocket전체보기").child("items").child(itemKey).removeValue { error, _ in
-                if let error = error {
-                    print("전체보기에서 아이템 삭제 실패: \(error.localizedDescription)")
-                } else {
-                    print("전체보기에서 아이템 삭제 성공")
+            if alsoRemoveFromDefaultPocket {
+                // 2. 전체보기에서도 삭제
+                self.ref.child("users").child(uid).child("pockets").child("pocket전체보기").child("items").child(itemKey).removeValue { error, _ in
+                    if let error = error {
+                        print("전체보기에서 아이템 삭제 실패: \(error.localizedDescription)")
+                    } else {
+                        print("전체보기에서 아이템 삭제 성공")
+                    }
                 }
             }
         }
