@@ -333,7 +333,10 @@ extension ItemSearchViewController {
         output.swipedCard
             .drive(onNext: { [weak self] swipedCard in
                 switch swipedCard.direction {
-                case .right: break
+                case .right:
+                    DatabaseManager.shared.addItemToAggregatePocket(newItem: swipedCard.item) {
+                        return
+                    }
                 case .left: break
                 case .up:
                     guard DatabaseManager.shared.hasUserLoggedIn() else {
