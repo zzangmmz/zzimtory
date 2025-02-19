@@ -33,30 +33,35 @@ final class LoginViewController: UIViewController {
         loginView?.appleCustomLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.signInWithApple(on: self!)
+                self?.loginView?.startLoading()
             })
             .disposed(by: disposeBag)
         
         loginView?.googleLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.signInWithGoogle(on: self!)
+                self?.loginView?.startLoading()
             })
             .disposed(by: disposeBag)
         
         loginView?.kakaoLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.signInWithKakao()
+                self?.loginView?.startLoading()
             })
             .disposed(by: disposeBag)
         
         loginView?.naverLoginButton.rx.tap
             .subscribe(onNext: { [weak self] in
                 self?.viewModel.signInWithNaver()
+                self?.loginView?.startLoading()
             })
             .disposed(by: disposeBag)
         
         DatabaseManager.shared.completedLogin
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] bool in
+                self?.loginView?.stopLoading()
                 if bool {
                     let tabbarVC = TabbarViewController()
                     

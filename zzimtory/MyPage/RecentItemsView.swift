@@ -21,10 +21,11 @@ final class RecentItemsView: UIView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: 100, height: 100)
-        layout.minimumLineSpacing = 8
+        layout.minimumLineSpacing = 10
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white100Zt
+        collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
         
         collectionView.register(RecentItemCell.self, forCellWithReuseIdentifier: String(describing: RecentItemCell.self))
         return collectionView

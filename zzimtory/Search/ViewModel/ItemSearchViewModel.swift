@@ -17,7 +17,8 @@ final class ItemSearchViewModel {
     
     private let userDefaults = UserDefaults.standard
     private let recentItemsKey = "recentItems"
-    private(set) var recentItems = [Item]()
+    private let recentItemsRelay = BehaviorRelay<[Item]>(value: []) // 최근 아이템 Relay 적용
+    var recentItems: Observable<[Item]> { return recentItemsRelay.asObservable() }
     
     private var currentItems: Observable<[Item]> = Observable.just([])
     private var searchHistory = UserDefaults.standard.array(forKey: "searchHistory") as? [String] ?? [] {
@@ -168,7 +169,8 @@ final class ItemSearchViewModel {
         if let data = userDefaults.data(forKey: recentItemsKey) {
             do {
                 let items = try JSONDecoder().decode([Item].self, from: data)
-                self.recentItems = items
+                // self.recentItems = items
+                recentItemsRelay.accept(items) //relay에 넣어줌
             } catch {
                 print("최근 본 아이템 - 유저 디폴트 디코딩 에러: \(error)")
             }
