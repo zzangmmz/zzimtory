@@ -128,3 +128,6 @@
 ---
 ## 📱 시연 영상
 🔗 [시연 영상 보러가기](https://youtube.com/shorts/HqwDDmTSEos)
+
+### Attributes
+<a href="https://www.flaticon.com/free-icons/swipe" title="swipe icons">Swipe icons created by Ilham Fitrotul Hayat - Flaticon</a>
