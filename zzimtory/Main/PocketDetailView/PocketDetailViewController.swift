@@ -54,7 +54,6 @@ class PocketDetailViewController: UIViewController,
     }
     
     private func bind() {
-        
         self.viewModel.fetchData { [weak self] _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -168,9 +167,7 @@ class PocketDetailViewController: UIViewController,
                     DatabaseManager.shared.deleteItem(productID: item.productID, from: "전체보기")
                 }
             }
-            
             self.bind()
-            
             self.editMode = false
             self.pocketDetailView?.toggleButtonHidden()
         }
@@ -184,27 +181,24 @@ class PocketDetailViewController: UIViewController,
     
     
     @objc func seedMoveButtonDidTap() {
-        
         guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
         let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
         
-        // 주머니에 없으면 모달 띄우기
         let pocketVC = PocketSelectionViewController(selectedItems: selectedItems)
         self.present(pocketVC, animated: true)
         
-        // 모달에서 주머니 추가 완료 시 ViewModel 업데이트
+        // 새 주머니로 이동 완료 후 이전 주머니에서 삭제
         pocketVC.onComplete = { [weak self] in
             guard let self = self else { return }
             selectedItems.forEach { item in
                 if self.viewModel.pocket.title != "전체보기" {
-                    DatabaseManager.shared.deleteItem(productID: item.productID, from: "전체보기")
+                    DatabaseManager.shared.deleteItem(productID: item.productID, alsoRemoveFromDefaultPocket: false, from: self.viewModel.pocket.title)
                 }
-                DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
-                
             }
+            
             self.bind()
-            editMode = false
-            pocketDetailView?.toggleButtonHidden()
+            self.editMode = false
+            self.pocketDetailView?.toggleButtonHidden()
         }
     }
     
