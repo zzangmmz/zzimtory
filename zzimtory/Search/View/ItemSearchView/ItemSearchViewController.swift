@@ -25,7 +25,7 @@ final class ItemSearchViewController: ZTViewController {
     var items: [Item] = []
     
     private lazy var dimLayerTapRecognizer = UITapGestureRecognizer(target: self,
-                                                               action: #selector(onTap))
+                                                                    action: #selector(onTap))
     
     // MARK: - Background layer
     private lazy var dimLayer: CALayer = {
@@ -104,10 +104,10 @@ final class ItemSearchViewController: ZTViewController {
             recentItemsView.placeHolder
         ]
             .forEach {
-            $0.snp.makeConstraints { make in
-                make.horizontalEdges.equalToSuperview()
+                $0.snp.makeConstraints { make in
+                    make.horizontalEdges.equalToSuperview()
+                }
             }
-        }
         
         // loadRecentItems()
     }
@@ -144,7 +144,7 @@ final class ItemSearchViewController: ZTViewController {
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         
         itemCollectionView.isScrollEnabled = true
-    
+        
         itemCollectionView.register(ItemCollectionViewHeader.self,
                                     forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                     withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
@@ -304,7 +304,7 @@ extension ItemSearchViewController {
                 detailVC.hidesBottomBarWhenPushed = true
                 
                 self.navigationController?.pushViewController(detailVC, animated: true)
-
+                
             })
             .disposed(by: disposeBag)
         
@@ -452,7 +452,7 @@ extension ItemSearchViewController: UICollectionViewDelegate {
         
         return UICollectionReusableView()
     }
-
+    
 }
 
 extension ItemSearchViewController: UICollectionViewDelegateFlowLayout {
@@ -484,5 +484,30 @@ extension ItemSearchViewController: UIGestureRecognizerDelegate {
             return false
         }
         return true
+    }
+}
+
+extension ItemSearchViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView == itemCollectionView else { return }
+        
+        let offsetY = scrollView.contentOffset.y            // 현재 스크롤된 위치
+        let contentHeight = scrollView.contentSize.height   // 스크롤뷰 내부 컨텐츠들의 전체 높이
+        let height = scrollView.frame.size.height           // 현재 화면에 보이는 스크롤뷰의 높이
+        
+        // 스크롤이 완전히 끝에 도달했을 때만!! 다음 페이지 로드
+        if offsetY >= contentHeight - height {
+            loadNextPageIfNeeded()
+        }
+    }
+    
+    private func loadNextPageIfNeeded() {
+        guard
+            let query = searchBar.text,
+            !query.isEmpty
+        else { return }
+        
+        // 다음 페이지 로드
+        itemSearchViewModel.loadNextPage(query: query)
     }
 }
