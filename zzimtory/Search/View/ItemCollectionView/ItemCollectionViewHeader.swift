@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ItemCollectionViewHeader: UICollectionReusableView {
+final class ItemCollectionViewHeader: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -23,12 +23,10 @@ final class ItemCollectionViewHeader: UICollectionReusableView {
     private(set) var cardButton: UIButton = {
         let button = UIButton()
         
-        var config = UIButton.Configuration.plain()
-        config.image = UIImage(systemName: "square.stack.3d.down.right.fill")
-        config.baseForegroundColor = .black900Zt
-        config.baseBackgroundColor = .white100Zt
-        config.cornerStyle = .large
-        button.configuration = config
+        button.setImage(UIImage(systemName: "square.stack.3d.down.right.fill"), for: .normal)
+        button.tintColor = .black900Zt
+        button.layer.cornerRadius = 20
+        button.backgroundColor = .white100Zt
         
         return button
     }()
@@ -36,6 +34,7 @@ final class ItemCollectionViewHeader: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        self.backgroundColor = .clear
         setSubviews()
         setConstraints()
     }
@@ -56,7 +55,13 @@ final class ItemCollectionViewHeader: UICollectionReusableView {
     private func setConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalToSuperview().inset(12)
+            make.leading.equalToSuperview().inset(4)
+        }
+        
+        cardButton.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.size.equalTo(40)
         }
     }
 }
