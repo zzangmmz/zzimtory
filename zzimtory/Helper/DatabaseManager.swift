@@ -166,7 +166,7 @@ final class DatabaseManager {
             // 전체보기 주머니와 나머지 주머니 분리
             let defaultPocket = pockets.first { $0.title == "전체보기" }
             var otherPockets = pockets.filter { $0.title != "전체보기" }
-
+            
             // 나머지 주머니들은 saveDate 기준으로 정렬
             otherPockets.sort { pocket1, pocket2 in
                 switch (pocket1.saveDate, pocket2.saveDate) {
@@ -176,7 +176,7 @@ final class DatabaseManager {
                 case (let date1?, let date2?): return date1 > date2
                 }
             }
-
+            
             // 전체보기 + 정렬된 나머지 주머니들
             pockets = []
             if let defaultPocket = defaultPocket {
@@ -313,21 +313,36 @@ final class DatabaseManager {
         let itemKey = "zzimtory\(productID)"
         
         if pocketTitle == "전체보기" {
-            // 전체보기에서 삭제할 경우 모든 주머니에서 삭제
+            // 현재 주머니(전체보기)에서 삭제
+            self.ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items").child(itemKey).removeValue { error, _ in
+                if let error = error {
+                    print("아이템 삭제 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 삭제 성공")
+                }
+            }
+            
+            // 다른 모든 주머니에서도 삭제
             ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
                 guard let pockets = snapshot.value as? [String: [String: Any]] else {
                     print("주머니 데이터 탐색 실패")
                     return
                 }
                 
-                // 모든 주머니에서 해당 아이템 삭제
+                // "전체보기"를 제외한 다른 주머니들에서 삭제
                 for (pocketKey, _) in pockets {
-                    self.ref.child("users").child(uid).child("pockets").child(pocketKey).child("items").child(itemKey).removeValue()
+                    if pocketKey != "pocket전체보기" {
+                        self.ref.child("users").child(uid).child("pockets").child(pocketKey).child("items").child(itemKey).removeValue { error, _ in
+                            if let error = error {
+                                print("다른 주머니에서 아이템 삭제 실패: \(error.localizedDescription)")
+                            } else {
+                                print("다른 주머니에서 아이템 삭제 성공")
+                            }
+                        }
+                    }
                 }
             }
-        } else {
-            // 특정 주머니에서 삭제할 경우
-            
+        } else { // 특정 주머니에서 삭제할 경우
             // 1. 해당 주머니에서 삭제
             self.ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items").child(itemKey).removeValue { error, _ in
                 if let error = error {

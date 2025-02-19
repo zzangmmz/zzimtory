@@ -159,18 +159,13 @@ class PocketDetailViewController: UIViewController,
         
         let deleteAction = UIAlertAction(title: "네", style: .destructive) { _ in
             selectedItems.forEach { item in
-                if self.viewModel.pocket.title == "전체보기" {
-                    DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
-                }else{
-                    
-                    DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
-                    DatabaseManager.shared.deleteItem(productID: item.productID, from: "전체보기")
-                }
+                DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
             }
             self.bind()
             self.editMode = false
             self.pocketDetailView?.toggleButtonHidden()
         }
+        
         let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
         
         alert.addAction(deleteAction)
@@ -178,7 +173,6 @@ class PocketDetailViewController: UIViewController,
         
         present(alert, animated: true, completion: nil)
     }
-    
     
     @objc func seedMoveButtonDidTap() {
         guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
