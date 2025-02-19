@@ -14,17 +14,15 @@ final class ItemDetailViewModel {
     private let disposeBag = DisposeBag()
     private let shoppingRepository = ShoppingRepository()
     
-    private var itemsRelay = BehaviorRelay<[Item]>(value: [])
     var items: Driver<[Item]>
+    private var itemsRelay = BehaviorRelay<[Item]>(value: [])
+    private let itemStatusRelay = BehaviorRelay<[String: Bool]>(value: [:]) // 아이템 저장 상태
     
-    private let currentIndexRelay: BehaviorRelay<Int>
     var currentItem: Item { itemsRelay.value[currentIndexRelay.value] } // 현재 보여줄 아이템
-    private var searchQuery: String = ""
-
-    let similarItems = BehaviorSubject<[Item]>(value: [])
+    private let currentIndexRelay: BehaviorRelay<Int>
     
-    let isInPocket = BehaviorSubject<Bool>(value: false)
-    var isInPocketStatus: Bool = false
+    let similarItems = BehaviorSubject<[Item]>(value: [])
+    private var searchQuery: String = ""
     
     init(items: [Item], currentIndex: Int) {
         self.itemsRelay = BehaviorRelay<[Item]>(value: items)
@@ -33,7 +31,7 @@ final class ItemDetailViewModel {
         
         setupSearchQuery()
         fetchSimilarItems()
-        checkItemStatus()
+        checkItemStatus(for: items)
     }
     
     // 인덱스 업데이트
@@ -67,50 +65,55 @@ final class ItemDetailViewModel {
             .disposed(by: disposeBag)
     }
     
-    // 검색어 재설정 및 재검색을 위한 메서드
-    func refreshSimilarItems() {
-        setupSearchQuery()
-        fetchSimilarItems()
-    }
-    
-    private func checkItemStatus() {
+    // 아이템 저장 상태 확인
+    private func checkItemStatus(for items: [Item]) {
         DatabaseManager.shared.readPocket { [weak self] pockets in
             guard let self = self else { return }
             
-            // 모든 주머니를 순회하면서 현재 아이템이 있는지 확인
-            let isInPocket = pockets.contains { pocket in
-                pocket.items.contains { item in
-                    item.productID == self.currentItem.productID
+            var statusMap: [String: Bool] = [:]
+            for item in items {
+                statusMap[item.productID] = pockets.contains { pocket in
+                    pocket.items.contains { $0.productID == item.productID }
                 }
             }
-            
-            self.isInPocketStatus = isInPocket
-            self.isInPocket.onNext(isInPocket)
+            self.itemStatusRelay.accept(statusMap)
         }
     }
-
-    func handlePocketButton() {
-        if isInPocketStatus {
-            // 아이템이 있는 주머니를 찾아서 삭제
+    
+    // 아이템 상태를 Driver로 제공
+    func itemStatus(for productID: String) -> Driver<Bool> {
+        return itemStatusRelay
+            .map { $0[productID] ?? false }
+            .asDriver(onErrorJustReturn: false)
+    }
+    
+    // 아이템의 저장 상태 토글
+    func togglePocketStatus(for productID: String) {
+        let currentStatus = itemStatusRelay.value[productID] ?? false
+        
+        if currentStatus {
             DatabaseManager.shared.readPocket { [weak self] pockets in
                 guard let self = self else { return }
                 
                 for pocket in pockets {
-                    if pocket.items.contains(where: { $0.productID == self.currentItem.productID }) {
-                        // 해당 주머니에서 아이템 삭제
-                        DatabaseManager.shared.deleteItem(productID: self.currentItem.productID, from: pocket.title)
-                        print("아이템 삭제됨: \(self.currentItem.title) from \(pocket.title)")
-                        break
+                    if pocket.items.contains(where: { $0.productID == productID }) {
+                        DatabaseManager.shared.deleteItem(productID: productID, from: pocket.title)
+                        // print("아이템 삭제됨: productID \(productID) from \(pocket.title)")
                     }
                 }
+                var currentMap = self.itemStatusRelay.value
+                currentMap[productID] = false
+                self.itemStatusRelay.accept(currentMap)
             }
-            isInPocketStatus = false
-            isInPocket.onNext(false)
+        } else {
+            if let item = itemsRelay.value.first(where: { $0.productID == productID }) {
+                DatabaseManager.shared.addItemToAggregatePocket(newItem: item) {
+                    // print("전체보기 주머니에 아이템 추가 완료")
+                }
+                var currentMap = self.itemStatusRelay.value
+                currentMap[productID] = true
+                self.itemStatusRelay.accept(currentMap)
+            }
         }
-    }
-    
-    func addToPocket() {
-        isInPocketStatus = true
-        isInPocket.onNext(true)
     }
 }
