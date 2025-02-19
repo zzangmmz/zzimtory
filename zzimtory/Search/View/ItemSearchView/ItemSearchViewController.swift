@@ -226,6 +226,7 @@ final class ItemSearchViewController: ZTViewController {
         self.tabBarController?.tabBar.isHidden = true
         
         view.bringSubviewToFront(cardStack)
+        searchBar.isUserInteractionEnabled = false
     }
     
     private func hideCardStack() {
@@ -235,6 +236,7 @@ final class ItemSearchViewController: ZTViewController {
         self.tabBarController?.tabBar.isHidden = false
         
         view.removeGestureRecognizer(dimLayerTapRecognizer)
+        searchBar.isUserInteractionEnabled = true
     }
     
     // MARK: - CardStack 보이기/숨기기
