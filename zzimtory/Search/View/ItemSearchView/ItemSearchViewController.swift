@@ -94,10 +94,12 @@ final class ItemSearchViewController: ZTViewController {
             })
             .disposed(by: disposeBag)
         
-        searchBar.rx.cancelButtonClicked.subscribe(onNext: { [unowned self] in
+        searchBar.rx.cancelButtonClicked
+            .subscribe(onNext: { [unowned self] in
             
             searchBar.becomeFirstResponder()
             view.addSubview(searchHistory)
+            showRecents()
             
         }).disposed(by: disposeBag)
     }
@@ -240,14 +242,14 @@ final class ItemSearchViewController: ZTViewController {
         recentItemsView.isHidden = false
         searchHistory.isHidden = false
         searchHistoryHeader.isHidden = false
+        searchHistory.reloadData()
+        searchHistory.layoutIfNeeded()
     }
     
     private func hideRecents() {
         recentItemsView.isHidden = true
         searchHistory.isHidden = true
         searchHistoryHeader.isHidden = true
-
-        searchHistory.reloadData()
     }
     
     private func hideSearchResults() {
