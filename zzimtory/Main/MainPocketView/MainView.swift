@@ -118,6 +118,7 @@ class MainView: ZTView {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.layer.cornerRadius = 20
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.register(PocketCell.self, forCellWithReuseIdentifier: "PocketCell")
         return collectionView
     }()
@@ -133,7 +134,6 @@ class MainView: ZTView {
     }
     
     private func setupUI() {
-        
         let logoStackView = UIStackView(arrangedSubviews: [logoImageView, logoLabel])
         logoStackView.axis = .horizontal
         logoStackView.spacing = 10
