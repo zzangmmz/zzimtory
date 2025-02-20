@@ -152,6 +152,11 @@ final class ItemSearchViewController: ZTViewController {
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         itemCollectionView.isScrollEnabled = true
+        
+        itemCollectionViewHeader.cardButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.showCardStack()
+            }).disposed(by: disposeBag)
     }
     
     private func setConstraints() {
