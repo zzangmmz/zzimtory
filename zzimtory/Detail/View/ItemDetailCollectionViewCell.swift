@@ -340,11 +340,7 @@ extension ItemDetailCollectionViewCell {
         
         itemNameLabel.text = item.title.removingHTMLTags
         
-        if let price = Int(item.price) {
-            priceLabel.text = "\(price.withSeparator)원"
-        } else {
-            priceLabel.text = "가격 정보 없음"
-        }
+        priceLabel.text = Int(item.price)?.withSeparator
         
         similarItemViewModel = SimilarItemViewModel(item: item)
         

@@ -12,6 +12,7 @@ extension Int {
     var withSeparator: String {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
-        return numberFormatter.string(from: NSNumber(value: self)) ?? String(self)
+        let formattedNumber = numberFormatter.string(from: NSNumber(value: self)) ?? String(self)
+        return formattedNumber + "원"
     }
 }
