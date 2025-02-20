@@ -131,12 +131,6 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: 150, height: 190)
-        //        let cellHeight = UIScreen.main.bounds.height * 0.18
-        //        let aspectRatio: CGFloat = 150.0 / 190.0
-        //        let cellWidth = cellHeight * aspectRatio
-        //
-        //        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
-        
         layout.minimumLineSpacing = 10
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -166,17 +160,16 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView(arrangedSubviews: [websiteButton, saveButton])
         
         stackView.axis = .horizontal
-        stackView.spacing = 10
+        stackView.spacing = 12
         stackView.alignment = .center
-        stackView.distribution = .fill
+        stackView.distribution = .fillProportionally
         
         return stackView
     }()
     
     // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
     private lazy var topStackView = {
-        let stackView = UIStackView(arrangedSubviews: [itemImageView,
-                                                       brandStackView,
+        let stackView = UIStackView(arrangedSubviews: [brandStackView,
                                                        itemNameLabel,
                                                        priceLabel])
         stackView.axis = .vertical
@@ -233,7 +226,6 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     }
     
     private func configureUI() {
-        // setupMainStackView()
         setupScrollView()
         setupTopStackView()
         setupBottomStackView()
@@ -241,48 +233,51 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     
     private func setupScrollView() {
         addSubview(scrollView)
+        scrollView.addSubview(itemImageView)
         scrollView.addSubview(mainStackView)
         
         scrollView.snp.makeConstraints { make in
-            make.edges.equalTo(safeAreaLayoutGuide)
+            make.horizontalEdges.top.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-30)
         }
         
-        mainStackView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(scrollView)
-            make.bottom.equalTo(scrollView).offset(-40)
-            make.width.equalTo(scrollView)
-        }
-    }
-    
-    //    private func setupMainStackView() {
-    //        contentView.addSubview(mainStackView)
-    //
-    //        mainStackView.snp.makeConstraints { make in
-    //            make.horizontalEdges.top.equalToSuperview()
-    //            make.bottom.equalToSuperview().offset(-30)
-    //            make.edges.equalToSuperview()
-    //        }
-    //    }
-    
-    // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
-    private func setupTopStackView() {
-        topStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(10)
-            make.leading.trailing.equalToSuperview()
+        scrollView.contentLayoutGuide.snp.makeConstraints { make in
+            make.top.equalTo(itemImageView.snp.top)
+            make.leading.trailing.equalTo(scrollView.frameLayoutGuide)
+            make.bottom.equalTo(mainStackView.snp.bottom)
         }
         
         itemImageView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(UIScreen.main.bounds.width)
+            make.top.equalTo(scrollView.contentLayoutGuide)
+            make.horizontalEdges.equalTo(scrollView.contentLayoutGuide)
+            make.height.width.equalTo(UIScreen.main.bounds.width)
+        }
+        
+        mainStackView.snp.makeConstraints { make in
+            make.top.equalTo(itemImageView.snp.bottom).offset(16)
+            make.horizontalEdges.equalTo(scrollView.contentLayoutGuide).inset(16)
+            make.bottom.equalTo(scrollView.contentLayoutGuide)
+        }
+    }
+
+    // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
+    private func setupTopStackView() {
+        topStackView.snp.makeConstraints { make in
+            make.horizontalEdges.equalTo(mainStackView)
         }
         
         shareButton.snp.makeConstraints { make in
             make.width.height.equalTo(40)
         }
         
-        [brandStackView, itemNameLabel, priceLabel].forEach { view in
+        brandStackView.snp.makeConstraints { make in
+            make.height.equalTo(40)
+            make.horizontalEdges.equalTo(topStackView)
+        }
+        
+        [itemNameLabel, priceLabel].forEach { view in
             view.snp.makeConstraints { make in
-                make.leading.trailing.equalToSuperview().inset(16)
+                make.height.equalTo(24)
             }
         }
     }
@@ -290,7 +285,7 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     // [하단 스택] 웹사이트 버튼 및 주머니 넣기 버튼 스택, 구분선, 유사상품 레이블, 유사 상품 컬렌션 뷰
     private func setupBottomStackView() {
         bottomStackView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16)
+            make.horizontalEdges.equalTo(mainStackView)
         }
         
         // 화면 내의 비율로 버튼 설정
@@ -300,23 +295,30 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
             }
         }
         
-        // 양옆 오프셋 20 , 중간 12 --> 이래도 안되는지 확인
         websiteButton.snp.makeConstraints { make in
-            make.width.equalTo(UIScreen.main.bounds.width * 0.4)
+            make.width.greaterThanOrEqualTo(80)
         }
         
         saveButton.snp.makeConstraints { make in
-            make.width.equalTo(UIScreen.main.bounds.width * 0.6)
+            make.width.greaterThanOrEqualTo(100)
+        }
+        
+        buttonStackView.snp.makeConstraints { make in
+            make.height.equalTo(50)
         }
         
         [buttonStackView, lineView, similarItemLabel, similarItemCollectionView].forEach { view in
             view.snp.makeConstraints { make in
-                make.leading.trailing.equalToSuperview()
+                make.horizontalEdges.equalToSuperview()
             }
         }
         
         lineView.snp.makeConstraints { make in
             make.height.equalTo(1)
+        }
+        
+        similarItemLabel.snp.makeConstraints { make in
+            make.height.equalTo(24)
         }
         
         similarItemCollectionView.snp.makeConstraints { make in
