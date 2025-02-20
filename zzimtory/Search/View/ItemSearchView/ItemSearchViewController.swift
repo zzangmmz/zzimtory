@@ -16,6 +16,7 @@ final class ItemSearchViewController: ZTViewController {
     private let searchHistory = UITableView()
     private let searchHistoryHeader = SearchHistoryHeader()
     private let itemCollectionView = ItemCollectionView()
+    private let itemCollectionViewHeader = ItemCollectionViewHeader()
     
     private let cardStack = SwipeCardStack()
     
@@ -94,10 +95,12 @@ final class ItemSearchViewController: ZTViewController {
             })
             .disposed(by: disposeBag)
         
-        searchBar.rx.cancelButtonClicked.subscribe(onNext: { [unowned self] in
+        searchBar.rx.cancelButtonClicked
+            .subscribe(onNext: { [unowned self] in
             
             searchBar.becomeFirstResponder()
             view.addSubview(searchHistory)
+            showRecents()
             
         }).disposed(by: disposeBag)
     }
@@ -144,17 +147,25 @@ final class ItemSearchViewController: ZTViewController {
         searchHistory.rowHeight = 40
     }
     
-    private func setColletionView() {
+    private func setCollectionView() {
+        view.addSubview(itemCollectionViewHeader)
+        view.addSubview(itemCollectionView)
+        
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
-        
         itemCollectionView.isScrollEnabled = true
         
-        itemCollectionView.register(ItemCollectionViewHeader.self,
-                                    forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                    withReuseIdentifier: String(describing: ItemCollectionViewHeader.self))
+        itemCollectionViewHeader.snp.makeConstraints { make in
+            make.top.equalTo(searchBar.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(40)
+        }
         
-
+        itemCollectionView.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().inset(12)
+            make.top.equalTo(itemCollectionViewHeader.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+        }
     }
     
     private func setConstraints() {
@@ -224,6 +235,7 @@ final class ItemSearchViewController: ZTViewController {
         self.tabBarController?.tabBar.isHidden = true
         
         view.bringSubviewToFront(cardStack)
+        searchBar.isUserInteractionEnabled = false
     }
     
     private func hideCardStack() {
@@ -233,6 +245,7 @@ final class ItemSearchViewController: ZTViewController {
         self.tabBarController?.tabBar.isHidden = false
         
         view.removeGestureRecognizer(dimLayerTapRecognizer)
+        searchBar.isUserInteractionEnabled = true
     }
     
     // MARK: - CardStack 보이기/숨기기
@@ -240,14 +253,21 @@ final class ItemSearchViewController: ZTViewController {
         recentItemsView.isHidden = false
         searchHistory.isHidden = false
         searchHistoryHeader.isHidden = false
+        
+        itemCollectionView.isHidden = true
+        itemCollectionViewHeader.isHidden = true
+
+        searchHistory.reloadData()
+        searchHistory.layoutIfNeeded()
     }
     
     private func hideRecents() {
         recentItemsView.isHidden = true
         searchHistory.isHidden = true
         searchHistoryHeader.isHidden = true
-
-        searchHistory.reloadData()
+      
+        itemCollectionView.isHidden = false
+        itemCollectionViewHeader.isHidden = false
     }
     
     private func hideSearchResults() {
@@ -329,7 +349,10 @@ extension ItemSearchViewController {
         output.swipedCard
             .drive(onNext: { [weak self] swipedCard in
                 switch swipedCard.direction {
-                case .right: break
+                case .right:
+                    DatabaseManager.shared.addItemToAggregatePocket(newItem: swipedCard.item) {
+                        return
+                    }
                 case .left: break
                 case .up:
                     guard DatabaseManager.shared.hasUserLoggedIn() else {
@@ -450,31 +473,6 @@ extension ItemSearchViewController {
     }
 }
 
-extension ItemSearchViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView,
-                        viewForSupplementaryElementOfKind kind: String,
-                        at indexPath: IndexPath) -> UICollectionReusableView {
-        
-        if kind == UICollectionView.elementKindSectionHeader {
-            let reusableView = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: String(describing: ItemCollectionViewHeader.self),
-                for: indexPath
-            )
-            
-            guard let header = reusableView as? ItemCollectionViewHeader else {
-                assertionFailure("UICollectionReusableView를 ItemCollectionViewHeader로 캐스팅하는 데 실패함")
-                return UICollectionReusableView()
-            }
-            
-            return header
-        }
-        
-        return UICollectionReusableView()
-    }
-    
-}
-
 extension ItemSearchViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
@@ -488,13 +486,6 @@ extension ItemSearchViewController: UICollectionViewDelegateFlowLayout {
         
         return CGSize(width: cellWidth, height: cellWidth * 1.25)
     }
-    
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 50)
-    }
-    
 }
 
 extension ItemSearchViewController: UIGestureRecognizerDelegate {

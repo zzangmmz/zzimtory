@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ItemCollectionViewHeader: UICollectionReusableView {
+final class ItemCollectionViewHeader: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -20,10 +20,22 @@ final class ItemCollectionViewHeader: UICollectionReusableView {
         return label
     }()
     
+    private(set) var cardButton: UIButton = {
+        let button = UIButton()
+        
+        button.setImage(UIImage(systemName: "square.stack.3d.down.right.fill"), for: .normal)
+        button.tintColor = .black900Zt
+        button.layer.cornerRadius = 20
+        button.backgroundColor = .white100Zt
+        
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(titleLabel)
         
+        self.backgroundColor = .clear
+        setSubviews()
         setConstraints()
     }
     
@@ -31,10 +43,25 @@ final class ItemCollectionViewHeader: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func setSubviews() {
+        [
+            titleLabel,
+            cardButton
+        ].forEach {
+            addSubview($0)
+        }
+    }
+    
     private func setConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalToSuperview().inset(12)
+            make.leading.equalToSuperview().inset(4)
+        }
+        
+        cardButton.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.size.equalTo(40)
         }
     }
 }
