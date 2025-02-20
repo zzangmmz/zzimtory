@@ -144,14 +144,19 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let pocket = viewModel.displayPockets[indexPath.item]
+        
         guard editMode else {
-            let pocket = viewModel.displayPockets[indexPath.item]
-            print("\(pocket.title) 이 클릭됨")
-            
             let detailViewModel = PocketDetailViewModel(pocket: pocket)
             let detailVC = PocketDetailViewController(viewModel: detailViewModel)
             navigationController?.pushViewController(detailVC, animated: true)
             
+            return
+        }
+        
+        // 편집모드에서 "전체보기" 주머니는 선택 불가
+        if pocket.title == "전체보기" {
+            collectionView.deselectItem(at: indexPath, animated: true)
             return
         }
         
@@ -195,31 +200,25 @@ class MainViewController: UIViewController, UICollectionViewDataSource, UICollec
     }
     
     @objc func pocketDeleteButtonDidTap() {
-        
         guard let selectedIndexPaths = mainView?.collectionView.indexPathsForSelectedItems else { return }
 
         let indexPathsToDelete = selectedIndexPaths.filter { $0.item != 0 }
         let selectedPockets = indexPathsToDelete.map { viewModel.displayPockets[$0.item] }
         
-        let alert = UIAlertController(title: "주머니 삭제", message: "주머니를 삭제하시겠습니까?", preferredStyle: .alert)
-
-        let deleteAction = UIAlertAction(title: "네", style: .destructive) { [weak self] _ in
+        showAlert(title: "주머니를 삭제하시겠습니까?") { [weak self] in
             selectedPockets.forEach { pocket in
-                DatabaseManager.shared.deletePocket(title: pocket.title)
-                DatabaseManager.shared.deletePocket(title: "전체보기")
+                DatabaseManager.shared.deletePocket(title: pocket.title) {
+                    self?.bind()  // 각 삭제 완료 후 데이터 새로고침 / 대신 주머니 3번 삭제하면 3번 호출됨
+                }
+                print()
+                print("삭제 성공 주머니 \(pocket.title)")
+                print()
             }
- 
+            
             self?.bind()
             self?.editMode = false
             self?.mainView?.toggleButtonHidden()
         }
-
-        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
-
-        alert.addAction(deleteAction)
-        alert.addAction(cancelAction)
-
-        present(alert, animated: true, completion: nil)
     }
 }
 
@@ -245,5 +244,20 @@ extension MainViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return 16
+    }
+}
+
+// MARK: - Alert
+extension MainViewController {
+    private func showAlert(title: String, completion: @escaping () -> ()) {
+        let alert = UIAlertController(title: title,
+                                      message: nil,
+                                      preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "확인", style: .destructive) { _ in
+            completion()
+        })
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
+        present(alert, animated: true)
     }
 }
