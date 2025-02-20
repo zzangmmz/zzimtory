@@ -24,6 +24,7 @@ final class ItemSearchViewController: ZTViewController {
     private var disposeBag = DisposeBag()
     
     private let dimLayerTapRecognizer = UITapGestureRecognizer()
+    private let dismissKeyboardTapRecognizer = UITapGestureRecognizer()
     
     // MARK: - Background layer
     private lazy var dimLayer: CALayer = {
@@ -98,12 +99,26 @@ final class ItemSearchViewController: ZTViewController {
         
         searchBar.rx.cancelButtonClicked
             .subscribe(onNext: { [unowned self] in
-            
-            searchBar.becomeFirstResponder()
-            view.addSubview(searchHistory)
-            showRecents()
-            
-        }).disposed(by: disposeBag)
+                
+                searchBar.becomeFirstResponder()
+                view.addSubview(searchHistory)
+                showRecents()
+                
+            })
+            .disposed(by: disposeBag)
+        
+        searchBar.rx.textDidBeginEditing
+            .subscribe(onNext: { [unowned self] _ in
+                self.view.addGestureRecognizer(self.dismissKeyboardTapRecognizer)
+            })
+            .disposed(by: disposeBag)
+                       
+        dismissKeyboardTapRecognizer.rx.event
+            .subscribe(onNext: { [unowned self] _ in
+                self.view.endEditing(true)
+                self.view.removeGestureRecognizer(self.dismissKeyboardTapRecognizer)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setRecectItems() {
