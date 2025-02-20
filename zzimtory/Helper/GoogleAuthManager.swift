@@ -60,7 +60,11 @@ final class GoogleAuthManager: NativeAuthProtocol {
     /// 계정의 구글 로그인 연동 끊는 메서드
     func disconnect() {
         instance.disconnect { error in
-            print("error: \(String(describing: error))")
+            if let error = error {
+                print("error: \(error)")
+            } else {
+                print("구글 로그인 연동 해제 성공")
+            }
         }
     }
 }

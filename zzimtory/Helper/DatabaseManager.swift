@@ -255,13 +255,34 @@ final class DatabaseManager {
     // MARK: - Data Delete Methods
     /// 유저 삭제 메서드
     func deleteUser() {
-        guard let uid = self.getUserUID() else { return }
+        guard let uid = self.getUserUID() else {
+            return
+        }
         
-        ref.child("users").child(uid).removeValue() { error, _ in
+        // 소셜로그인 탈퇴를 우선 진행
+        NaverAuthManager().disconnect()
+        KakaoAuthManager().disconnect()
+        GoogleAuthManager().disconnect()
+        // 애플은 따로 탈퇴처리가 없음
+        
+        // DB에서 삭제
+        self.ref.child("users").child(uid).removeValue { [weak self] error, _ in
             if let error = error {
-                print("유저 삭제 실패: \(error.localizedDescription)")
+                print("DB 삭제 실패: \(error.localizedDescription)")
             } else {
-                print("유저 삭제 성공")
+                print("DB 삭제 성공")
+            }
+            
+            // Auth에서 삭제
+            Auth.auth().currentUser?.delete { error in
+                if let error = error {
+                    print("유저 삭제 실패: \(error.localizedDescription)")
+                } else {
+                    print("유저 삭제 성공")
+                }
+                
+                // 로컬에서 삭제
+                self?.userUID = nil
             }
         }
     }
