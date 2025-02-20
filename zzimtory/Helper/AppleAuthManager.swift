@@ -117,5 +117,6 @@ extension AppleAuthManager {
     
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         print("Sign in with Apple errored: \(error)")
+        DatabaseManager.shared.completedLogin.onNext(false)
     }
 }

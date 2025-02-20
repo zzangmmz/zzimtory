@@ -22,6 +22,7 @@ final class GoogleAuthManager: NativeAuthProtocol {
         instance.signIn(withPresenting: viewController) { signInResult, error in
             if let error = error {
                 print(error)
+                DatabaseManager.shared.completedLogin.onNext(false)
                 return
             }
             guard let user = signInResult?.user else {

@@ -46,6 +46,7 @@ extension KakaoAuthManager: ThirdPartyAuthProtocol {
                 UserApi.shared.loginWithKakaoTalk { (oAuthToken, error ) in
                     if let error = error {
                         print("카카오톡으로 로그인 실패: \(error)")
+                        DatabaseManager.shared.completedLogin.onNext(false)
                     } else {
                         if let _ = oAuthToken {
                             print("카카오톡으로 로그인 성공")
@@ -59,6 +60,7 @@ extension KakaoAuthManager: ThirdPartyAuthProtocol {
                 UserApi.shared.loginWithKakaoAccount { (oAuthToken, error) in
                     if let error = error {
                         print("카카오 계정으로 로그인 실패: \(error)")
+                        DatabaseManager.shared.completedLogin.onNext(false)
                     } else {
                         if let _ = oAuthToken {
                             print("카카오 계정으로 로그인 성공")
