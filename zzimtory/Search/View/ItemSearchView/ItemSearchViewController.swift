@@ -110,6 +110,7 @@ final class ItemSearchViewController: ZTViewController {
         searchBar.rx.textDidBeginEditing
             .subscribe(onNext: { [unowned self] _ in
                 self.view.addGestureRecognizer(self.dismissKeyboardTapRecognizer)
+                self.searchHistory.visibleCells.forEach { $0.selectionStyle = .none }
             })
             .disposed(by: disposeBag)
                        
@@ -117,6 +118,7 @@ final class ItemSearchViewController: ZTViewController {
             .subscribe(onNext: { [unowned self] _ in
                 self.view.endEditing(true)
                 self.view.removeGestureRecognizer(self.dismissKeyboardTapRecognizer)
+                self.searchHistory.visibleCells.forEach { $0.selectionStyle = .default }
             })
             .disposed(by: disposeBag)
     }
