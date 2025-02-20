@@ -114,7 +114,7 @@ final class ItemDetailViewController: ZTViewController {
                 cellIdentifier: "ItemDetailCollectionViewCell",
                 cellType: ItemDetailCollectionViewCell.self
             )) { [weak self] index, item, cell in
-                print("Current index: \(index), Item title: \(item.title)")
+                // print("Current index: \(index), Item title: \(item.title)")
                 cell.delegate = self
                 cell.setCell(with: item)
                 
