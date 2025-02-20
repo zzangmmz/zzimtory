@@ -23,10 +23,7 @@ final class ItemSearchViewController: ZTViewController {
     private let itemSearchViewModel = ItemSearchViewModel()
     private var disposeBag = DisposeBag()
     
-    var items: [Item] = []
-    
-    private lazy var dimLayerTapRecognizer = UITapGestureRecognizer(target: self,
-                                                                    action: #selector(onTap))
+    private let dimLayerTapRecognizer = UITapGestureRecognizer()
     
     // MARK: - Background layer
     private lazy var dimLayer: CALayer = {
@@ -45,6 +42,8 @@ final class ItemSearchViewController: ZTViewController {
         
         addComponents()
         setSearchBar()
+        setCardStack()
+        setColletionView()
         setRecectItems()
         setSearchHistory()
         setConstraints()
@@ -52,6 +51,10 @@ final class ItemSearchViewController: ZTViewController {
         bind()
         bindRecentItemsCollectionView()
         otherRxCocoaStuff()
+        
+        hideCardStack()
+        showRecents()
+        hideSearchResults()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -66,7 +69,9 @@ final class ItemSearchViewController: ZTViewController {
             searchBar,
             recentItemsView,
             searchHistory,
-            searchHistoryHeader
+            searchHistoryHeader,
+            cardStack,
+            itemCollectionView
         ].forEach { view.addSubview($0) }
     }
     
@@ -79,19 +84,23 @@ final class ItemSearchViewController: ZTViewController {
         
         view.addSubview(searchBar)
         
-        searchBar.rx.searchButtonClicked.subscribe(onNext: { [unowned self] in
-            searchBar.resignFirstResponder() // 키보드 내리기
-            
-            // TabBar 숨기기
-            if let viewController = self.next as? UIViewController {
-                viewController.tabBarController?.tabBar.isHidden = true
-            }
-        }).disposed(by: disposeBag)
+        searchBar.rx.searchButtonClicked
+            .subscribe(onNext: { [weak self] in
+                // 키보드 내리기
+                self?.searchBar.resignFirstResponder()
+                
+                self?.hideRecents()
+                self?.showSearchResults()
+                self?.showCardStack()
+            })
+            .disposed(by: disposeBag)
         
-        searchBar.rx.cancelButtonClicked.subscribe(onNext: { [unowned self] in
+        searchBar.rx.cancelButtonClicked
+            .subscribe(onNext: { [unowned self] in
             
             searchBar.becomeFirstResponder()
             view.addSubview(searchHistory)
+            showRecents()
             
         }).disposed(by: disposeBag)
     }
@@ -189,13 +198,6 @@ final class ItemSearchViewController: ZTViewController {
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(400)
         }
-    }
-    
-    private func setCardStack() {
-        cardStack.backgroundColor = .clear
-        
-        view.layer.addSublayer(dimLayer)
-        view.addSubview(cardStack)
         
         cardStack.snp.makeConstraints { make in
             make.width.equalTo(UIScreen.main.bounds.width * 0.9)
@@ -203,40 +205,77 @@ final class ItemSearchViewController: ZTViewController {
             make.center.equalToSuperview()
         }
         
-        view.addGestureRecognizer(dimLayerTapRecognizer)
-        
+        itemCollectionView.snp.makeConstraints { make in
+            make.bottom.equalToSuperview().inset(12)
+            make.top.equalTo(searchBar.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+        }
     }
     
-    private func showRecentsAndHideSearchResults() {
+    private func setCardStack() {
+        cardStack.backgroundColor = .clear
+        cardStack.layer.cornerRadius = 14
+        
+        dimLayerTapRecognizer.rx.event
+            .subscribe(onNext: { _ in
+                print("Dismiss Card Stack")
+                self.hideCardStack()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - CardStack 보이기/숨기기
+    private func showCardStack() {
+        cardStack.isHidden = false
+        view.layer.addSublayer(dimLayer)
+        dimLayer.isHidden = false
+        
+        view.addGestureRecognizer(dimLayerTapRecognizer)
+        
+        self.tabBarController?.tabBar.isHidden = true
+        
+        view.bringSubviewToFront(cardStack)
+        searchBar.isUserInteractionEnabled = false
+    }
+    
+    private func hideCardStack() {
+        cardStack.isHidden = true
+        dimLayer.isHidden = true
+        
+        self.tabBarController?.tabBar.isHidden = false
+        
+        view.removeGestureRecognizer(dimLayerTapRecognizer)
+        searchBar.isUserInteractionEnabled = true
+    }
+    
+    // MARK: - CardStack 보이기/숨기기
+    private func showRecents() {
         recentItemsView.isHidden = false
         searchHistory.isHidden = false
         searchHistoryHeader.isHidden = false
         
         itemCollectionView.isHidden = true
         itemCollectionViewHeader.isHidden = true
+
         searchHistory.reloadData()
+        searchHistory.layoutIfNeeded()
     }
     
-    private func hideRecentsAndShowSearchResults() {
+    private func hideRecents() {
         recentItemsView.isHidden = true
         searchHistory.isHidden = true
         searchHistoryHeader.isHidden = true
-        
+      
         itemCollectionView.isHidden = false
         itemCollectionViewHeader.isHidden = false
     }
     
-    @objc private func onTap() {
-        print("ItemCardsView Tapped")
-        cardStack.removeFromSuperview()
-        dimLayer.removeFromSuperlayer()
-        
-        // TabBar 다시 보이기
-        if let viewController = self.next as? UIViewController {
-            viewController.tabBarController?.tabBar.isHidden = false
-        }
-        
-        view.removeGestureRecognizer(dimLayerTapRecognizer)
+    private func hideSearchResults() {
+        itemCollectionView.isHidden = true
+    }
+    
+    private func showSearchResults() {
+        itemCollectionView.isHidden = false
     }
     
 }
@@ -262,10 +301,6 @@ extension ItemSearchViewController {
         
         // MARK: - 검색 결과값 CollectionView에 바인딩
         output.searchResult
-            .do(onNext: { [weak self] _ in
-                self?.setCollectionView()
-                self?.hideRecentsAndShowSearchResults()
-            })
             .drive(itemCollectionView.rx.items(
                 cellIdentifier: String(describing: ItemCollectionViewCell.self),
                 cellType: ItemCollectionViewCell.self)
@@ -276,9 +311,6 @@ extension ItemSearchViewController {
         
         // MARK: - 검색 결과를 CardStack으로 표시해주는 코드
         output.searchResult
-            .do(onNext: { [weak self] _ in
-                self?.setCardStack()
-            })
             .drive(cardStack.rx.items(with: { item in
                 let card = SwipeCard()
                 
@@ -317,7 +349,10 @@ extension ItemSearchViewController {
         output.swipedCard
             .drive(onNext: { [weak self] swipedCard in
                 switch swipedCard.direction {
-                case .right: break
+                case .right:
+                    DatabaseManager.shared.addItemToAggregatePocket(newItem: swipedCard.item) {
+                        return
+                    }
                 case .left: break
                 case .up:
                     guard DatabaseManager.shared.hasUserLoggedIn() else {
@@ -379,7 +414,9 @@ extension ItemSearchViewController {
                 print("Rx: VC Output selected search history: \(query)")
                 self.searchBar.searchTextField.text = query
                 self.searchBar.resignFirstResponder()
-                self.hideRecentsAndShowSearchResults()
+                self.hideRecents()
+                self.showSearchResults()
+                self.showCardStack()
             })
             .disposed(by: disposeBag)
     }
@@ -430,7 +467,8 @@ extension ItemSearchViewController {
         // MARK: -
         searchBar.rx.textDidBeginEditing
             .subscribe(onNext: { [unowned self] _ in
-                self.showRecentsAndHideSearchResults()
+                self.showRecents()
+                self.hideSearchResults()
             }).disposed(by: disposeBag)
     }
 }
