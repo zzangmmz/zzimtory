@@ -178,17 +178,19 @@ class PocketDetailViewController: UIViewController,
         guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
         let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
         
+        // 1) 아이템 삭제 진행
+        selectedItems.forEach { item in
+            if self.viewModel.pocket.title != "전체보기" {
+                DatabaseManager.shared.deleteItem(productID: item.productID, alsoRemoveFromDefaultPocket: false, from: self.viewModel.pocket.title)
+            }
+        }
+        
+        // 2) 새 주머니로 이동
         let pocketVC = PocketSelectionViewController(selectedItems: selectedItems)
         self.present(pocketVC, animated: true)
         
-        // 새 주머니로 이동 완료 후 이전 주머니에서 삭제
         pocketVC.onComplete = { [weak self] in
             guard let self = self else { return }
-            selectedItems.forEach { item in
-                if self.viewModel.pocket.title != "전체보기" {
-                    DatabaseManager.shared.deleteItem(productID: item.productID, alsoRemoveFromDefaultPocket: false, from: self.viewModel.pocket.title)
-                }
-            }
             
             self.bind()
             self.editMode = false
