@@ -178,7 +178,7 @@ final class ItemSearchViewController: ZTViewController {
     
     private func setConstraints() {
         searchBar.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(16)
             make.horizontalEdges.equalToSuperview().inset(24)
             make.height.equalTo(44)
         }
