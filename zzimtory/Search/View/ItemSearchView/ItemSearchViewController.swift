@@ -239,7 +239,7 @@ final class ItemSearchViewController: ZTViewController {
         searchBar.isUserInteractionEnabled = true
     }
     
-    // MARK: - CardStack 보이기/숨기기
+    // MARK: - 최근 검색어 보이기/숨기기
     private func showRecents() {
         recentItemsView.isHidden = false
         searchHistory.isHidden = false
