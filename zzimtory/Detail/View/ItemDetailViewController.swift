@@ -101,7 +101,7 @@ final class ItemDetailViewController: ZTViewController {
         view.addSubview(itemDetailCollectionView)
         
         itemDetailCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide) // 네비게이션바 아래부터
+            make.top.equalTo(view.safeAreaLayoutGuide).inset(10) // 네비게이션바 아래부터
             make.horizontalEdges.bottom.equalToSuperview()
             // make.edges.equalToSuperview() // 네비게이션바를 덮도록
         }
@@ -114,7 +114,7 @@ final class ItemDetailViewController: ZTViewController {
                 cellIdentifier: "ItemDetailCollectionViewCell",
                 cellType: ItemDetailCollectionViewCell.self
             )) { [weak self] index, item, cell in
-                print("Current index: \(index), Item title: \(item.title)")
+                // print("Current index: \(index), Item title: \(item.title)")
                 cell.delegate = self
                 cell.setCell(with: item)
                 
