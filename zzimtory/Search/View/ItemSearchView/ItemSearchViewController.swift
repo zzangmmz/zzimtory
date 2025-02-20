@@ -87,38 +87,40 @@ final class ItemSearchViewController: ZTViewController {
         view.addSubview(searchBar)
         
         searchBar.rx.searchButtonClicked
-            .subscribe(onNext: { [weak self] in
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, _ in
                 // 키보드 내리기
-                self?.searchBar.resignFirstResponder()
+                itemSearchVC.searchBar.resignFirstResponder()
                 
-                self?.hideRecents()
-                self?.showSearchResults()
-                self?.showCardStack()
+                itemSearchVC.hideRecents()
+                itemSearchVC.showSearchResults()
+                itemSearchVC.showCardStack()
             })
             .disposed(by: disposeBag)
         
         searchBar.rx.cancelButtonClicked
-            .subscribe(onNext: { [unowned self] in
-                
-                searchBar.becomeFirstResponder()
-                view.addSubview(searchHistory)
-                showRecents()
-                
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, _ in
+                itemSearchVC.searchBar.becomeFirstResponder()
+                itemSearchVC.view.addSubview(itemSearchVC.searchHistory)
+                itemSearchVC.showRecents()
             })
             .disposed(by: disposeBag)
         
         searchBar.rx.textDidBeginEditing
-            .subscribe(onNext: { [unowned self] _ in
-                self.view.addGestureRecognizer(self.dismissKeyboardTapRecognizer)
-                self.searchHistory.visibleCells.forEach { $0.selectionStyle = .none }
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, _ in
+                itemSearchVC.view.addGestureRecognizer(itemSearchVC.dismissKeyboardTapRecognizer)
+                itemSearchVC.searchHistory.visibleCells.forEach { $0.selectionStyle = .none }
             })
             .disposed(by: disposeBag)
                        
         dismissKeyboardTapRecognizer.rx.event
-            .subscribe(onNext: { [unowned self] _ in
-                self.view.endEditing(true)
-                self.view.removeGestureRecognizer(self.dismissKeyboardTapRecognizer)
-                self.searchHistory.visibleCells.forEach { $0.selectionStyle = .default }
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, _ in
+                itemSearchVC.view.endEditing(true)
+                itemSearchVC.view.removeGestureRecognizer(itemSearchVC.dismissKeyboardTapRecognizer)
+                itemSearchVC.searchHistory.visibleCells.forEach { $0.selectionStyle = .default }
             })
             .disposed(by: disposeBag)
     }
@@ -171,9 +173,11 @@ final class ItemSearchViewController: ZTViewController {
         itemCollectionView.isScrollEnabled = true
         
         itemCollectionViewHeader.cardButton.rx.tap
-            .subscribe(onNext: { [weak self] in
-                self?.showCardStack()
-            }).disposed(by: disposeBag)
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, _ in
+                itemSearchVC.showCardStack()
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setConstraints() {
@@ -231,9 +235,10 @@ final class ItemSearchViewController: ZTViewController {
         cardStack.layer.cornerRadius = 14
         
         dimLayerTapRecognizer.rx.event
-            .subscribe(onNext: { _ in
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, _ in
                 print("Dismiss Card Stack")
-                self.hideCardStack()
+                itemSearchVC.hideCardStack()
             })
             .disposed(by: disposeBag)
     }
@@ -359,23 +364,21 @@ extension ItemSearchViewController {
         
         // MARK: - 카드 스와이프 제스쳐 지정
         output.swipedCard
-            .drive(onNext: { [weak self] swipedCard in
+            .drive(onNext: { swipedCard in
                 switch swipedCard.direction {
                 case .right:
-                    DatabaseManager.shared.addItemToAggregatePocket(newItem: swipedCard.item) {
-                        return
-                    }
+                    DatabaseManager.shared.addItemToAggregatePocket(newItem: swipedCard.item) { return }
                 case .left: break
                 case .up:
                     guard DatabaseManager.shared.hasUserLoggedIn() else {
-                        self?.navigationController?.present(LoginViewController(), animated: true)
+                        self.navigationController?.present(LoginViewController(), animated: true)
                         
                         return
                     }
                     
                     let pocketSelectionVC = PocketSelectionViewController(selectedItems: [swipedCard.item])
                     
-                    self?.navigationController?.present(pocketSelectionVC, animated: true)
+                    self.navigationController?.present(pocketSelectionVC, animated: true)
                     
                 default: print("Undefined swipe direction")
                 }
@@ -384,10 +387,10 @@ extension ItemSearchViewController {
         
         // MARK: - 모든 카드 스와이프 완료
         output.swipedAllCards
-            .drive(onNext: { [unowned self] in
-                cardStack.removeFromSuperview()
-                dimLayer.removeFromSuperlayer()
-                view.removeGestureRecognizer(dimLayerTapRecognizer)
+            .drive(with: self, onNext: { itemSearchVC, _ in
+                itemSearchVC.cardStack.removeFromSuperview()
+                itemSearchVC.dimLayer.removeFromSuperlayer()
+                itemSearchVC.view.removeGestureRecognizer(itemSearchVC.dimLayerTapRecognizer)
             })
             .disposed(by: disposeBag)
         
@@ -422,13 +425,13 @@ extension ItemSearchViewController {
         
         // MARK: - 최근 검색기록 선택 시 동작
         output.selectedSearchHistory
-            .drive(onNext: { [unowned self] query in
+            .drive(with: self, onNext: { itemSearchVC, query in
                 print("Rx: VC Output selected search history: \(query)")
-                self.searchBar.searchTextField.text = query
-                self.searchBar.resignFirstResponder()
-                self.hideRecents()
-                self.showSearchResults()
-                self.showCardStack()
+                itemSearchVC.searchBar.searchTextField.text = query
+                itemSearchVC.searchBar.resignFirstResponder()
+                itemSearchVC.hideRecents()
+                itemSearchVC.showSearchResults()
+                itemSearchVC.showCardStack()
             })
             .disposed(by: disposeBag)
     }
@@ -437,13 +440,12 @@ extension ItemSearchViewController {
     func bindRecentItemsCollectionView() {
         // 구독하여 UI 업데이트
         itemSearchViewModel.recentItems
-            .subscribe(onNext: { [weak self] items in
-                guard let self = self else { return }
-                
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, items in
                 if items.isEmpty {
-                    self.recentItemsView.showPlaceHolderLabel()
+                    itemSearchVC.recentItemsView.showPlaceHolderLabel()
                 } else {
-                    self.recentItemsView.hidePlaceHolderLabel()
+                    itemSearchVC.recentItemsView.hidePlaceHolderLabel()
                 }
             })
             .disposed(by: disposeBag)
@@ -463,11 +465,11 @@ extension ItemSearchViewController {
             .withLatestFrom(itemSearchViewModel.recentItems) { indexPath, items in
                 return items[indexPath.item]
             }
-            .subscribe(onNext: { [weak self] item in
-                guard let self = self else { return }
+            .withUnretained(self)
+            .subscribe(onNext: { itemSearchVC, item in
                 let detailVC = ItemDetailViewController(items: [item])
                 detailVC.hidesBottomBarWhenPushed = true
-                self.navigationController?.pushViewController(detailVC, animated: true)
+                itemSearchVC.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
     }
@@ -478,7 +480,8 @@ extension ItemSearchViewController {
         
         // MARK: -
         searchBar.rx.textDidBeginEditing
-            .subscribe(onNext: { [unowned self] _ in
+            .withUnretained(self)
+            .subscribe(onNext: { _ in
                 self.showRecents()
                 self.hideSearchResults()
             }).disposed(by: disposeBag)
