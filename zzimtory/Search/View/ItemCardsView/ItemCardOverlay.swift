@@ -54,7 +54,7 @@ final class ItemCardOverlay: UIView {
             descriptionLabel.text = "왼쪽으로 밀어 패스!"
             gestureIcon.image = .swipeLeft
         case .right:
-            descriptionLabel.text = "오른쪽으로 밀어 좋아요!"
+            descriptionLabel.text = "오른쪽으로 밀어 전체보기 주머니에 넣기!"
             gestureIcon.image = .swipeRight
         case .up:
             descriptionLabel.text = "위로 밀어 원하는 주머니에 넣기!"
