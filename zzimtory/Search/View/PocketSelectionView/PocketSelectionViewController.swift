@@ -45,7 +45,7 @@ final class PocketSelectionViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
 
         DatabaseManager.shared.readPocket { pockets in
-            self.pockets = pockets.filter { $0.title == "전체보기" } + pockets.filter { $0.title != "전체보기" } // 전체보기 주머니가 항상 맨 앞으로 오도록
+            self.pockets = pockets
             self.pocketColletionView.reloadData()
         }
     }
