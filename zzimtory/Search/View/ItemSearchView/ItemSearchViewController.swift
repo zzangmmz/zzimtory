@@ -43,7 +43,7 @@ final class ItemSearchViewController: ZTViewController {
         addComponents()
         setSearchBar()
         setCardStack()
-        setColletionView()
+        setCollectionView()
         setRecectItems()
         setSearchHistory()
         setConstraints()
@@ -71,6 +71,7 @@ final class ItemSearchViewController: ZTViewController {
             searchHistory,
             searchHistoryHeader,
             cardStack,
+            itemCollectionViewHeader,
             itemCollectionView
         ].forEach { view.addSubview($0) }
     }
@@ -148,24 +149,9 @@ final class ItemSearchViewController: ZTViewController {
     }
     
     private func setCollectionView() {
-        view.addSubview(itemCollectionViewHeader)
-        view.addSubview(itemCollectionView)
-        
         itemCollectionView.register(ItemCollectionViewCell.self,
                                     forCellWithReuseIdentifier: String(describing: ItemCollectionViewCell.self))
         itemCollectionView.isScrollEnabled = true
-        
-        itemCollectionViewHeader.snp.makeConstraints { make in
-            make.top.equalTo(searchBar.snp.bottom).offset(12)
-            make.horizontalEdges.equalToSuperview().inset(24)
-            make.height.equalTo(40)
-        }
-        
-        itemCollectionView.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().inset(12)
-            make.top.equalTo(itemCollectionViewHeader.snp.bottom).offset(12)
-            make.horizontalEdges.equalToSuperview().inset(24)
-        }
     }
     
     private func setConstraints() {
@@ -205,9 +191,15 @@ final class ItemSearchViewController: ZTViewController {
             make.center.equalToSuperview()
         }
         
+        itemCollectionViewHeader.snp.makeConstraints { make in
+            make.top.equalTo(searchBar.snp.bottom).offset(12)
+            make.horizontalEdges.equalToSuperview().inset(24)
+            make.height.equalTo(40)
+        }
+        
         itemCollectionView.snp.makeConstraints { make in
             make.bottom.equalToSuperview().inset(12)
-            make.top.equalTo(searchBar.snp.bottom).offset(12)
+            make.top.equalTo(itemCollectionViewHeader.snp.bottom).offset(12)
             make.horizontalEdges.equalToSuperview().inset(24)
         }
     }
@@ -251,11 +243,9 @@ final class ItemSearchViewController: ZTViewController {
     // MARK: - 최근 검색어 보이기/숨기기
     private func showRecents() {
         recentItemsView.isHidden = false
+        
         searchHistory.isHidden = false
         searchHistoryHeader.isHidden = false
-        
-        itemCollectionView.isHidden = true
-        itemCollectionViewHeader.isHidden = true
 
         searchHistory.reloadData()
         searchHistory.layoutIfNeeded()
@@ -263,19 +253,19 @@ final class ItemSearchViewController: ZTViewController {
     
     private func hideRecents() {
         recentItemsView.isHidden = true
+        
         searchHistory.isHidden = true
         searchHistoryHeader.isHidden = true
-      
-        itemCollectionView.isHidden = false
-        itemCollectionViewHeader.isHidden = false
     }
     
     private func hideSearchResults() {
         itemCollectionView.isHidden = true
+        itemCollectionViewHeader.isHidden = true
     }
     
     private func showSearchResults() {
         itemCollectionView.isHidden = false
+        itemCollectionViewHeader.isHidden = false
     }
     
 }
