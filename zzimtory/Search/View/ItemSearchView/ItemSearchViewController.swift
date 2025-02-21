@@ -399,7 +399,7 @@ extension ItemSearchViewController {
             .drive(onNext: { swipedCard in
                 switch swipedCard.direction {
                 case .right:
-                    DatabaseManager.shared.addItemToAggregatePocket(newItem: swipedCard.item) { return }
+                    DatabaseManager.shared.updatePocketItem(newItem: swipedCard.item, pocketTitle: "전체보기")
                 case .left: break
                 case .up:
                     guard DatabaseManager.shared.hasUserLoggedIn() else {
