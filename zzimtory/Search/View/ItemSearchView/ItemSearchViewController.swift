@@ -361,13 +361,20 @@ extension ItemSearchViewController {
                 card.content = ItemCardContents(item: item)
                 card.contentMode = .scaleAspectFill
                 
-                let leftOverlay = ItemCardOverlay(with: .left)
+                let userDefaults = UserDefaults.standard
+                let overlaysShownBefore = userDefaults.integer(forKey: "overlaysShownBefore")
                 
-                let rightOverlay = ItemCardOverlay(with: .right)
-                
-                let upOverlay = ItemCardOverlay(with: .up)
-                
-                card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
+                if overlaysShownBefore < 3 {
+                    let leftOverlay = ItemCardOverlay(with: .left)
+                    
+                    let rightOverlay = ItemCardOverlay(with: .right)
+                    
+                    let upOverlay = ItemCardOverlay(with: .up)
+                    
+                    card.setOverlays([.left: leftOverlay, .right: rightOverlay, .up: upOverlay])
+                    
+                    userDefaults.set(overlaysShownBefore + 1, forKey: "overlaysShownBefore")
+                }
                 
                 card.layer.cornerRadius = 8
                 
