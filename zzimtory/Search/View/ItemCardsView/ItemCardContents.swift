@@ -51,6 +51,7 @@ final class ItemCardContents: UIView {
         super.init(frame: .zero)
         
         backgroundColor = .white100Zt
+        layer.cornerRadius = 16
         
         setSubviews()
         setConstraints()
