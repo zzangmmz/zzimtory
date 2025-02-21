@@ -255,6 +255,16 @@ final class ItemSearchViewController: ZTViewController {
         
         view.bringSubviewToFront(cardStack)
         searchBar.isUserInteractionEnabled = false
+        
+        let userDefaults = UserDefaults.standard
+        
+        let hasShownTutorialBefore = userDefaults.bool(forKey: "hasShownTutorialBefore")
+    
+        if !hasShownTutorialBefore {
+            showOnBoardingTutorial()
+            userDefaults.set(true, forKey: "hasShownTutorialBefore")
+        }
+        
     }
     
     private func hideCardStack() {
@@ -267,6 +277,21 @@ final class ItemSearchViewController: ZTViewController {
         searchBar.isUserInteractionEnabled = true
     }
     
+    private func showOnBoardingTutorial() {
+
+        let tutorialView = ItemSearchTutorial()
+        
+        view.addSubview(tutorialView)
+        
+        tutorialView.snp.makeConstraints { make in
+            make.edges.equalTo(cardStack.snp.edges)
+            make.center.equalTo(cardStack.snp.center)
+        }
+
+        tutorialView.beginTutorial(onComplete: { tutorialView.removeFromSuperview() })
+
+    }
+ 
     // MARK: - 최근 검색어 보이기/숨기기
     private func showRecents() {
         recentItemsView.isHidden = false
