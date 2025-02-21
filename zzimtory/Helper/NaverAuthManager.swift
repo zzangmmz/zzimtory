@@ -13,6 +13,7 @@ final class NaverAuthManager: NSObject {
     private let instance = NaverThirdPartyLoginConnection.getSharedInstance()
     private let repository: NaverLoginRepositoryProtocol
     private let disposeBag = DisposeBag()
+    private var disconnectCompletion: (() -> Void)?  // 추가
     
     init(repository: NaverLoginRepositoryProtocol = NaverLoginRepository()) {
         self.repository = repository
@@ -86,11 +87,13 @@ extension NaverAuthManager: ThirdPartyAuthProtocol {
     }
     
     func logout() {
-        instance?.requestDeleteToken()
+        instance?.requestDeleteToken() // 얘로 해야 자동 로그인 안됨
+        // instance?.resetToken()
     }
     
     func disconnect() {
         instance?.requestDeleteToken()
+        print("네이버 disconnect")
     }
 }
 

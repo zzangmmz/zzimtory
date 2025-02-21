@@ -229,12 +229,7 @@ extension MyPageViewController: UITableViewDelegate {
             }
         case .deleteAccount:
             showAlert(title: "탈퇴 하시겠습니까?") { [weak self] in
-                GoogleAuthManager().logout()
-                KakaoAuthManager().logout()
-                NaverAuthManager().logout()
-                AppleAuthManager().logout()
                 DatabaseManager.shared.deleteUser()
-                DatabaseManager.shared.logout()
                 
                 self?.pushToLoginView()
             }

@@ -32,11 +32,12 @@ final class ItemCardOverlay: UIView {
         self.direction = direction
         super.init(frame: .zero)
         
+        backgroundColor = .backgroundGradientBottom
+        layer.cornerRadius = 16
+        
         setComponents()
         addComponents()
         setConstraints()
-        
-        backgroundColor = .backgroundGradientBottom
     }
     
     required init?(coder: NSCoder) {

@@ -73,11 +73,35 @@ final class ItemDetailViewController: ZTViewController {
         }
     }
     
+    // 앱 최초 사용시 위로 살짝 올라갔다 내려오는 모션 적용
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // 최초 실행 여부 확인
+        let hasShownOnboarding = UserDefaults.standard.bool(forKey: "hasShownScrollOnboarding")
+        
+        if !hasShownOnboarding {
+            // 현재 보이는 셀의 y offset 구하기
+            let currentOffset = itemDetailCollectionView.contentOffset.y
+            
+            UIView.animate(withDuration: 0.5, delay: 0.5) { [weak self] in
+                // 현재 위치에서 위로 살짝 이동
+                self?.itemDetailCollectionView.contentOffset.y = currentOffset + 50
+            } completion: { _ in
+                UIView.animate(withDuration: 0.3) { [weak self] in
+                    // 다시 원래 위치로
+                    self?.itemDetailCollectionView.contentOffset.y = currentOffset
+                }
+            }
+            UserDefaults.standard.set(true, forKey: "hasShownScrollOnboarding")
+        }
+    }
+    
     private func setupCollectionView() {
         view.addSubview(itemDetailCollectionView)
         
         itemDetailCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide) // 네비게이션바 아래부터
+            make.top.equalTo(view.safeAreaLayoutGuide).inset(10) // 네비게이션바 아래부터
             make.horizontalEdges.bottom.equalToSuperview()
             // make.edges.equalToSuperview() // 네비게이션바를 덮도록
         }
@@ -90,7 +114,7 @@ final class ItemDetailViewController: ZTViewController {
                 cellIdentifier: "ItemDetailCollectionViewCell",
                 cellType: ItemDetailCollectionViewCell.self
             )) { [weak self] index, item, cell in
-                print("Current index: \(index), Item title: \(item.title)")
+                // print("Current index: \(index), Item title: \(item.title)")
                 cell.delegate = self
                 cell.setCell(with: item)
                 

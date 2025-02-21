@@ -15,6 +15,7 @@ final class TermsOfServiceViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white100Zt
         
         setupNavigationBar()
         setupWebView()
