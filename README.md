@@ -121,6 +121,7 @@
 #### 📝 문제
 - 검색 화면에서 이전 행동이 의도치 않게 반복됨.
 <img width="300" src="https://github.com/user-attachments/assets/d2986d41-fa20-4dc3-a11c-72f0764cfc08">
+
 - 검색 기능 뿐만이 아니라 무한 스크롤 시에도 이전 행동이 반복됨.
 
 #### 🔄 재현경로
