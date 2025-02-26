@@ -169,3 +169,6 @@
    - 팀원의 70%가 승인 시 머지 가능
    - PR 템플릿 작성 후 머지
 
+---
+### 아이콘 출처
+<a href="https://www.flaticon.com/free-icons/swipe" title="swipe icons">Swipe icons created by Ilham Fitrotul Hayat - Flaticon</a>
