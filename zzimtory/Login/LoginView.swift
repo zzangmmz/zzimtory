@@ -7,10 +7,9 @@
 
 import UIKit
 import SnapKit
-import AuthenticationServices
 
 final class LoginView: ZTView {
-        
+    
     private let logoImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "LogoIcon"))
         imageView.contentMode = .scaleAspectFit
@@ -18,15 +17,16 @@ final class LoginView: ZTView {
         return imageView
     }()
     
-    private(set) var appleLoginButton: ASAuthorizationAppleIDButton = {
-        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .black)
-        return button
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
     }()
     
-    private(set) var appleCustomLoginButton = LoginButton(type: .apple)
-    private(set) var googleLoginButton = LoginButton(type: .google)
-    private(set) var kakaoLoginButton = LoginButton(type: .kakao)
-    private(set) var naverLoginButton = LoginButton(type: .naver)
+    private(set) var appleCustomLoginButton = LoginButton(sns: .apple)
+    private(set) var googleLoginButton = LoginButton(sns: .google)
+    private(set) var kakaoLoginButton = LoginButton(sns: .kakao)
+    private(set) var naverLoginButton = LoginButton(sns: .naver)
     
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [
@@ -51,12 +51,17 @@ final class LoginView: ZTView {
     private func setupView() {
         self.addSubview(logoImageView)
         self.addSubview(stackView)
+        self.addSubview(activityIndicator)
         
         logoImageView.snp.makeConstraints {make in
             make.centerX.equalToSuperview()
             make.bottom.equalTo(stackView.snp.top)
             make.height.equalToSuperview().multipliedBy(0.2)
             make.width.equalToSuperview().multipliedBy(1.0)
+        }
+        
+        activityIndicator.snp.makeConstraints {make in
+            make.center.equalToSuperview()
         }
         
         stackView.arrangedSubviews.forEach {
@@ -70,5 +75,13 @@ final class LoginView: ZTView {
             $0.centerY.equalToSuperview()
             $0.width.equalToSuperview().multipliedBy(0.7)
         }
+    }
+    
+    func startLoading() {
+        activityIndicator.startAnimating()
+    }
+    
+    func stopLoading() {
+        activityIndicator.stopAnimating()
     }
 }

@@ -17,12 +17,30 @@ class MainView: ZTView {
         return imageView
     }()
     
+    let pocketDeleteButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("주머니 삭제", for: .normal)
+        button.setTitleColor(.red, for: .normal)
+        button.tintColor = .red
+        button.layer.cornerRadius = 16
+        button.backgroundColor = .white100Zt
+        button.isHidden = true
+        return button
+    }()
+    
     let logoLabel: UILabel = {
         let label = UILabel()
         label.text = "찜토리"
         label.textColor = .black900Zt
         label.font = .systemFont(ofSize: 16, weight: .regular)
         return label
+    }()
+    
+    let overlayView: ZTView = {
+        let view = ZTView()
+        view.backgroundColor = UIColor.black900Zt.withAlphaComponent(0.5)
+        view.isHidden = true
+        return view
     }()
     
     let addPocketButton: UIButton = {
@@ -74,11 +92,21 @@ class MainView: ZTView {
         return button
     }()
     
+    let moveCancelButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("X", for: .normal)
+        button.setTitleColor(.black900Zt, for: .normal)
+        button.backgroundColor = .gray200Zt
+        button.layer.cornerRadius = 20
+        button.isHidden = true
+        return button
+    }()
+    
     let editButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "pencil"), for: .normal)
         button.tintColor = .black900Zt
-        button.isHidden = true
+        button.isHidden = false
         button.layer.cornerRadius = 20
         button.backgroundColor = .white100Zt
         return button
@@ -89,6 +117,8 @@ class MainView: ZTView {
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
+        collectionView.layer.cornerRadius = 20
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.register(PocketCell.self, forCellWithReuseIdentifier: "PocketCell")
         return collectionView
     }()
@@ -104,7 +134,6 @@ class MainView: ZTView {
     }
     
     private func setupUI() {
-        
         let logoStackView = UIStackView(arrangedSubviews: [logoImageView, logoLabel])
         logoStackView.axis = .horizontal
         logoStackView.spacing = 10
@@ -128,18 +157,33 @@ class MainView: ZTView {
         pocKetCountStackView.distribution = .equalSpacing
         
         let mainStackView = UIStackView(arrangedSubviews: [topStackView,
-                                                           searchBar, pocKetCountStackView, collectionView])
+                                                           searchBar, pocKetCountStackView])
         mainStackView.axis = .vertical
         mainStackView.spacing = 16
         mainStackView.alignment = .fill
         mainStackView.distribution = .fill
         
         addSubview(mainStackView)
+        addSubview(overlayView)
+        addSubview(collectionView)
+        addSubview(moveCancelButton)
+        addSubview(pocketDeleteButton)
         
         mainStackView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(20)
+            make.top.equalTo(safeAreaLayoutGuide).offset(10)
             make.leading.trailing.equalToSuperview().inset(24)
+           
+        }
+        
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(mainStackView.snp.bottom).offset(20)
             make.bottom.equalTo(safeAreaLayoutGuide).offset(-16)
+            make.leading.trailing.equalToSuperview().inset(24)
+        }
+        
+        moveCancelButton.snp.makeConstraints { make in
+            make.top.equalTo(editButton)
+                make.trailing.equalToSuperview().inset(24)
         }
         
         sortButton.snp.makeConstraints { make in
@@ -163,6 +207,20 @@ class MainView: ZTView {
         collectionView.snp.makeConstraints { make in
             make.bottom.equalToSuperview()
         }
+        
+        overlayView.snp.makeConstraints { make in
+            make.top.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        pocketDeleteButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide).inset(32)
+            make.height.equalTo(50)
+            make.width.equalTo(120)
+        }
+        moveCancelButton.snp.makeConstraints { make in
+            make.size.equalTo(40)
+        }
     }
     
     // 외부 탭 하면 키보드 사라지게 함
@@ -170,6 +228,11 @@ class MainView: ZTView {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         tapGesture.delegate = self
         self.addGestureRecognizer(tapGesture)
+    }
+    
+    func toggleButtonHidden() {
+        [moveCancelButton, pocketDeleteButton,
+         overlayView].forEach { $0.isHidden.toggle() }
     }
     
     @objc private func handleTap() {

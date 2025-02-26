@@ -7,9 +7,18 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+
+protocol ItemDetailCollectionViewCellDelegate: AnyObject { // 유사 상품 선택 시 화면 전환을 위한 delegate 설정
+    func didSelectSimilarItem(_ item: Item)
+}
 
 final class ItemDetailCollectionViewCell: UICollectionViewCell {
-
+    weak var delegate: ItemDetailCollectionViewCellDelegate?
+    
+    var similarItemViewModel: SimilarItemViewModel?
+    var disposeBag = DisposeBag()
+    
     // 유사 상품 데이터 저장 배열
     var similarItems: [Item] = []
     
@@ -52,9 +61,9 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     // 공유 버튼
     let shareButton: UIButton = {
         let button = UIButton()
-
+        
         button.setAsIconButton()
-        button.setButtonWithSystemImage(imageName: "square.and.arrow.up")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.shareButtonImage)
         
         return button
     }()
@@ -70,7 +79,7 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
         
-        button.setButtonWithSystemImage(imageName: "safari")
+        button.setButtonWithSystemImage(imageName: ButtonImageConstants.websiteButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -87,8 +96,8 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         
         button.setTitleColor(.black900Zt, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
-
-        button.setButtonWithCustomImage(imageName: "PocketIcon")
+        
+        button.setButtonWithCustomImage(imageName: ButtonImageConstants.PocketButtonImage)
         button.setImageWithSpacing()
         button.setButtonDefaultShadow()
         
@@ -151,17 +160,16 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView(arrangedSubviews: [websiteButton, saveButton])
         
         stackView.axis = .horizontal
-        stackView.spacing = 10
+        stackView.spacing = 12
         stackView.alignment = .center
-        stackView.distribution = .fill
+        stackView.distribution = .fillProportionally
         
         return stackView
     }()
     
     // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
     private lazy var topStackView = {
-        let stackView = UIStackView(arrangedSubviews: [itemImageView,
-                                                       brandStackView,
+        let stackView = UIStackView(arrangedSubviews: [brandStackView,
                                                        itemNameLabel,
                                                        priceLabel])
         stackView.axis = .vertical
@@ -198,8 +206,18 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
+    // 스크롤뷰
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        
+        scrollView.showsVerticalScrollIndicator = false
+        
+        return scrollView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
+        scrollView.setContentOffset(.zero, animated: false)
         configureUI()
     }
     
@@ -208,37 +226,58 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     }
     
     private func configureUI() {
+        setupScrollView()
         setupTopStackView()
         setupBottomStackView()
     }
     
-    private func setupMainStackView() {
-        addSubview(mainStackView)
+    private func setupScrollView() {
+        addSubview(scrollView)
+        scrollView.addSubview(itemImageView)
+        scrollView.addSubview(mainStackView)
         
-        mainStackView.snp.makeConstraints { make in
-            make.edges.equalTo(safeAreaLayoutGuide)
+        scrollView.snp.makeConstraints { make in
+            make.horizontalEdges.top.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-30)
         }
-    }
-    
-    // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
-    private func setupTopStackView() {
-        topStackView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.leading.trailing.equalToSuperview()
+        
+        scrollView.contentLayoutGuide.snp.makeConstraints { make in
+            make.top.equalTo(itemImageView.snp.top)
+            make.leading.trailing.equalTo(scrollView.frameLayoutGuide)
+            make.bottom.equalTo(mainStackView.snp.bottom)
         }
         
         itemImageView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(UIScreen.main.bounds.width)
+            make.top.equalTo(scrollView.contentLayoutGuide)
+            make.horizontalEdges.equalTo(scrollView.contentLayoutGuide)
+            make.height.width.equalTo(UIScreen.main.bounds.width)
+        }
+        
+        mainStackView.snp.makeConstraints { make in
+            make.top.equalTo(itemImageView.snp.bottom).offset(16)
+            make.horizontalEdges.equalTo(scrollView.contentLayoutGuide).inset(16)
+            make.bottom.equalTo(scrollView.contentLayoutGuide)
+        }
+    }
+
+    // [상단 스택: 상품 정보] 아이템 이미지, 브랜드 버튼 및 공유 버튼 스택, 상품 이름 레이블, 가격 레이블
+    private func setupTopStackView() {
+        topStackView.snp.makeConstraints { make in
+            make.horizontalEdges.equalTo(mainStackView)
         }
         
         shareButton.snp.makeConstraints { make in
             make.width.height.equalTo(40)
         }
         
-        [brandStackView, itemNameLabel, priceLabel].forEach { view in
+        brandStackView.snp.makeConstraints { make in
+            make.height.equalTo(40)
+            make.horizontalEdges.equalTo(topStackView)
+        }
+        
+        [itemNameLabel, priceLabel].forEach { view in
             view.snp.makeConstraints { make in
-                make.leading.trailing.equalToSuperview().inset(16)
+                make.height.equalTo(24)
             }
         }
     }
@@ -246,7 +285,7 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
     // [하단 스택] 웹사이트 버튼 및 주머니 넣기 버튼 스택, 구분선, 유사상품 레이블, 유사 상품 컬렌션 뷰
     private func setupBottomStackView() {
         bottomStackView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16)
+            make.horizontalEdges.equalTo(mainStackView)
         }
         
         // 화면 내의 비율로 버튼 설정
@@ -256,18 +295,21 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
             }
         }
         
-        // 양옆 오프셋 20 , 중간 12 --> 이래도 안되는지 확인
         websiteButton.snp.makeConstraints { make in
-            make.width.equalTo(UIScreen.main.bounds.width * 0.4)
+            make.width.greaterThanOrEqualTo(80)
         }
         
         saveButton.snp.makeConstraints { make in
-            make.width.equalTo(UIScreen.main.bounds.width * 0.6)
+            make.width.greaterThanOrEqualTo(100)
+        }
+        
+        buttonStackView.snp.makeConstraints { make in
+            make.height.equalTo(50)
         }
         
         [buttonStackView, lineView, similarItemLabel, similarItemCollectionView].forEach { view in
             view.snp.makeConstraints { make in
-                make.leading.trailing.equalToSuperview()
+                make.horizontalEdges.equalToSuperview()
             }
         }
         
@@ -275,8 +317,57 @@ final class ItemDetailCollectionViewCell: UICollectionViewCell {
             make.height.equalTo(1)
         }
         
+        similarItemLabel.snp.makeConstraints { make in
+            make.height.equalTo(24)
+        }
+        
         similarItemCollectionView.snp.makeConstraints { make in
             make.height.equalTo(190)
         }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        scrollView.setContentOffset(.zero, animated: false)
+        disposeBag = DisposeBag()
+    }
+}
+
+extension ItemDetailCollectionViewCell {
+    func setCell(with item: Item) {
+        itemImageView.kf.setImage(with: URL(string: item.image))
+        
+        let brandText = item.brand.isEmpty ? item.mallName : item.brand
+        brandButton.setTitle(brandText, for: .normal)
+        
+        itemNameLabel.text = item.title.removingHTMLTags
+        
+        priceLabel.text = Int(item.price)?.withSeparator
+        
+        similarItemViewModel = SimilarItemViewModel(item: item)
+        
+        similarItemViewModel?.similarItems
+            .bind(to: similarItemCollectionView.rx.items(
+                cellIdentifier: ItemCollectionViewCell.id,
+                cellType: ItemCollectionViewCell.self
+            )) { _, similarItem, similarCell in
+                similarCell.setCell(with: similarItem)
+            }
+            .disposed(by: disposeBag)
+        
+        // 유사 상품 선택
+        similarItemCollectionView.rx.modelSelected(Item.self)
+            .subscribe(onNext: { [weak self] selectedItem in
+                self?.delegate?.didSelectSimilarItem(selectedItem)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func setSaveButton(_ isInPocket: Bool) {
+        let title = isInPocket ? "주머니에서 빼기" : "주머니에 넣기"
+        let imageName = isInPocket ? ButtonImageConstants.EmptyPocketButtonImage : ButtonImageConstants.PocketButtonImage
+        
+        saveButton.setTitle(title, for: .normal)
+        saveButton.setButtonWithCustomImage(imageName: imageName)
     }
 }

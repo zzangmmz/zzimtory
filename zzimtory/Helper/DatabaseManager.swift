@@ -19,7 +19,6 @@ final class DatabaseManager {
     private init() {
         // 파이어베이스 참조 설정
         ref = Database.database(url: "https://zzimtory-default-rtdb.asia-southeast1.firebasedatabase.app").reference()
-        getUserUID()
     }
     
     func hasUserLoggedIn() -> Bool {
@@ -39,12 +38,12 @@ final class DatabaseManager {
         }
     }
     
-    private func getUserUID() {
+    private func getUserUID() -> String? {
         guard let currentUser = Auth.auth().currentUser else {
             print("현재 인증된 유저가 없습니다.")
-            return
+            return nil
         }
-        self.userUID = currentUser.uid
+        return currentUser.uid
     }
     
     // MARK: - Data Create Method
@@ -67,7 +66,9 @@ final class DatabaseManager {
                         print("유저 등록 실패: \(error.localizedDescription)")
                     } else {
                         print("유저 등록 성공")
-                        self.completedLogin.onNext(true)
+                        self.createPocket(title: "전체보기") {
+                            self.completedLogin.onNext(true)
+                        }
                     }
                 }
             } else {
@@ -79,13 +80,14 @@ final class DatabaseManager {
     
     /// 주머니 만드는 메서드
     func createPocket(title: String, completion: @escaping () -> Void) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
             let newPocket: [String: Any] = [
                 "title": title,
                 "items": [:],
-                "image": ""
+                "images": [],
+                "saveDate": ServerValue.timestamp()
             ]
             
             self.ref.child("users").child(uid).child("pockets").child("pocket\(title)").setValue(newPocket) { error, _ in
@@ -102,9 +104,12 @@ final class DatabaseManager {
     // MARK: - Data Read Method
     /// 유저 주머니 읽어오는 메서드
     func readPocket(completion: @escaping ([Pocket]) -> Void) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else {
+            completion([])
+            return
+        }
         
-        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+        ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot, _ in
             guard let pocketData = snapshot.value as? [String: [String: Any]] else {
                 print("❌ No data found or wrong format")
                 completion([])
@@ -120,12 +125,16 @@ final class DatabaseManager {
                       let title = pocketInfo["title"] as? String else { continue }
                 
                 var items: [Item] = []
+                
                 if let itemsDict = pocketInfo["items"] as? [String: [String: Any]] {
                     for itemKey in itemsDict.keys {
                         if let itemData = itemsDict[itemKey] {
                             do {
                                 let itemJsonData = try JSONSerialization.data(withJSONObject: itemData)
-                                if let item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
+                                if var item = try? JSONDecoder().decode(Item.self, from: itemJsonData) {
+                                    if let saveDate = itemData["saveDate"] as? TimeInterval {
+                                        item.saveDate = Date(timeIntervalSince1970: saveDate / 1000)
+                                    }
                                     items.append(item)
                                 }
                             } catch {
@@ -134,21 +143,55 @@ final class DatabaseManager {
                             }
                         }
                     }
-                    items.sort { $0.title < $1.title }
+                    items.sort {
+                        switch ($0.saveDate, $1.saveDate) {
+                        case (nil, nil): return false
+                        case (nil, _): return false
+                        case (_, nil): return true
+                        case (let date1?, let date2?): return date1 > date2
+                        }
+                    }
                 }
                 
-                let pocket = Pocket(title: title, items: items)
+                var pocket = Pocket(title: title, items: items)
+                
+                if let saveDateTimestamp = pocketInfo["saveDate"] as? TimeInterval {
+                    pocket.saveDate = Date(timeIntervalSince1970: saveDateTimestamp / 1000)
+                } else {
+                    pocket.saveDate = nil
+                }
                 pockets.append(pocket)
             }
-            pockets.sort { $0.title < $1.title }
+            
+            // 전체보기 주머니와 나머지 주머니 분리
+            let defaultPocket = pockets.first { $0.title == "전체보기" }
+            var otherPockets = pockets.filter { $0.title != "전체보기" }
+            
+            // 나머지 주머니들은 saveDate 기준으로 정렬
+            otherPockets.sort { pocket1, pocket2 in
+                switch (pocket1.saveDate, pocket2.saveDate) {
+                case (nil, nil): return false
+                case (nil, _): return false
+                case (_, nil): return true
+                case (let date1?, let date2?): return date1 > date2
+                }
+            }
+            
+            // 전체보기 + 정렬된 나머지 주머니들
+            pockets = []
+            if let defaultPocket = defaultPocket {
+                pockets.append(defaultPocket)
+            }
+            pockets.append(contentsOf: otherPockets)
+            
             print("✅ 최종 Pocket 데이터: \(pockets)")
             completion(pockets)
         }
     }
-
+    
     /// 유저 프로필(이메일, 닉네임) 읽어오는 메서드
     func readUserProfile(completion: @escaping ((email: String, nickname: String)?) -> Void) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
         ref.child("users").child(uid).observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [String: Any],
@@ -162,30 +205,49 @@ final class DatabaseManager {
         }
     }
     
-    
     // MARK: - Data Update Methods
     /// 아이템 추가하는 메서드
     func updatePocketItem(newItem: Item, pocketTitle: String) {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else { return }
         
-        let itemsRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items")
+        let pocketRef = ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)")
+        let allViewRef = ref.child("users").child(uid).child("pockets").child("pocket전체보기")
         
-        itemsRef.observeSingleEvent(of: .value) { snapshot in
+        pocketRef.observeSingleEvent(of: .value) { snapshot in
             let newIndex = String("zzimtory\(newItem.productID)")
             
-            do {
-                let data = try JSONEncoder().encode(newItem)
-                let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
-                
-                itemsRef.child(newIndex).setValue(dict) { error, _ in
-                    if let error = error {
-                        print("아이템 추가 실패: \(error.localizedDescription)")
-                    } else {
-                        print("아이템 추가 성공")
+            var updatedItem = newItem
+            updatedItem.saveDate = Date()
+            
+            // as? 를 사용하여 안전하게 타입 캐스팅
+            guard let dict = updatedItem.asAny() as? [String: Any] else {
+                print("아이템 데이터 변환 실패")
+                return
+            }
+            
+            let updates: [String: Any] = [
+                "items/\(newIndex)": dict,
+                "saveDate": ServerValue.timestamp()
+            ]
+            
+            // 선택된 주머니에 아이템 추가
+            pocketRef.updateChildValues(updates) { error, _ in
+                if let error = error {
+                    print("아이템 추가 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 추가 성공")
+                    
+                    // 전체보기 주머니가 아닌 경우에만 전체보기에도 추가
+                    if pocketTitle != "전체보기" {
+                        allViewRef.updateChildValues(updates) { error, _ in
+                            if let error = error {
+                                print("전체보기 주머니에 아이템 추가 실패: \(error.localizedDescription)")
+                            } else {
+                                print("전체보기 주머니에 아이템 추가 성공")
+                            }
+                        }
                     }
                 }
-            } catch {
-                print("아이템 변환 실패: \(error)")
             }
         }
     }
@@ -193,55 +255,133 @@ final class DatabaseManager {
     // MARK: - Data Delete Methods
     /// 유저 삭제 메서드
     func deleteUser() {
-        guard let uid = self.userUID else { return }
+        guard let uid = self.getUserUID() else {
+            return
+        }
         
-        ref.child("users").child(uid).removeValue() { error, _ in
+        // 소셜로그인 탈퇴를 우선 진행
+        NaverAuthManager().disconnect()
+        KakaoAuthManager().disconnect()
+        GoogleAuthManager().disconnect()
+        // 애플은 따로 탈퇴처리가 없음
+        
+        // DB에서 삭제
+        self.ref.child("users").child(uid).removeValue { [weak self] error, _ in
             if let error = error {
-                print("유저 삭제 실패: \(error.localizedDescription)")
+                print("DB 삭제 실패: \(error.localizedDescription)")
             } else {
-                print("유저 삭제 성공")
+                print("DB 삭제 성공")
+            }
+            
+            // Auth에서 삭제
+            Auth.auth().currentUser?.delete { error in
+                if let error = error {
+                    print("유저 삭제 실패: \(error.localizedDescription)")
+                } else {
+                    print("유저 삭제 성공")
+                }
+                
+                // 로컬에서 삭제
+                self?.userUID = nil
             }
         }
     }
     
     /// 주머니 삭제 메서드
-    func deletePocket(title: String) {
-        guard let uid = self.userUID else { return }
+    func deletePocket(title: String, completion: @escaping () -> Void) {
+        guard let uid = self.getUserUID() else { return }
         
-        ref.child("users").child(uid).child("pockets").child("pocket\(title)").removeValue { error, _ in
-            if let error = error {
-                print("주머니 삭제 실패: \(error.localizedDescription)")
-            } else {
+        // 주머니 정보를 먼저 확인
+        ref.child("users").child(uid).child("pockets").child("pocket\(title)").observeSingleEvent(of: .value) { [weak self] snapshot in
+            guard let self = self else { return }
+            
+            // 1. 주머니 삭제
+            self.ref.child("users").child(uid).child("pockets").child("pocket\(title)").removeValue { error, _ in
+                if let error = error {
+                    print("주머니 삭제 실패: \(error.localizedDescription)")
+                    return
+                }
                 print("주머니 \(title) 삭제 성공")
+                
+                // 주머니에 아이템이 있는 경우에만 전체보기에서 삭제 진행
+                if let pocketData = snapshot.value as? [String: Any],
+                   let itemsToDelete = pocketData["items"] as? [String: Any] {
+                    // 2. 전체보기에서도 해당 아이템들 삭제
+                    for itemKey in itemsToDelete.keys {
+                        self.ref.child("users").child(uid).child("pockets").child("pocket전체보기").child("items").child(itemKey).removeValue { error, _ in
+                            if let error = error {
+                                print("전체보기에서 아이템 삭제 실패: \(error.localizedDescription)")
+                            } else {
+                                print("전체보기에서 아이템 삭제 성공")
+                                completion()
+                            }
+                        }
+                    }
+                } else {
+                    print("주머니 데이터 가져오기 실패")
+                }
             }
         }
     }
     
     /// 아이템 삭제 메서드
-    func deleteItem(productID: String, from pocketTitle: String) {
-        guard let uid = self.userUID else { return }
+    /// 아이템을 이동하는 경우에도  [ 기존 주머니 -> 이동 주머니 ] 과정을 거치며 기존 주머니에서 해당 메서드를 실행
+    /// 하지만 항상 해당 메서드에서는 항상 "전체보기"에서도 삭제를 진행하고 있어 제대로 이동 되지 않는 이슈 발생
+    /// 따라서 alsoRemoveFromDefaultPocket 매개변수를 추가하여 보통 때엔 true로, 아이템 이동할 때에는 false로 설정해주어 전체보기 주머니에서는 삭제가 되지 않도록 수정함
+    func deleteItem(productID: String, alsoRemoveFromDefaultPocket: Bool = true, from pocketTitle: String) {
+        guard let uid = self.getUserUID() else { return }
         
-        ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").observeSingleEvent(of: .value) { snapshot in
-            guard let pocket = snapshot.value as? [String: Any],
-                  let items = pocket["items"] as? [String: Any] else {
-                print("주머니 탐색 실패")
-                return
+        let itemKey = "zzimtory\(productID)"
+        
+        if pocketTitle == "전체보기" {
+            // 현재 주머니(전체보기)에서 삭제
+            self.ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items").child(itemKey).removeValue { error, _ in
+                if let error = error {
+                    print("아이템 삭제 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 삭제 성공")
+                }
             }
             
-            // 아이템 키 형식을 "zzimtory{productID}"로 사용
-            let itemKey = "zzimtory\(productID)"
-            
-            // 해당 키가 items에 존재하는지 확인
-            if items[itemKey] != nil {
-                self.ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items").child(itemKey).removeValue { error, _ in
-                    if let error = error {
-                        print("아이템 삭제 실패: \(error.localizedDescription)")
-                    } else {
-                        print("아이템 삭제 성공")
+            // 다른 모든 주머니에서도 삭제
+            ref.child("users").child(uid).child("pockets").observeSingleEvent(of: .value) { snapshot in
+                guard let pockets = snapshot.value as? [String: [String: Any]] else {
+                    print("주머니 데이터 탐색 실패")
+                    return
+                }
+                
+                // "전체보기"를 제외한 다른 주머니들에서 삭제
+                for (pocketKey, _) in pockets {
+                    if pocketKey != "pocket전체보기" {
+                        self.ref.child("users").child(uid).child("pockets").child(pocketKey).child("items").child(itemKey).removeValue { error, _ in
+                            if let error = error {
+                                print("다른 주머니에서 아이템 삭제 실패: \(error.localizedDescription)")
+                            } else {
+                                print("다른 주머니에서 아이템 삭제 성공")
+                            }
+                        }
                     }
                 }
-            } else {
-                print("해당 아이템을 찾을 수 없습니다: \(itemKey)")
+            }
+        } else { // 특정 주머니에서 삭제할 경우
+            // 1. 해당 주머니에서 삭제
+            self.ref.child("users").child(uid).child("pockets").child("pocket\(pocketTitle)").child("items").child(itemKey).removeValue { error, _ in
+                if let error = error {
+                    print("아이템 삭제 실패: \(error.localizedDescription)")
+                } else {
+                    print("아이템 삭제 성공")
+                }
+            }
+            
+            if alsoRemoveFromDefaultPocket {
+                // 2. 전체보기에서도 삭제
+                self.ref.child("users").child(uid).child("pockets").child("pocket전체보기").child("items").child(itemKey).removeValue { error, _ in
+                    if let error = error {
+                        print("전체보기에서 아이템 삭제 실패: \(error.localizedDescription)")
+                    } else {
+                        print("전체보기에서 아이템 삭제 성공")
+                    }
+                }
             }
         }
     }

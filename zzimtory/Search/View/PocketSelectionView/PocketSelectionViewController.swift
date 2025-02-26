@@ -43,7 +43,7 @@ final class PocketSelectionViewController: UIViewController {
     init(selectedItems: [Item]) {
         self.selectedItems = selectedItems
         super.init(nibName: nil, bundle: nil)
-        
+
         DatabaseManager.shared.readPocket { pockets in
             self.pockets = pockets
             self.pocketColletionView.reloadData()

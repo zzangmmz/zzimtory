@@ -9,7 +9,7 @@ import Foundation
 import Moya
 
 enum ShoppingAPI {
-    case search(query: String)
+    case search(query: String, page: Int)
 }
 
 extension ShoppingAPI: TargetType {
@@ -33,8 +33,12 @@ extension ShoppingAPI: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .search(query: let query):
-            let parameters: [String: Any] = ["query": query]
+        case .search(let query, let page):
+            let parameters: [String: Any] = [
+                "query": query,
+                "display": 10,
+                "start": (page - 1) * 10 + 1    // 다음으로 가져올 데이터 시작 인덱스 계산
+            ]
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
         }
     }

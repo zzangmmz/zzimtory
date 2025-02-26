@@ -12,6 +12,17 @@ class PocketDetailViewController: UIViewController,
     private var pocketDetailView: PocketDetailView?
     private var viewModel: PocketDetailViewModel
     
+    private var editMode: Bool = false {
+        didSet {
+            pocketDetailView?.itemCollectionView.visibleCells.forEach { cell in
+                if let itemCell = cell as? ItemCollectionViewCell {
+                    itemCell.setEditModeCell(with: editMode)
+                }
+            }
+            
+        }
+    }
+    
     // viewModel을 전달받는 생성자
     init(viewModel: PocketDetailViewModel) {
         self.viewModel = viewModel
@@ -25,7 +36,7 @@ class PocketDetailViewController: UIViewController,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
-
+        
         bind()
     }
     
@@ -43,7 +54,6 @@ class PocketDetailViewController: UIViewController,
     }
     
     private func bind() {
-        
         self.viewModel.fetchData { [weak self] _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -58,12 +68,19 @@ class PocketDetailViewController: UIViewController,
         pocketDetailView?.sortButton.addTarget(self, action: #selector(sortButtonDidTap), for: .touchUpInside)
         pocketDetailView?.searchBar.delegate = self
         pocketDetailView?.cancelButton.addTarget(self, action: #selector(cancelSearch), for: .touchUpInside)
-        
+        pocketDetailView?.editButton.addTarget(self, action: #selector (editButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.moveCancelButton.addTarget(self
+                                                     , action: #selector(moveCancelButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.seedDeleteButton.addTarget(self
+                                                     , action: #selector(seedDeleteButtonDidTap), for: .touchUpInside)
+        pocketDetailView?.seedMoveButton.addTarget(self
+                                                   , action: #selector(seedMoveButtonDidTap), for: .touchUpInside)
     }
     
     private func setupCollectionView() {
         pocketDetailView?.itemCollectionView.delegate = self
         pocketDetailView?.itemCollectionView.dataSource = self
+        pocketDetailView?.itemCollectionView.allowsMultipleSelection = true
         pocketDetailView?.itemCollectionView.register(ItemCollectionViewCell.self,
                                                       forCellWithReuseIdentifier: ItemCollectionViewCell.id)
     }
@@ -85,10 +102,28 @@ class PocketDetailViewController: UIViewController,
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedItem = viewModel.displayItems[indexPath.item]
-        let detailVC = DetailViewController(item: selectedItem)
-        detailVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(detailVC, animated: true)
+        guard editMode else {
+            let selectedItem = viewModel.displayItems
+            let detailVC = ItemDetailViewController(items: selectedItem, currentIndex: indexPath.item)
+            detailVC.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(detailVC, animated: true)
+            return
+        }
+        
+        // 편집모드인 경우
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as? ItemCollectionViewCell {
+            selectedCell.cellOverlayView.isHidden = true
+            selectedCell.isSelected = true
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        guard editMode else { return }
+        
+        if let selectedCell = collectionView.cellForItem(at: indexPath) as? ItemCollectionViewCell {
+            selectedCell.cellOverlayView.isHidden = false
+            selectedCell.isSelected = false
+        }
     }
     
     // 서치바 텍스트 변경 시 필터링된 결과를 업데이트
@@ -103,6 +138,66 @@ class PocketDetailViewController: UIViewController,
         pocketDetailView?.itemCollectionView.reloadData()
     }
     
+    // 취소 버튼 클릭 시 서치바를 숨기고, 카운트앤버튼스택뷰 다시 보이게
+    @objc func editButtonDidTap() {
+        editMode.toggle()
+        pocketDetailView?.toggleButtonHidden()
+    }
+    
+    @objc func moveCancelButtonDidTap() {
+        editMode.toggle()
+        pocketDetailView?.toggleButtonHidden()
+        pocketDetailView?.itemCollectionView.reloadData()
+    }
+    
+    @objc func seedDeleteButtonDidTap() {
+        guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
+        
+        let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
+        
+        let alert = UIAlertController(title: "씨앗 삭제", message: "씨앗을 삭제하시겠습니까?", preferredStyle: .alert)
+        
+        let deleteAction = UIAlertAction(title: "네", style: .destructive) { _ in
+            selectedItems.forEach { item in
+                DatabaseManager.shared.deleteItem(productID: item.productID, from: self.viewModel.pocket.title)
+            }
+            self.bind()
+            self.editMode = false
+            self.pocketDetailView?.toggleButtonHidden()
+        }
+        
+        let cancelAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+        
+        alert.addAction(deleteAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func seedMoveButtonDidTap() {
+        guard let selectedIndexPaths = pocketDetailView?.itemCollectionView.indexPathsForSelectedItems else { return }
+        let selectedItems = selectedIndexPaths.map { viewModel.displayItems[$0.item] }
+        
+        // 1) 아이템 삭제 진행
+        selectedItems.forEach { item in
+            if self.viewModel.pocket.title != "전체보기" {
+                DatabaseManager.shared.deleteItem(productID: item.productID, alsoRemoveFromDefaultPocket: false, from: self.viewModel.pocket.title)
+            }
+        }
+        
+        // 2) 새 주머니로 이동
+        let pocketVC = PocketSelectionViewController(selectedItems: selectedItems)
+        self.present(pocketVC, animated: true)
+        
+        pocketVC.onComplete = { [weak self] in
+            guard let self = self else { return }
+            
+            self.bind()
+            self.editMode = false
+            self.pocketDetailView?.toggleButtonHidden()
+        }
+    }
+    
     @objc private func cancelSearch() {
         self.pocketDetailView?.searchBar.searchTextField.text = ""  // 서치바 초기화
         self.pocketDetailView?.setHidden()
@@ -113,21 +208,28 @@ class PocketDetailViewController: UIViewController,
     @objc private func sortButtonDidTap() {
         let alert = UIAlertController(title: "상품명", message: "정렬 기준을 선택하세요.", preferredStyle: .actionSheet)
         
-        let sortByOldestAction = UIAlertAction(title: "내림차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortItems(by: .descending) { [weak self] in
+        let sortByDictionary = UIAlertAction(title: "가나다순", style: .default) { [weak self] _ in
+            self?.viewModel.sortItems(by: .dictionary) { [weak self] in
                 self?.pocketDetailView?.itemCollectionView.reloadData()
             }
         }
         
-        let sortByNewestAction = UIAlertAction(title: "오름차순", style: .default) { [weak self] _ in
-            self?.viewModel.sortItems(by: .ascending)  { [weak self] in
+        let sortByNewest = UIAlertAction(title: "최신순", style: .default) { [weak self] _ in
+            self?.viewModel.sortItems(by: .newest)  { [weak self] in
+                self?.pocketDetailView?.itemCollectionView.reloadData()
+            }
+        }
+        
+        let sortByOldest = UIAlertAction(title: "오래된순", style: .default) { [weak self] _ in
+            self?.viewModel.sortItems(by: .oldest)  { [weak self] in
                 self?.pocketDetailView?.itemCollectionView.reloadData()
             }
         }
         
         let cancelAction = UIAlertAction(title: "취소", style: .cancel)
-        alert.addAction(sortByOldestAction)
-        alert.addAction(sortByNewestAction)
+        alert.addAction(sortByDictionary)
+        alert.addAction(sortByNewest)
+        alert.addAction(sortByOldest)
         alert.addAction(cancelAction)
         
         present(alert, animated: true, completion: nil)
