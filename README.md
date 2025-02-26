@@ -117,90 +117,13 @@
 
 ---
 ## 💣 트러블 슈팅
-### 1️⃣ 하나의 옵저버블을 여러 곳에서 구독해 의도하지 않았던 구독자에게도 이벤트가 전달되는 문제
-#### 📝 문제
-- 검색 화면에서 이전 행동이 의도치 않게 반복됨.
-<img width="300" src="https://github.com/user-attachments/assets/d2986d41-fa20-4dc3-a11c-72f0764cfc08">
+[1️⃣ 하나의 옵저버블을 여러 곳에서 구독해 의도하지 않았던 구독자에게도 이벤트가 전달되는 문제](https://github.com/zzangmmz/zzimtory/blob/main/.github/trouble/observable_side_effects.md)
 
-- 검색 기능 뿐만이 아니라 무한 스크롤 시에도 이전 행동이 반복됨.
+[2️⃣ AppStore 심사 거절 이슈: 비회원 플로우](https://github.com/zzangmmz/zzimtory/blob/main/.github/trouble/reject_1.md)
 
-#### 🔄 재현경로
-1. 앱을 실행하고 검색 화면으로 이동함.
-2. 검색어를 입력하고 무한 스크롤을 시작함.
-3. 스크롤 중 `CardStack`이 반복적으로 나타나고, 상세 페이지나 모달창이 예기치 않게 열림.
+[3️⃣ AppStore 심사 거절 이슈: 로그인의 필요성](https://github.com/zzangmmz/zzimtory/blob/main/.github/trouble/reject_2.md)
 
-#### 💡 가설
-- 무한 스크롤 로직에서 데이터 로딩과 UI 업데이트가 중복 호출.
-- 새 데이터가 로드될 때마다 상세 페이지나 모달창이 호출.
-
-#### 🎯 원인
-- 무한 스크롤 시 데이터 페칭과 `CardStack` 뷰 추가가 중복 호출됐음.
-- 상세 페이지와 모달창이 스크롤 이벤트와 독립적으로 호출돼 타이밍 충돌.
-
-#### ⚡️ 해결방안
-- 무한 스크롤 로직에 중복 방지 플래그를 추가해 `CardStack`이 한 번만 추가되게 함.
-- 상세 페이지와 모달창 호출 시 스크롤 상태를 체크해 타이밍 제어.
-
-#### ✅ 결과
-- 무한 스크롤 시 `CardStack`이 중복되지 않음.
-- 의도한대로 셀을 터치했을 때에만 상세 페이지와 모달창이 나타남.
-
-### 2️⃣ AppStore 심사 거절 이슈: 비회원 플로우
-#### 📝 문제
-- 1.0 버전 출시 과정에서 심사 거절 통보를 받음.
-
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/37243596-ddf0-47a7-a5b0-a16556d977bb" />
-
-#### 🎯 원인
-- 앱이 계정 기반 기능이 아닌 기능(예: 제품 브라우징)에도 로그인을 요구하도록 설계됨.
-- 앱스토어 가이드라인 5.1.1(Legal - Privacy - Data Collection and Storage)에 따라, 계정 기반 기능(예: 장바구니 추가, 체크아웃 등)에만 로그인이 필요하며, 비계정 기반 기능은 자유롭게 접근 가능해야 함.
-
-#### ⚡️ 해결방안
-- 비회원 플로우를 추가함.
-- 앱에서 최소 기능(검색 기능)을 사용할 수 있도록 하고 로그인이 필요한 서비스에 접근할 경우 로그인 유도를 함.
-
-#### ✅ 결과
-- 비회원 플로우 완전 구현.
-- 그러나 2차 심사 거절.
-
-### 3️⃣ AppStore 심사 거절 이슈: 로그인의 필요성
-#### 📝 문제
-- 1.0 버전 출시 과정에서 2차 심사 거절 통보를 받음.
-
-<img width="600" src="https://github.com/user-attachments/assets/91f3ec4c-f675-4933-bf70-17a32bd1ab96">
-    
-#### 🎯 원인
-- 해당 앱에서 로그인이 왜 필요한지에 대한 설명이 부족한 상태였음.
-
-#### ⚡️ 해결방안
-- 시연 영상을 첨부하여 로그인이 필요한 이유에 대해 작성하여 답신을 보냄
-- 앱 심사 정보 - 메모 항목에 회원/비회원 플로우에 대해 자세히 작성함
-    
-<img width="800" src="https://github.com/user-attachments/assets/3d60a11c-f294-4532-b6f2-606acab8cdf0">
-    
-
-#### ✅ 결과
-- 해당 문제는 해결 되었음.
-- 그러나 3차 심사 거절
-
-### 4️⃣ AppStore 심사 거절 이슈: 구글 로그인 문제
-## 📝 문제
-- 1.0 버전 출시 과정에서 구글 로그인 시 크래시가 발생해 3차 심사 거절 통보를 받음.
-    
-<img width="600" src="https://github.com/user-attachments/assets/49faa968-0077-4210-9e3d-1f079219aaa3">
-
-## 🎯 원인
-- 구글 로그인을 하면 앱 크래시 발생.
-
-## ⚡️ 해결방안
-- Firebase에서 새로운 GoogleService-Info.plist를 발급 받았는데, Xcode info.plist에서는 이전 URLScheme을 사용하고 있었음.
-- info.plist의 URLScheme를 최신 버전으로 수정함.
-- 2차와 동일하게 답신과 구글 로그인이 잘 작동하는 영상을 첨부해서 보냄.
-
-<img width="800" src="https://github.com/user-attachments/assets/765b0973-3584-4aea-846b-7b6c075d83d2">
-
-## ✅ 결과
-- 출시 성공.
+[4️⃣ AppStore 심사 거절 이슈: 구글 로그인 문제](https://github.com/zzangmmz/zzimtory/blob/main/.github/trouble/reject_3.md)
 
 ---
 ## 🎨 와이어프레임 & 브레인스토밍
